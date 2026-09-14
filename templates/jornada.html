@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+Jornada
+{% endblock %}
+
+
+{% block content %}
+
+<body style="background-color:rgb(19 31 36);"></body>>
+<div class="max-w-5xl mx-auto px-4 py-10 ">
+    <section
+        class="
+        bg-indigo-800
+        text-white
+        rounded-3xl
+        p-6
+        md:p-10
+        "
+    ><img
+                src="https://i.pinimg.com/originals/b8/a1/1d/b8a11dffb22f55874cc0f3dc0e747bd8.gif"
+                alt=""
+                class="
+                    w-full
+                    max-w-[260px]
+                    h-auto
+                    object-contain
+
+                "
+
+                
+            >  <h1 class="relative font-black text-7xl  ">
+        Jornada 
+    </h1>
+ </section>
+
+
+
+    
+
+   
+    <p class="text-slate-500 mt-2 text-5xl text-center text-white">
+        Escolha um ano para continuar aprendendo.
+    </p>
+
+
+    <div class="grid md:grid-cols-2 gap-5 mt-8 ">
+
+        {% for ano_id, ano in anos %}
+
+        <a
+            href="{{ url_for('ano', ano_id=ano_id) }}"
+            class="
+            group
+            bg-white
+            border
+            rounded-3xl
+            p-6
+            hover:bg-indigo-500
+            rounded transition-all duration-300 ease-in-out hover:scale-105
+            
+          
+
+            "
+        >
+
+            <div class="flex justify-between gap-4 " >
+
+                <div>
+
+                    <div class="text-4xl">
+                        {{ ano.icone }}
+                        
+                    </div>
+
+                    <h2 class=" relative text-2xl font-black mt-3 group-hover:text-white transition-transform duration-1000 ease-in-out group-hover:translate-x-[140px]  group-hover:text-4xl 
+                               ">
+                        {{ ano.nome }}
+                    </h2>
+
+                    <p class="text-slate-500 group-hover:text-white transition-transform duration-1000 ease-in-out group-hover:translate-x-[110px]   ">
+                        {{ ano.descricao }}
+                    </p>
+
+                </div>
+
+                <strong class=" text-indigo-600 group-hover:text-white ">
+                    {{ progresso_anos.get(ano_id, 0) }}%
+                </strong>
+
+           
+
+
+                <div
+                    class="
+                    bg-indigo-600
+                    h-full
+                    rounded-full
+                    "
+                    ></div>
+                   
+                  
+                     </div>
+
+            
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

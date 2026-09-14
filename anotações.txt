@@ -1,0 +1,78 @@
+
+
+bcc base dos assuntos por unidade ensino fundamental
+
+1 primeiro ano assuntos
+
+tema[NUMEROS]
+->Composição e Decomposição
+->Problemas de Adição
+->Subtração
+
+tema[GEOMETRIA]
+-> Figuras geometricas planas
+
+tema[GRANDEZAS E MEDIDAS] 
+-> noção de tempo e Calendario
+->sistema monetario cedulas e moedas
+
+tema[probabilidade e estatistica]
+->probabilidade
+->analise de graficos
+
+2 ano assuntos
+
+tema[NUMEROS] 
+
+->numeros decimais
+->introção a multiplicação
+->multiplicação
+->dobro metade triplo e terça parte
+->adição 
+->Subtração
+->comparação de quantidades
+->igualdade e equivalencia
+
+tema[GEOMETRIA]
+->reconhecimentos figuras solidas geometricas
+->figuras planas lados e vertice
+
+tema[GRANDEZAS E NEDIDAS] 
+-> medição de comprimento
+-> capacidade e massas padronizadas
+
+3 terceiro ano assuntos
+
+tema[NUMEROS] 
+
+->leitura e escrita unidade de milhar 
+->Decomposição ate 4 ordens
+->problema com 4 operações
+->problema com divisao 
+->problema multiplicação avançada
+->fração
+
+tema[GEOMETRIA]
+->classificação de polignos
+
+tema[GRANDEZA E MEDIDAS] 
+->escala de temperatura Celsius
+-> escala de horas e minutos
+
+4 ano assuntos
+
+ tema[GEOMETRIA]
+->angulos
+
+tema[GRANDEZAS E MEDIDAS] 
+->perimetro e area
+
+5 ano assuntos
+
+tema[ALGEBRA ] 
+-> grandeza diretamentte propocionais
+-> plano cartesiano 
+-> poliedros
+-> conversao de unidade Medidas
+->volume
+-> analisar grafico de barras e pizza

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-md mx-auto px-4 py-12">
+
+    <div class="text-center">
+
+        <div class="text-6xl">
+            🚪
+        </div>
+
+        <h1 class="text-4xl font-black mt-4">
+            Entrar
+        </h1>
+
+    </div>
+
+
+    <form
+        method="POST"
+        class="
+        bg-white
+        border
+        rounded-3xl
+        p-6
+        mt-8
+        space-y-5
+        "
+    >
+
+        <div>
+
+            <label class="font-black">
+                Código da sala
+            </label>
+
+            <input
+                name="codigo"
+                inputmode="numeric"
+                maxlength="6"
+                required
+                placeholder="123456"
+                class="
+                w-full
+                border-2
+                rounded-2xl
+                p-4
+                mt-2
+                text-center
+                text-3xl
+                tracking-widest
+                font-black
+                "
+            >
+
+        </div>
+
+
+        <div>
+
+            <label class="font-black">
+                Seu apelido
+            </label>
+
+            <input
+                name="apelido"
+                maxlength="20"
+                placeholder="{{ current_user.nome }}"
+                class="
+                w-full
+                border
+                rounded-2xl
+                p-4
+                mt-2
+                "
+            >
+
+        </div>
+
+
+        <button
+            class="
+            w-full
+            bg-indigo-600
+            text-white
+            font-black
+            rounded-2xl
+            p-4
+            "
+        >
+            Entrar na partida
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

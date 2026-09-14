@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body style="background-color:rgb(19 31 36);"></body>
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+    <a
+        href="{{ url_for('ano', ano_id=ano_id) }}"
+        class="text-indigo-600 font-bold bg-indigo-500 "
+    >
+        ← {{ ano.nome }}
+    </a>
+
+
+    <h1 class="text-4xl font-black mt-5">
+        {{ tema.icone }} {{ tema.nome }}
+    </h1>
+
+
+    <div class="space-y-4 mt-8">
+
+        {% for assunto_id, assunto in tema.assuntos.items() %}
+
+            {% set progresso = progressos.get(assunto_id) %}
+
+            <a
+                href="{{
+                    url_for(
+                        'assunto',
+                        ano_id=ano_id,
+                        tema_id=tema_id,
+                        assunto_id=assunto_id
+                    )
+                }}"
+                class="
+                group
+                block
+                bg-white
+                border
+                rounded-3xl
+                p-6
+                rounded transition-all duration-300 ease-in-out hover:scale-95
+                "
+            >
+
+                <div
+                    class="
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                    "
+                >
+
+                    <div>
+
+                        <h2 class="text-xl font-black group-hover:text-blue transition-transform duration-1000 ease-in-out group-hover:translate-x-[310px]">
+                            {{ assunto.nome }}
+                        </h2>
+
+                        <p class="text-slate-500 mt-1 group-hover:text-red transition-transform duration-1000 ease-in-out group-hover:translate-x-[310px]">
+                            {{ assunto.descricao }}
+                        </p>
+
+                        <p
+                            class="
+                            text-sm
+                            font-bold
+                            text-indigo-600
+                            mt-3
+                            group-hover:text-red transition-transform duration-1000 ease-in-out group-hover:translate-x-[380px]
+                            "
+                        >
+                            {{ assunto.etapas|length }}
+                            etapas
+                        </p>
+
+                    </div>
+
+
+                    {% if progresso and progresso.concluido %}
+
+                        <div class="text-3xl">
+                            🏆
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-3xl">
+                            ➜
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

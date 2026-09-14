@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        FlashMatty
+        {% endblock %}
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+{% if current_user.is_authenticated %}
+
+<header class="bg-white border-b">
+
+    <div
+        class="
+        max-w-6xl
+        mx-auto
+        px-4
+        py-3
+        flex
+        flex-wrap
+        gap-4
+        items-center
+        justify-between
+        "
+    >
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="font-black text-xl text-indigo-600"
+        >
+            FlashMatty
+        </a>
+
+        <nav
+            class="
+            flex
+            flex-wrap
+            items-center
+            gap-4
+            text-sm
+            font-bold
+            "
+        >
+
+            <a href="{{ url_for('jornada') }}">
+                Jornada
+            </a>
+
+            <a href="{{ url_for('biblioteca') }}">
+                Biblioteca
+            </a>
+
+            <span>
+                ⭐ {{ current_user.xp or 0 }} XP
+            </span>
+
+            <span>
+                🪙 {{ current_user.moedas or 0 }}
+            </span>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="text-red-500"
+            >
+                Sair
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+{% endif %}
+
+
+{% with mensagens = get_flashed_messages() %}
+
+    {% if mensagens %}
+
+        <div class="max-w-4xl mx-auto px-4 pt-4">
+
+            {% for mensagem in mensagens %}
+
+                <div
+                    class="
+                    bg-yellow-100
+                    border
+                    border-yellow-300
+                    rounded-xl
+                    p-3
+                    mb-2
+                    "
+                >
+                    {{ mensagem }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+
+<main>
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+</body>
+
+</html>

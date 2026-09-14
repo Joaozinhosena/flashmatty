@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+    <h1 class="text-4xl font-black">
+        Biblioteca 📚
+    </h1>
+
+    <p class="text-slate-500 mt-2">
+        Acompanhe seu desenvolvimento.
+    </p>
+
+
+    <div
+        class="
+        grid
+        grid-cols-2
+        lg:grid-cols-4
+        gap-4
+        mt-8
+        "
+    >
+
+        <div class="bg-white border rounded-2xl p-5">
+
+            <p class="text-slate-500">
+                XP
+            </p>
+
+            <strong class="text-2xl">
+                {{ current_user.xp or 0 }}
+            </strong>
+
+        </div>
+
+
+        <div class="bg-white border rounded-2xl p-5">
+
+            <p class="text-slate-500">
+                Etapas
+            </p>
+
+            <strong class="text-2xl">
+                {{ etapas_concluidas }}
+            </strong>
+
+        </div>
+
+
+        <div class="bg-white border rounded-2xl p-5">
+
+            <p class="text-slate-500">
+                Assuntos
+            </p>
+
+            <strong class="text-2xl">
+
+                {{ assuntos_concluidos }}
+                /
+                {{ total_assuntos }}
+
+            </strong>
+
+        </div>
+
+
+        <div class="bg-white border rounded-2xl p-5">
+
+            <p class="text-slate-500">
+                Jornada
+            </p>
+
+            <strong class="text-2xl">
+                {{ progresso_geral }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <section class="mt-10">
+
+        <h2 class="text-2xl font-black">
+            Atividade recente
+        </h2>
+
+
+        <div class="space-y-3 mt-5">
+
+            {% for item in historico %}
+
+            <div
+                class="
+                bg-white
+                border
+                rounded-2xl
+                p-4
+                "
+            >
+
+                <div class="flex justify-between gap-4">
+
+                    <div>
+
+                        <p class="font-bold">
+                            {{ item.pergunta }}
+                        </p>
+
+                        <p class="text-sm text-slate-500 mt-1">
+
+                            Sua resposta:
+                            {{ item.resposta_usuario }}
+
+                        </p>
+
+                    </div>
+
+
+                    {% if item.acertou %}
+
+                        <span class="text-green-500 text-2xl">
+                            ✓
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-red-500 text-2xl">
+                            ✕
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <p class="text-slate-500">
+                Você ainda não respondeu exercícios.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

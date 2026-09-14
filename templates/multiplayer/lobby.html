@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div
+    id="lobby"
+    data-codigo="{{ codigo }}"
+    data-jogador="{{ jogador_id }}"
+    data-host="{{ 'true' if host else 'false' }}"
+    class="max-w-4xl mx-auto px-4 py-10"
+>
+
+    <div class="text-center">
+
+        <p class="text-slate-500 font-bold">
+            CÓDIGO DA SALA
+        </p>
+
+        <h1
+            class="
+            text-5xl
+            md:text-7xl
+            font-black
+            tracking-widest
+            mt-2
+            "
+        >
+            {{ codigo }}
+        </h1>
+
+        <p class="text-slate-500 mt-3">
+            Compartilhe este código com seus amigos.
+        </p>
+
+    </div>
+
+
+    <div
+        class="
+        bg-white
+        border
+        rounded-3xl
+        p-6
+        mt-10
+        "
+    >
+
+        <div class="flex justify-between">
+
+            <h2 class="text-2xl font-black">
+                Jogadores
+            </h2>
+
+            <span
+                id="quantidadeJogadores"
+                class="font-black text-indigo-600"
+            >
+                0
+            </span>
+
+        </div>
+
+
+        <div
+            id="listaJogadores"
+            class="
+            grid
+            grid-cols-2
+            md:grid-cols-3
+            gap-3
+            mt-6
+            "
+        ></div>
+
+    </div>
+
+
+    {% if host %}
+
+    <button
+        id="iniciarPartida"
+        type="button"
+        class="
+        w-full
+        bg-green-500
+        text-white
+        rounded-2xl
+        p-5
+        mt-6
+        text-xl
+        font-black
+        "
+    >
+        ▶ Iniciar partida
+    </button>
+
+    {% else %}
+
+    <div
+        class="
+        text-center
+        bg-indigo-50
+        rounded-2xl
+        p-5
+        mt-6
+        font-bold
+        "
+    >
+        ⏳ Aguardando o anfitrião iniciar...
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script
+    src="{{
+        url_for(
+            'static',
+            filename='js/multiplayer/lobby.js'
+        )
+    }}"
+></script>
+
+{% endblock %}

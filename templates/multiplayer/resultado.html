@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div
+    id="resultado"
+    data-codigo="{{ codigo }}"
+    class="
+    max-w-3xl
+    mx-auto
+    px-4
+    py-12
+    text-center
+    "
+>
+
+    <div class="text-7xl">
+        🏆
+    </div>
+
+    <h1 class="text-4xl font-black mt-4">
+        Fim da partida!
+    </h1>
+
+    <div
+        id="podio"
+        class="mt-10"
+    >
+        Carregando resultado...
+    </div>
+
+
+    <a
+        href="{{ url_for('multiplayer.inicio') }}"
+        class="
+        block
+        bg-indigo-600
+        text-white
+        rounded-2xl
+        p-4
+        mt-10
+        font-black
+        "
+    >
+        Jogar novamente
+    </a>
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script>
+
+const resultado =
+    document.getElementById(
+        "resultado"
+    );
+
+const codigo =
+    resultado.dataset.codigo;
+
+const podio =
+    document.getElementById(
+        "podio"
+    );
+
+const socket =
+    io();
+
+
+socket.on(
+    "connect",
+    () => {
+
+        /*
+        A página final pode ter sido
+        carregada depois do último evento.
+
+        Por enquanto mostramos o resultado
+        quando o servidor enviar novamente.
+        */
+
+        socket.emit(
+            "pedir_ranking",
+            {
+                codigo: codigo
+            }
+        );
+    }
+);
+
+
+socket.on(
+    "ranking_final",
+    dados => {
+
+        let html = "";
+
+
+        dados.ranking.forEach(
+            jogador => {
+
+                let medalha =
+                    `${jogador.posicao}º`;
+
+
+                if (
+                    jogador.posicao === 1
+                ) {
+                    medalha = "🥇";
+                }
+
+                if (
+                    jogador.posicao === 2
+                ) {
+                    medalha = "🥈";
+                }
+
+                if (
+                    jogador.posicao === 3
+                ) {
+                    medalha = "🥉";
+                }
+
+
+                html += `
+                    <div
+                        class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
+                        bg-white
+                        border
+                        rounded-2xl
+                        p-5
+                        mb-3
+                        "
+                    >
+
+                        <div
+                            class="
+                            flex
+                            items-center
+                            gap-4
+                            "
+                        >
+
+                            <div class="text-3xl">
+                                ${medalha}
+                            </div>
+
+                            <div class="text-left">
+
+                                <strong class="text-lg">
+                                    ${jogador.nome}
+                                </strong>
+
+                                <p class="text-sm text-slate-500">
+                                    ${jogador.acertos}
+                                    acertos
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <strong
+                            class="
+                            text-xl
+                            text-indigo-600
+                            "
+                        >
+                            ${jogador.pontos}
+                        </strong>
+
+                    </div>
+                `;
+            }
+        );
+
+
+        podio.innerHTML =
+            html;
+    }
+);
+
+</script>
+
+{% endblock %}

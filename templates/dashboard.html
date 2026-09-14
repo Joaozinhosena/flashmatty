@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}
+Início
+{% endblock %}
+
+
+{% block content %}
+<body style="background-color:rgb(19 31 36);"></body>
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+    <section
+        class="
+        bg-indigo-600
+        text-white
+        rounded-3xl
+        p-6
+        md:p-10
+        "
+    >
+
+        <p class="font-bold opacity-80">
+            Olá,
+        </p>
+
+        <h1 class="text-3xl md:text-5xl font-black">
+            {{ current_user.nome }} 👋
+        </h1>
+
+        <div class="flex flex-wrap gap-4 mt-8">
+
+            <div class="bg-white/10 rounded-xl p-4">
+                Nível
+                <strong class="block text-2xl">
+                    {{ current_user.nivel }}
+                </strong>
+            </div>
+
+            <div class="bg-white/10 rounded-xl p-4">
+                XP
+                <strong class="block text-2xl">
+                    {{ current_user.xp or 0 }}
+                </strong>
+            </div>
+
+            <div class="bg-white/10 rounded-xl p-4">
+                Precisão
+                <strong class="block text-2xl">
+                    {{ current_user.precisao }}%
+                </strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="grid md:grid-cols-2 gap-5 mt-8">
+
+        <a
+            href="{{ url_for('jornada') }}"
+            class="
+            bg-white
+            border
+            rounded-3xl
+            p-7
+            hover:border-indigo-400
+            "
+        >
+
+            <div class="text-4xl">
+
+                 <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLuChs4XQuFEx06_gPUj5-QcZBbYaRIp502HHO9VdiOg2vVs--8_L6bZk&s=10"
+                alt="Pinguim"
+                class="
+                    w-full
+                    max-w-[260px]
+                    h-auto
+                    object-contain
+                "
+            >
+                
+            </div>
+
+            <h2 class="font-black text-2xl mt-3">
+                Jornada
+            </h2>
+
+            <p class="text-slate-500 mt-2">
+                Continue sua trilha de aprendizado.
+            </p>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('biblioteca') }}"
+            class="
+            bg-white
+            border
+            rounded-3xl
+            p-7
+            hover:border-indigo-400
+            "
+        >
+
+            <div class="text-4xl">
+
+                 <img
+                src="https://64.media.tumblr.com/bbbf37b965bdac4fa6dbfeb18e8d707e/b04f5bab00b82903-11/s500x750/50d847950b13ca8dae47ad2a0ace031920da7d15.gifv"
+                alt="Pinguim"
+                class="
+                    w-full
+                    max-w-[360px]
+                    h-auto
+                    object-contain
+                "
+            >
+                
+            </div>
+
+            <h2 class="font-black text-2xl mt-3">
+                Biblioteca
+            </h2>
+
+            <p class="text-slate-500 mt-2">
+                Veja seu progresso.
+            </p>
+
+        </a>
+        
+
+
+
+        <a
+    href="{{ url_for('multiplayer.inicio') }}"
+    class="
+    bg-white
+    border
+    rounded-3xl
+    p-7
+    hover:border-indigo-400
+    "
+>
+
+    <div class="text-4xl">
+        🎮
+    </div>
+
+    <h2 class="font-black text-2xl mt-3">
+        Jogar com amigos
+    </h2>
+
+    <p class="text-slate-500 mt-2">
+        Crie uma sala e desafie seus amigos.
+    </p>
+
+</a>
+
+
+
+                                  
+
+    </div>
+
+</div>
+
+{% endblock %}

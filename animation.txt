@@ -1,0 +1,11 @@
+organizacao animacao container padronizadas
+
+
+mudar plano de fundo ao passar o mouse
+
+hover:bg-indigo-500
+
+
+
+animacao suave
+rounded transition-all duration-300 ease-in-out hover:scale-105

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+Jogar com amigos
+{% endblock %}
+
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-12">
+
+    <div class="text-center">
+
+        <div class="text-7xl">
+            🎮
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-black mt-5">
+            Jogar com amigos
+        </h1>
+
+        <p class="text-slate-500 mt-3">
+            Crie uma sala ou entre em uma partida.
+        </p>
+
+    </div>
+
+
+    <div class="grid md:grid-cols-2 gap-5 mt-10">
+
+        <a
+            href="{{ url_for('multiplayer.criar') }}"
+            class="
+            bg-indigo-600
+            text-white
+            rounded-3xl
+            p-8
+            text-center
+            "
+        >
+
+            <div class="text-5xl">
+                👑
+            </div>
+
+            <h2 class="text-2xl font-black mt-4">
+                Criar sala
+            </h2>
+
+            <p class="mt-2 opacity-80">
+                Você será o anfitrião.
+            </p>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('multiplayer.entrar') }}"
+            class="
+            bg-white
+            border-2
+            border-indigo-200
+            rounded-3xl
+            p-8
+            text-center
+            "
+        >
+
+            <div class="text-5xl">
+                🚪
+            </div>
+
+            <h2 class="text-2xl font-black mt-4">
+                Entrar na sala
+            </h2>
+
+            <p class="text-slate-500 mt-2">
+                Use o código dos seus amigos.
+            </p>
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div
+    id="multiplayerGame"
+    data-codigo="{{ codigo }}"
+    data-jogador="{{ jogador_id }}"
+    data-host="{{ 'true' if host else 'false' }}"
+    class="max-w-4xl mx-auto px-4 py-8"
+>
+
+    <div
+        class="
+        flex
+        justify-between
+        items-center
+        gap-4
+        "
+    >
+
+        <div class="font-black">
+            Rodada
+            <span id="rodada">-</span>
+            /
+            <span id="total">-</span>
+        </div>
+
+
+        <div
+            id="cronometro"
+            class="
+            text-2xl
+            font-black
+            "
+        >
+            ⏱️ --
+        </div>
+
+    </div>
+
+
+    <div
+        class="
+        bg-slate-200
+        h-3
+        rounded-full
+        mt-4
+        overflow-hidden
+        "
+    >
+
+        <div
+            id="tempoBarra"
+            class="
+            bg-indigo-500
+            h-full
+            "
+            style="width:100%"
+        ></div>
+
+    </div>
+
+
+    <section
+        id="areaPergunta"
+        class="mt-10"
+    >
+
+        <div class="text-center py-16">
+
+            <div class="text-6xl">
+                🎮
+            </div>
+
+            <p class="font-black mt-4">
+                Preparando partida...
+            </p>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script
+    src="{{
+        url_for(
+            'static',
+            filename='js/multiplayer/jogo.js'
+        )
+    }}"
+></script>
+
+{% endblock %}
