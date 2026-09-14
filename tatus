@@ -1,0 +1,87 @@
+[35m.gitignore[m[36m:[m[32m431[m[36m:[m[1;31m=======[m
+[35m.gitignore[m[36m:[m[32m439[m[36m:[m[1;31m>>>>>>>[m 7d2e41f (Adiciona requirements para Render)
+[35mapp.py[m[36m:[m[32m1434[m[36m:[m[1;31m=======[m
+[35mapp.py[m[36m:[m[32m2867[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mgame.py[m[36m:[m[32m925[m[36m:[m[1;31m=======[m
+[35mgame.py[m[36m:[m[32m1849[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmodels.py[m[36m:[m[32m337[m[36m:[m[1;31m=======[m
+[35mmodels.py[m[36m:[m[32m673[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmultiplayer/questions.py[m[36m:[m[32m378[m[36m:[m[1;31m=======[m
+[35mmultiplayer/questions.py[m[36m:[m[32m755[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmultiplayer/room_manager.py[m[36m:[m[32m221[m[36m:[m[1;31m=======[m
+[35mmultiplayer/room_manager.py[m[36m:[m[32m441[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmultiplayer/routes.py[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mmultiplayer/routes.py[m[36m:[m[32m404[m[36m:[m[1;31m=======[m
+[35mmultiplayer/routes.py[m[36m:[m[32m807[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmultiplayer/scoring.py[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mmultiplayer/scoring.py[m[36m:[m[32m99[m[36m:[m[1;31m=======[m
+[35mmultiplayer/scoring.py[m[36m:[m[32m197[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mmultiplayer/socket_events.py[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mmultiplayer/socket_events.py[m[36m:[m[32m868[m[36m:[m[1;31m=======[m
+[35mmultiplayer/socket_events.py[m[36m:[m[32m1735[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mstatic/js/etapa.js[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mstatic/js/etapa.js[m[36m:[m[32m360[m[36m:[m[1;31m=======[m
+[35mstatic/js/etapa.js[m[36m:[m[32m719[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mstatic/js/exercicio.js[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mstatic/js/exercicio.js[m[36m:[m[32m270[m[36m:[m[1;31m=======[m
+[35mstatic/js/exercicio.js[m[36m:[m[32m539[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mstatic/js/game.js[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mstatic/js/game.js[m[36m:[m[32m168[m[36m:[m[1;31m=======[m
+[35mstatic/js/game.js[m[36m:[m[32m335[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mstatic/js/multiplayer/jogo.js[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mstatic/js/multiplayer/jogo.js[m[36m:[m[32m569[m[36m:[m[1;31m=======[m
+[35mstatic/js/multiplayer/jogo.js[m[36m:[m[32m1137[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mstatic/js/multiplayer/lobby.js[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mstatic/js/multiplayer/lobby.js[m[36m:[m[32m166[m[36m:[m[1;31m=======[m
+[35mstatic/js/multiplayer/lobby.js[m[36m:[m[32m331[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/ano.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/ano.html[m[36m:[m[32m69[m[36m:[m[1;31m=======[m
+[35mtemplates/ano.html[m[36m:[m[32m137[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/assunto.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/assunto.html[m[36m:[m[32m208[m[36m:[m[1;31m=======[m
+[35mtemplates/assunto.html[m[36m:[m[32m415[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/base.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/base.html[m[36m:[m[32m134[m[36m:[m[1;31m=======[m
+[35mtemplates/base.html[m[36m:[m[32m267[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/biblioteca.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/biblioteca.html[m[36m:[m[32m155[m[36m:[m[1;31m=======[m
+[35mtemplates/biblioteca.html[m[36m:[m[32m309[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/cadastro.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/cadastro.html[m[36m:[m[32m544[m[36m:[m[1;31m=======[m
+[35mtemplates/cadastro.html[m[36m:[m[32m1087[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/dashboard.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/dashboard.html[m[36m:[m[32m170[m[36m:[m[1;31m=======[m
+[35mtemplates/dashboard.html[m[36m:[m[32m339[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/etapa.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/etapa.html[m[36m:[m[32m191[m[36m:[m[1;31m=======[m
+[35mtemplates/etapa.html[m[36m:[m[32m381[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/exercicio.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/exercicio.html[m[36m:[m[32m214[m[36m:[m[1;31m=======[m
+[35mtemplates/exercicio.html[m[36m:[m[32m427[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/jornada.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/jornada.html[m[36m:[m[32m116[m[36m:[m[1;31m=======[m
+[35mtemplates/jornada.html[m[36m:[m[32m231[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/login.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/login.html[m[36m:[m[32m154[m[36m:[m[1;31m=======[m
+[35mtemplates/login.html[m[36m:[m[32m307[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/criar.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/criar.html[m[36m:[m[32m193[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/criar.html[m[36m:[m[32m385[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/entrar.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/entrar.html[m[36m:[m[32m100[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/entrar.html[m[36m:[m[32m199[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/inicio.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/inicio.html[m[36m:[m[32m88[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/inicio.html[m[36m:[m[32m175[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/jogo.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/jogo.html[m[36m:[m[32m99[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/jogo.html[m[36m:[m[32m197[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/lobby.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/lobby.html[m[36m:[m[32m129[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/lobby.html[m[36m:[m[32m257[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/multiplayer/resultado.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/multiplayer/resultado.html[m[36m:[m[32m192[m[36m:[m[1;31m=======[m
+[35mtemplates/multiplayer/resultado.html[m[36m:[m[32m383[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
+[35mtemplates/tema.html[m[36m:[m[32m1[m[36m:[m[1;31m<<<<<<<[m HEAD
+[35mtemplates/tema.html[m[36m:[m[32m106[m[36m:[m[1;31m=======[m
+[35mtemplates/tema.html[m[36m:[m[32m211[m[36m:[m[1;31m>>>>>>>[m c586ec33b8576a9c96f6e3427ee96206b782b68a
