@@ -34,7 +34,10 @@ from models import (
 from curriculum import CURRICULO
 from game import gerar_questao
 
+# ============================================================
 # MULTIPLAYER
+# ============================================================
+
 from multiplayer import socketio
 from multiplayer.routes import multiplayer_bp
 
@@ -46,8 +49,14 @@ from multiplayer.routes import multiplayer_bp
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "matematica-kids-desenvolvimento"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///matematica.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "sqlite:///matematica.db"
+
+app.config[
+    "SQLALCHEMY_TRACK_MODIFICATIONS"
+] = False
 
 
 # ============================================================
@@ -55,6 +64,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # ============================================================
 
 db.init_app(app)
+
 
 # ============================================================
 # LOGIN
@@ -66,23 +76,26 @@ login_manager.init_app(app)
 
 login_manager.login_view = "login"
 
-login_manager.login_message = "Faça login para continuar."
+login_manager.login_message = (
+    "Faça login para continuar."
+)
 
 
 @login_manager.user_loader
 def carregar_usuario(user_id):
-    """
-    Informa ao Flask-Login como recuperar o usuário
-    salvo na sessão.
-    """
 
     try:
+
         return db.session.get(
             Usuario,
             int(user_id)
         )
 
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
+
         return None
 
 
@@ -99,96 +112,150 @@ app.register_blueprint(
     multiplayer_bp
 )
 
-# Importa os eventos somente depois de
-# SocketIO e Blueprint estarem configurados.
+# IMPORTANTE:
+# eventos somente depois de configurar SocketIO
 import multiplayer.socket_events
 
 
 # ============================================================
-# BANCO - CRIA TABELAS
+# CRIAR TABELAS
 # ============================================================
 
 with app.app_context():
+
     db.create_all()
 
 
-
-    
 # ============================================================
-# FUNÇÕES
+# BUSCAR ANO
 # ============================================================
 
 def buscar_ano(ano_id):
 
-    ano = CURRICULO.get(ano_id)
+    ano = CURRICULO.get(
+        ano_id
+    )
 
     if not ano:
+
         abort(404)
 
     return ano
 
+
+# ============================================================
+# BUSCAR TEMA
+# ============================================================
 
 def buscar_tema(
     ano,
     tema_id
 ):
 
-    tema = ano.get(
-        "temas",
-        {}
-    ).get(
-        tema_id
+    tema = (
+        ano
+        .get(
+            "temas",
+            {}
+        )
+        .get(
+            tema_id
+        )
     )
 
     if not tema:
+
         abort(404)
 
     return tema
 
+
+# ============================================================
+# BUSCAR ASSUNTO
+# ============================================================
 
 def buscar_assunto(
     tema,
     assunto_id
 ):
 
-    assunto = tema.get(
-        "assuntos",
-        {}
-    ).get(
-        assunto_id
+    assunto = (
+        tema
+        .get(
+            "assuntos",
+            {}
+        )
+        .get(
+            assunto_id
+        )
     )
 
     if not assunto:
+
         abort(404)
 
     return assunto
 
+
+# ============================================================
+# BUSCAR ETAPA
+# ============================================================
 
 def buscar_etapa(
     assunto,
     etapa_id
 ):
 
-    etapa = assunto.get(
-        "etapas",
-        {}
-    ).get(
-        etapa_id
+    etapa = (
+        assunto
+        .get(
+            "etapas",
+            {}
+        )
+        .get(
+            etapa_id
+        )
     )
 
     if not etapa:
+
         abort(404)
 
     return etapa
 
 
-def corrigir_usuario(usuario):
+# ============================================================
+# CORRIGIR VALORES NULOS DO USUÁRIO
+# ============================================================
 
-    usuario.xp = usuario.xp or 0
-    usuario.moedas = usuario.moedas or 0
-    usuario.acertos = usuario.acertos or 0
-    usuario.erros = usuario.erros or 0
+def corrigir_usuario(
+    usuario
+):
 
+    usuario.xp = (
+        usuario.xp
+        or 0
+    )
+
+    usuario.moedas = (
+        usuario.moedas
+        or 0
+    )
+
+    usuario.acertos = (
+        usuario.acertos
+        or 0
+    )
+
+    usuario.erros = (
+        usuario.erros
+        or 0
+    )
+
+
+# ============================================================
+# PROGRESSO DA ETAPA
+# ============================================================
 
 def obter_progresso_etapa(
     ano_id,
@@ -201,28 +268,49 @@ def obter_progresso_etapa(
     progresso = (
         ProgressoEtapa.query
         .filter_by(
-            usuario_id=current_user.id,
-            ano=ano_id,
-            tema=tema_id,
-            assunto=assunto_id,
-            etapa=etapa_id
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                ano_id,
+
+            tema=
+                tema_id,
+
+            assunto=
+                assunto_id,
+
+            etapa=
+                etapa_id
+
         )
         .first()
     )
 
-    if not progresso and criar:
+
+    if (
+        not progresso
+        and
+        criar
+    ):
 
         progresso = ProgressoEtapa(
 
-            usuario_id=current_user.id,
+            usuario_id=
+                current_user.id,
 
-            ano=ano_id,
+            ano=
+                ano_id,
 
-            tema=tema_id,
+            tema=
+                tema_id,
 
-            assunto=assunto_id,
+            assunto=
+                assunto_id,
 
-            etapa=etapa_id,
+            etapa=
+                etapa_id,
 
             acertos=0,
 
@@ -241,8 +329,13 @@ def obter_progresso_etapa(
             progresso
         )
 
+
     return progresso
 
+
+# ============================================================
+# PROGRESSO DO ASSUNTO
+# ============================================================
 
 def obter_progresso_assunto(
     ano_id,
@@ -254,35 +347,61 @@ def obter_progresso_assunto(
     progresso = (
         ProgressoAssunto.query
         .filter_by(
-            usuario_id=current_user.id,
-            ano=ano_id,
-            tema=tema_id,
-            assunto=assunto_id
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                ano_id,
+
+            tema=
+                tema_id,
+
+            assunto=
+                assunto_id
+
         )
         .first()
     )
 
-    if not progresso and criar:
 
-        progresso = ProgressoAssunto(
+    if (
+        not progresso
+        and
+        criar
+    ):
 
-            usuario_id=current_user.id,
+        progresso = (
+            ProgressoAssunto(
 
-            ano=ano_id,
+                usuario_id=
+                    current_user.id,
 
-            tema=tema_id,
+                ano=
+                    ano_id,
 
-            assunto=assunto_id,
+                tema=
+                    tema_id,
 
-            concluido=False
+                assunto=
+                    assunto_id,
+
+                concluido=False
+            )
         )
+
 
         db.session.add(
             progresso
         )
 
+
     return progresso
 
+
+# ============================================================
+# VERIFICAR SE ETAPA ESTÁ LIBERADA
+# ============================================================
 
 def etapa_liberada(
     assunto,
@@ -293,36 +412,61 @@ def etapa_liberada(
 ):
 
     ids = list(
-        assunto["etapas"].keys()
+        assunto[
+            "etapas"
+        ].keys()
     )
+
+
+    if etapa_id not in ids:
+
+        return False
+
 
     indice = ids.index(
         etapa_id
     )
 
-    # Primeira etapa sempre liberada
+
+    # PRIMEIRA ETAPA SEMPRE LIBERADA
+
     if indice == 0:
+
         return True
+
 
     etapa_anterior = ids[
         indice - 1
     ]
 
+
     progresso_anterior = (
         obter_progresso_etapa(
+
             ano_id,
+
             tema_id,
+
             assunto_id,
+
             etapa_anterior
         )
     )
 
+
     return bool(
+
         progresso_anterior
+
         and
+
         progresso_anterior.concluida
     )
 
+
+# ============================================================
+# ATUALIZAR CONCLUSÃO DO ASSUNTO
+# ============================================================
 
 def atualizar_assunto(
     ano_id,
@@ -333,14 +477,20 @@ def atualizar_assunto(
 
     progresso_assunto = (
         obter_progresso_assunto(
+
             ano_id,
+
             tema_id,
+
             assunto_id,
+
             criar=True
         )
     )
 
+
     todas_concluidas = True
+
 
     for etapa_id in assunto[
         "etapas"
@@ -348,12 +498,17 @@ def atualizar_assunto(
 
         progresso = (
             obter_progresso_etapa(
+
                 ano_id,
+
                 tema_id,
+
                 assunto_id,
+
                 etapa_id
             )
         )
+
 
         if (
             not progresso
@@ -362,14 +517,251 @@ def atualizar_assunto(
         ):
 
             todas_concluidas = False
+
             break
 
-    # Uma vez concluído, permanece concluído.
+
+    # Uma vez concluído, permanece concluído
+
     if todas_concluidas:
 
         progresso_assunto.concluido = True
 
+
     return progresso_assunto
+
+
+# ============================================================
+# QUESTÃO PÚBLICA
+# ============================================================
+
+def questao_publica(
+    questao
+):
+
+    """
+    Remove a resposta correta antes de
+    enviar a questão para o navegador.
+    """
+
+    if not isinstance(
+        questao,
+        dict
+    ):
+
+        return {}
+
+
+    return {
+
+        chave:
+            valor
+
+        for chave, valor
+        in questao.items()
+
+        if chave != "resposta"
+    }
+
+
+# ============================================================
+# NORMALIZAR RESPOSTA
+# ============================================================
+
+def normalizar_resposta(
+    valor
+):
+
+    # --------------------------------------------------------
+    # ASSOCIAÇÃO
+    # --------------------------------------------------------
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return {
+
+            str(chave)
+            .strip()
+            .casefold():
+
+                normalizar_resposta(
+                    conteudo
+                )
+
+            for chave, conteudo
+            in sorted(
+
+                valor.items(),
+
+                key=lambda item:
+                    str(
+                        item[0]
+                    )
+            )
+        }
+
+
+    # --------------------------------------------------------
+    # ORDENAÇÃO
+    # --------------------------------------------------------
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return [
+
+            normalizar_resposta(
+                item
+            )
+
+            for item
+            in valor
+        ]
+
+
+    # --------------------------------------------------------
+    # NULO
+    # --------------------------------------------------------
+
+    if valor is None:
+
+        return ""
+
+
+    # --------------------------------------------------------
+    # TEXTO / NÚMERO
+    # --------------------------------------------------------
+
+    return (
+
+        str(valor)
+
+        .strip()
+
+        .casefold()
+
+        .replace(
+            ",",
+            "."
+        )
+    )
+
+
+# ============================================================
+# COMPARAR RESPOSTAS
+# ============================================================
+
+def respostas_iguais(
+    resposta_usuario,
+    resposta_correta
+):
+
+    return (
+
+        normalizar_resposta(
+            resposta_usuario
+        )
+
+        ==
+
+        normalizar_resposta(
+            resposta_correta
+        )
+    )
+
+
+# ============================================================
+# CONVERTER RESPOSTA PARA TEXTO
+# ============================================================
+
+def resposta_para_texto(
+    valor
+):
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return "; ".join(
+
+            f"{chave} → {conteudo}"
+
+            for chave, conteudo
+            in valor.items()
+        )
+
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return " → ".join(
+
+            str(item)
+
+            for item
+            in valor
+        )
+
+
+    return str(
+        valor
+    )
+
+
+# ============================================================
+# VERIFICAR RESPOSTA VAZIA
+# ============================================================
+
+def resposta_vazia(
+    valor
+):
+
+    if valor is None:
+
+        return True
+
+
+    if isinstance(
+        valor,
+        str
+    ):
+
+        return not valor.strip()
+
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return (
+            len(valor)
+            ==
+            0
+        )
+
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return (
+            len(valor)
+            ==
+            0
+        )
+
+
+    return False
 
 
 # ============================================================
@@ -382,11 +774,16 @@ def index():
     if current_user.is_authenticated:
 
         return redirect(
-            url_for("dashboard")
+            url_for(
+                "dashboard"
+            )
         )
 
+
     return redirect(
-        url_for("login")
+        url_for(
+            "login"
+        )
     )
 
 
@@ -396,47 +793,75 @@ def index():
 
 @app.route(
     "/cadastro",
-    methods=["GET", "POST"]
+    methods=[
+        "GET",
+        "POST"
+    ]
 )
 def cadastro():
 
     if current_user.is_authenticated:
 
         return redirect(
-            url_for("dashboard")
+            url_for(
+                "dashboard"
+            )
         )
+
 
     if request.method == "POST":
 
-        nome = request.form.get(
-            "nome",
-            ""
-        ).strip()
+        nome = (
+            request.form
+            .get(
+                "nome",
+                ""
+            )
+            .strip()
+        )
 
-        username = request.form.get(
-            "username",
-            ""
-        ).strip()
+
+        username = (
+            request.form
+            .get(
+                "username",
+                ""
+            )
+            .strip()
+        )
+
 
         senha = request.form.get(
             "senha",
             ""
         )
 
+
         confirmar = request.form.get(
             "confirmar_senha",
             ""
         )
 
-        if not nome or not username or not senha:
+
+        if (
+            not nome
+            or
+            not username
+            or
+            not senha
+        ):
 
             flash(
                 "Preencha todos os campos."
             )
 
+
             return redirect(
-                url_for("cadastro")
+                url_for(
+                    "cadastro"
+                )
             )
+
 
         if senha != confirmar:
 
@@ -444,17 +869,23 @@ def cadastro():
                 "As senhas não são iguais."
             )
 
+
             return redirect(
-                url_for("cadastro")
+                url_for(
+                    "cadastro"
+                )
             )
+
 
         existente = (
             Usuario.query
             .filter_by(
-                username=username
+                username=
+                    username
             )
             .first()
         )
+
 
         if existente:
 
@@ -462,39 +893,56 @@ def cadastro():
                 "Usuário já existe."
             )
 
+
             return redirect(
-                url_for("cadastro")
+                url_for(
+                    "cadastro"
+                )
             )
+
 
         usuario = Usuario(
 
-            nome=nome,
+            nome=
+                nome,
 
-            username=username,
+            username=
+                username,
 
-            senha=generate_password_hash(
-                senha
-            ),
+            senha=
+                generate_password_hash(
+                    senha
+                ),
 
             xp=0,
+
             moedas=0,
+
             acertos=0,
+
             erros=0
         )
+
 
         db.session.add(
             usuario
         )
 
+
         db.session.commit()
+
 
         login_user(
             usuario
         )
 
+
         return redirect(
-            url_for("dashboard")
+            url_for(
+                "dashboard"
+            )
         )
+
 
     return render_template(
         "cadastro.html"
@@ -507,35 +955,49 @@ def cadastro():
 
 @app.route(
     "/login",
-    methods=["GET", "POST"]
+    methods=[
+        "GET",
+        "POST"
+    ]
 )
 def login():
 
     if current_user.is_authenticated:
 
         return redirect(
-            url_for("dashboard")
+            url_for(
+                "dashboard"
+            )
         )
+
 
     if request.method == "POST":
 
-        username = request.form.get(
-            "username",
-            ""
-        ).strip()
+        username = (
+            request.form
+            .get(
+                "username",
+                ""
+            )
+            .strip()
+        )
+
 
         senha = request.form.get(
             "senha",
             ""
         )
 
+
         usuario = (
             Usuario.query
             .filter_by(
-                username=username
+                username=
+                    username
             )
             .first()
         )
+
 
         if (
             not usuario
@@ -550,23 +1012,33 @@ def login():
                 "Usuário ou senha incorretos."
             )
 
+
             return redirect(
-                url_for("login")
+                url_for(
+                    "login"
+                )
             )
+
 
         corrigir_usuario(
             usuario
         )
 
+
         db.session.commit()
+
 
         login_user(
             usuario
         )
 
+
         return redirect(
-            url_for("dashboard")
+            url_for(
+                "dashboard"
+            )
         )
+
 
     return render_template(
         "login.html"
@@ -577,16 +1049,22 @@ def login():
 # LOGOUT
 # ============================================================
 
-@app.route("/logout")
+@app.route(
+    "/logout"
+)
 @login_required
 def logout():
 
     logout_user()
 
+
     session.clear()
 
+
     return redirect(
-        url_for("login")
+        url_for(
+            "login"
+        )
     )
 
 
@@ -594,7 +1072,9 @@ def logout():
 # DASHBOARD
 # ============================================================
 
-@app.route("/dashboard")
+@app.route(
+    "/dashboard"
+)
 @login_required
 def dashboard():
 
@@ -602,7 +1082,9 @@ def dashboard():
         current_user
     )
 
+
     db.session.commit()
+
 
     return render_template(
         "dashboard.html"
@@ -613,39 +1095,55 @@ def dashboard():
 # JORNADA
 # ============================================================
 
-@app.route("/jornada")
+@app.route(
+    "/jornada"
+)
 @login_required
 def jornada():
 
     anos = sorted(
+
         CURRICULO.items(),
-        key=lambda x: x[1]["ordem"]
+
+        key=lambda item:
+            item[1][
+                "ordem"
+            ]
     )
 
+
     progresso_anos = {}
+
 
     for ano_id, ano in anos:
 
         total = 0
+
         concluidos = 0
+
 
         for tema_id, tema in ano[
             "temas"
         ].items():
 
-            for assunto_id, assunto in tema[
+            for assunto_id in tema[
                 "assuntos"
-            ].items():
+            ]:
 
                 total += 1
 
+
                 progresso = (
                     obter_progresso_assunto(
+
                         ano_id,
+
                         tema_id,
+
                         assunto_id
                     )
                 )
+
 
                 if (
                     progresso
@@ -655,16 +1153,36 @@ def jornada():
 
                     concluidos += 1
 
-        progresso_anos[
-            ano_id
-        ] = round(
-            concluidos / total * 100
-        ) if total else 0
+
+        if total:
+
+            progresso_anos[
+                ano_id
+            ] = round(
+
+                concluidos
+                /
+                total
+                *
+                100
+            )
+
+        else:
+
+            progresso_anos[
+                ano_id
+            ] = 0
+
 
     return render_template(
+
         "jornada.html",
-        anos=anos,
-        progresso_anos=progresso_anos
+
+        anos=
+            anos,
+
+        progresso_anos=
+            progresso_anos
     )
 
 
@@ -676,16 +1194,24 @@ def jornada():
     "/ano/<ano_id>"
 )
 @login_required
-def ano(ano_id):
+def ano(
+    ano_id
+):
 
     dados_ano = buscar_ano(
         ano_id
     )
 
+
     return render_template(
+
         "ano.html",
-        ano=dados_ano,
-        ano_id=ano_id
+
+        ano=
+            dados_ano,
+
+        ano_id=
+            ano_id
     )
 
 
@@ -706,12 +1232,17 @@ def tema(
         ano_id
     )
 
+
     dados_tema = buscar_tema(
+
         dados_ano,
+
         tema_id
     )
 
+
     progressos = {}
+
 
     for assunto_id in dados_tema[
         "assuntos"
@@ -720,26 +1251,38 @@ def tema(
         progressos[
             assunto_id
         ] = obter_progresso_assunto(
+
             ano_id,
+
             tema_id,
+
             assunto_id
         )
 
+
     return render_template(
+
         "tema.html",
 
-        ano=dados_ano,
-        ano_id=ano_id,
+        ano=
+            dados_ano,
 
-        tema=dados_tema,
-        tema_id=tema_id,
+        ano_id=
+            ano_id,
 
-        progressos=progressos
+        tema=
+            dados_tema,
+
+        tema_id=
+            tema_id,
+
+        progressos=
+            progressos
     )
 
 
 # ============================================================
-# TRILHA DO ASSUNTO
+# ASSUNTO / TRILHA
 # ============================================================
 
 @app.route(
@@ -756,17 +1299,25 @@ def assunto(
         ano_id
     )
 
+
     dados_tema = buscar_tema(
+
         dados_ano,
+
         tema_id
     )
 
+
     dados_assunto = buscar_assunto(
+
         dados_tema,
+
         assunto_id
     )
 
+
     progressos = {}
+
 
     for etapa_id in dados_assunto[
         "etapas"
@@ -774,54 +1325,85 @@ def assunto(
 
         progresso = (
             obter_progresso_etapa(
+
                 ano_id,
+
                 tema_id,
+
                 assunto_id,
+
                 etapa_id
             )
         )
+
 
         progressos[
             etapa_id
         ] = {
 
-            "progresso": progresso,
+            "progresso":
+                progresso,
 
-            "liberada": etapa_liberada(
-                dados_assunto,
-                ano_id,
-                tema_id,
-                assunto_id,
-                etapa_id
-            )
+            "liberada":
+                etapa_liberada(
+
+                    dados_assunto,
+
+                    ano_id,
+
+                    tema_id,
+
+                    assunto_id,
+
+                    etapa_id
+                )
         }
+
 
     progresso_assunto = (
         atualizar_assunto(
+
             ano_id,
+
             tema_id,
+
             assunto_id,
+
             dados_assunto
         )
     )
 
+
     db.session.commit()
 
+
     return render_template(
+
         "assunto.html",
 
-        ano=dados_ano,
-        ano_id=ano_id,
+        ano=
+            dados_ano,
 
-        tema=dados_tema,
-        tema_id=tema_id,
+        ano_id=
+            ano_id,
 
-        assunto=dados_assunto,
-        assunto_id=assunto_id,
+        tema=
+            dados_tema,
 
-        progressos=progressos,
+        tema_id=
+            tema_id,
 
-        progresso_assunto=progresso_assunto
+        assunto=
+            dados_assunto,
+
+        assunto_id=
+            assunto_id,
+
+        progressos=
+            progressos,
+
+        progresso_assunto=
+            progresso_assunto
     )
 
 
@@ -840,30 +1422,49 @@ def etapa(
     etapa_id
 ):
 
-    ano = buscar_ano(
+    dados_ano = buscar_ano(
         ano_id
     )
 
-    tema = buscar_tema(
-        ano,
+
+    dados_tema = buscar_tema(
+
+        dados_ano,
+
         tema_id
     )
 
-    assunto = buscar_assunto(
-        tema,
+
+    dados_assunto = buscar_assunto(
+
+        dados_tema,
+
         assunto_id
     )
 
-    etapa = buscar_etapa(
-        assunto,
+
+    dados_etapa = buscar_etapa(
+
+        dados_assunto,
+
         etapa_id
     )
 
+
+    # --------------------------------------------------------
+    # VERIFICAR LIBERAÇÃO
+    # --------------------------------------------------------
+
     if not etapa_liberada(
-        assunto,
+
+        dados_assunto,
+
         ano_id,
+
         tema_id,
+
         assunto_id,
+
         etapa_id
     ):
 
@@ -871,59 +1472,149 @@ def etapa(
             "Conclua a etapa anterior primeiro. 🔒"
         )
 
+
         return redirect(
             url_for(
+
                 "assunto",
-                ano_id=ano_id,
-                tema_id=tema_id,
-                assunto_id=assunto_id
+
+                ano_id=
+                    ano_id,
+
+                tema_id=
+                    tema_id,
+
+                assunto_id=
+                    assunto_id
             )
         )
 
-    nova_questao = gerar_questao(
-        etapa["tipo"]
+
+    # --------------------------------------------------------
+    # TIPOS DE INTERAÇÃO DA ETAPA
+    # --------------------------------------------------------
+
+    interacoes = (
+        dados_etapa.get(
+            "interacoes",
+            []
+        )
     )
 
-    # Cada acesso inicia uma tentativa
-    session["tentativa"] = {
 
-        "ano": ano_id,
-        "tema": tema_id,
-        "assunto": assunto_id,
-        "etapa": etapa_id,
+    # --------------------------------------------------------
+    # GERAR PRIMEIRA QUESTÃO
+    # --------------------------------------------------------
 
-        "respondidas": 0,
-        "acertos": 0,
+    nova_questao = gerar_questao(
+
+        dados_etapa[
+            "tipo"
+        ],
+
+        interacoes
+    )
+
+
+    if (
+        not isinstance(
+            nova_questao,
+            dict
+        )
+        or
+        "pergunta" not in nova_questao
+        or
+        "resposta" not in nova_questao
+    ):
+
+        abort(
+            500,
+            description=
+                "O gerador retornou uma questão inválida."
+        )
+
+
+    # --------------------------------------------------------
+    # CRIAR TENTATIVA
+    # --------------------------------------------------------
+
+    session[
+        "tentativa"
+    ] = {
+
+        "ano":
+            ano_id,
+
+        "tema":
+            tema_id,
+
+        "assunto":
+            assunto_id,
+
+        "etapa":
+            etapa_id,
+
+        "respondidas":
+            0,
+
+        "acertos":
+            0,
 
         "quantidade":
-            etapa["quantidade"],
+            dados_etapa[
+                "quantidade"
+            ],
 
         "pergunta":
-            nova_questao["pergunta"],
+            nova_questao[
+                "pergunta"
+            ],
 
         "resposta":
-            nova_questao["resposta"],
+            nova_questao[
+                "resposta"
+            ],
 
         "tipo":
-            etapa["tipo"]
+            dados_etapa[
+                "tipo"
+            ],
+
+        "interacoes":
+            interacoes
     }
+
 
     session.modified = True
 
+
+    # --------------------------------------------------------
+    # NÃO ENVIA RESPOSTA CORRETA AO NAVEGADOR
+    # --------------------------------------------------------
+
     return render_template(
+
         "etapa.html",
 
-        ano=ano,
+        ano=
+            dados_ano,
 
-        tema=tema,
+        tema=
+            dados_tema,
 
-        assunto=assunto,
+        assunto=
+            dados_assunto,
 
-        etapa=etapa,
+        etapa=
+            dados_etapa,
 
-        etapa_id=etapa_id,
+        etapa_id=
+            etapa_id,
 
-        questao=nova_questao
+        questao_publica=
+            questao_publica(
+                nova_questao
+            )
     )
 
 
@@ -933,108 +1624,154 @@ def etapa(
 
 @app.route(
     "/api/responder",
-    methods=["POST"]
+    methods=[
+        "POST"
+    ]
 )
 @login_required
 def responder():
 
     try:
 
+        # ====================================================
+        # RECEBER JSON
+        # ====================================================
+
         dados = (
+
             request.get_json(
                 silent=True
             )
+
             or {}
         )
 
-        resposta_usuario = str(
-            dados.get(
-                "resposta",
-                ""
-            )
-        ).strip()
 
-        if not resposta_usuario:
+        if "resposta" not in dados:
 
             return jsonify(
-                erro="Digite uma resposta."
+
+                erro=
+                    "Escolha ou digite uma resposta."
+
             ), 400
+
+
+        resposta_usuario = dados.get(
+            "resposta"
+        )
+
+
+        if resposta_vazia(
+            resposta_usuario
+        ):
+
+            return jsonify(
+
+                erro=
+                    "Escolha ou digite uma resposta."
+
+            ), 400
+
+
+        # ====================================================
+        # TENTATIVA
+        # ====================================================
 
         tentativa = session.get(
             "tentativa"
         )
 
+
         if not tentativa:
 
             return jsonify(
-                erro="A tentativa expirou."
+
+                erro=
+                    "A tentativa expirou."
+
             ), 400
 
-        correta = str(
-            tentativa["resposta"]
-        ).strip()
 
-        normal_usuario = (
-            resposta_usuario
-            .casefold()
-            .replace(",", ".")
-        )
+        correta = tentativa[
+            "resposta"
+        ]
 
-        normal_correta = (
+
+        # ====================================================
+        # COMPARAR RESPOSTA
+        # ====================================================
+
+        acertou = respostas_iguais(
+
+            resposta_usuario,
+
             correta
-            .casefold()
-            .replace(",", ".")
         )
 
-        acertou = (
-            normal_usuario
-            ==
-            normal_correta
-        )
 
         corrigir_usuario(
             current_user
         )
 
-        # ----------------------------------------------------
-        # DADOS DO PROGRESSO
-        # ----------------------------------------------------
+
+        # ====================================================
+        # PROGRESSO
+        # ====================================================
 
         progresso = (
             obter_progresso_etapa(
 
-                tentativa["ano"],
-                tentativa["tema"],
-                tentativa["assunto"],
-                tentativa["etapa"],
+                tentativa[
+                    "ano"
+                ],
+
+                tentativa[
+                    "tema"
+                ],
+
+                tentativa[
+                    "assunto"
+                ],
+
+                tentativa[
+                    "etapa"
+                ],
 
                 criar=True
             )
         )
 
+
         progresso.acertos = (
-            progresso.acertos or 0
+            progresso.acertos
+            or 0
         )
 
         progresso.erros = (
-            progresso.erros or 0
+            progresso.erros
+            or 0
         )
 
         progresso.xp = (
-            progresso.xp or 0
+            progresso.xp
+            or 0
         )
 
         progresso.tentativas = (
-            progresso.tentativas or 0
+            progresso.tentativas
+            or 0
         )
 
         progresso.melhor_pontuacao = (
-            progresso.melhor_pontuacao or 0
+            progresso.melhor_pontuacao
+            or 0
         )
 
-        # ----------------------------------------------------
-        # ACERTO / ERRO
-        # ----------------------------------------------------
+
+        # ====================================================
+        # ACERTO
+        # ====================================================
 
         if acertou:
 
@@ -1042,84 +1779,127 @@ def responder():
                 "acertos"
             ] += 1
 
+
             progresso.acertos += 1
+
 
             progresso.xp += 10
 
+
             current_user.acertos += 1
+
 
             current_user.xp += 10
 
+
             current_user.moedas += 2
+
 
             mensagem = (
                 "Muito bem! 🎉"
             )
 
+
+        # ====================================================
+        # ERRO
+        # ====================================================
+
         else:
 
             progresso.erros += 1
 
+
             current_user.erros += 1
 
+
             mensagem = (
-                f"Quase! A resposta era {correta}."
+
+                "Quase! A resposta correta era "
+
+                f"{resposta_para_texto(correta)}."
             )
+
 
         tentativa[
             "respondidas"
         ] += 1
 
-        # ----------------------------------------------------
-        # HISTÓRICO
-        # ----------------------------------------------------
+
+        # ====================================================
+        # SALVAR HISTÓRICO
+        # ====================================================
 
         registro = Resposta(
 
-            usuario_id=current_user.id,
+            usuario_id=
+                current_user.id,
 
-            ano=tentativa["ano"],
+            ano=
+                tentativa[
+                    "ano"
+                ],
 
-            tema=tentativa["tema"],
+            tema=
+                tentativa[
+                    "tema"
+                ],
 
-            assunto=tentativa[
-                "assunto"
-            ],
+            assunto=
+                tentativa[
+                    "assunto"
+                ],
 
-            etapa=tentativa[
-                "etapa"
-            ],
+            etapa=
+                tentativa[
+                    "etapa"
+                ],
 
-            pergunta=tentativa[
-                "pergunta"
-            ],
+            pergunta=
+                tentativa[
+                    "pergunta"
+                ],
 
-            resposta_usuario=(
-                resposta_usuario
-            ),
+            resposta_usuario=
+                resposta_para_texto(
+                    resposta_usuario
+                ),
 
-            resposta_correta=correta,
+            resposta_correta=
+                resposta_para_texto(
+                    correta
+                ),
 
-            acertou=acertou
+            acertou=
+                acertou
         )
+
 
         db.session.add(
             registro
         )
 
-        # ----------------------------------------------------
-        # TERMINOU A ETAPA?
-        # ----------------------------------------------------
+
+        # ====================================================
+        # TERMINOU?
+        # ====================================================
 
         terminou = (
+
             tentativa[
                 "respondidas"
             ]
+
             >=
+
             tentativa[
                 "quantidade"
             ]
         )
+
+
+        # ====================================================
+        # FINAL DA ETAPA
+        # ====================================================
 
         if terminou:
 
@@ -1127,48 +1907,60 @@ def responder():
                 "quantidade"
             ]
 
+
             acertos_tentativa = tentativa[
                 "acertos"
             ]
 
+
             pontuacao = round(
+
                 acertos_tentativa
+
                 /
+
                 quantidade
+
                 *
+
                 100
             )
 
+
             progresso.tentativas += 1
 
-            if (
+
+            progresso.melhor_pontuacao = max(
+
+                progresso.melhor_pontuacao,
+
                 pontuacao
-                >
-                progresso.melhor_pontuacao
-            ):
+            )
 
-                progresso.melhor_pontuacao = (
-                    pontuacao
-                )
 
-            # 80% para passar
             passou = (
                 pontuacao >= 80
             )
 
 
-            ja_estava_concluida = bool(progresso.concluida)
+            # ------------------------------------------------
+            # EVITA GANHAR BÔNUS REPETIDO
+            # ------------------------------------------------
 
-            # Nunca perde uma conclusão antiga
+            ja_estava_concluida = bool(
+                progresso.concluida
+            )
+
+
             if passou:
 
                 progresso.concluida = True
 
+
                 if not ja_estava_concluida:
-                    
-                    # bônus por concluir
+
                     current_user.xp += 20
-                    
+
                     current_user.moedas += 5
 
 
@@ -1176,138 +1968,229 @@ def responder():
             # VERIFICAR ASSUNTO
             # ------------------------------------------------
 
-            ano = buscar_ano(
-                tentativa["ano"]
+            dados_ano = buscar_ano(
+
+                tentativa[
+                    "ano"
+                ]
             )
 
-            tema = buscar_tema(
-                ano,
-                tentativa["tema"]
+
+            dados_tema = buscar_tema(
+
+                dados_ano,
+
+                tentativa[
+                    "tema"
+                ]
             )
 
-            assunto = buscar_assunto(
-                tema,
-                tentativa["assunto"]
+
+            dados_assunto = buscar_assunto(
+
+                dados_tema,
+
+                tentativa[
+                    "assunto"
+                ]
             )
+
 
             progresso_assunto = (
                 atualizar_assunto(
 
-                    tentativa["ano"],
+                    tentativa[
+                        "ano"
+                    ],
 
-                    tentativa["tema"],
+                    tentativa[
+                        "tema"
+                    ],
 
                     tentativa[
                         "assunto"
                     ],
 
-                    assunto
+                    dados_assunto
                 )
             )
 
-            assunto_concluido = bool(
-                progresso_assunto.concluido
-            )
 
             db.session.commit()
+
 
             session.pop(
                 "tentativa",
                 None
             )
 
+
+            session.modified = True
+
+
             return jsonify(
 
-                terminou=True,
+                terminou=
+                    True,
 
-                correto=acertou,
+                correto=
+                    acertou,
 
-                mensagem=mensagem,
+                mensagem=
+                    mensagem,
 
-                passou=passou,
+                passou=
+                    passou,
 
-                pontuacao=pontuacao,
+                pontuacao=
+                    pontuacao,
 
-                acertos=acertos_tentativa,
+                acertos=
+                    acertos_tentativa,
 
-                quantidade=quantidade,
+                quantidade=
+                    quantidade,
 
-                xp=current_user.xp,
+                xp=
+                    current_user.xp,
 
-                moedas=current_user.moedas,
+                moedas=
+                    current_user.moedas,
 
-                assunto_concluido=(
-                    assunto_concluido
-                )
+                assunto_concluido=
+                    bool(
+                        progresso_assunto.concluido
+                    )
             )
 
-        # ----------------------------------------------------
-        # PRÓXIMA QUESTÃO
-        # ----------------------------------------------------
+
+        # ====================================================
+        # GERAR PRÓXIMA QUESTÃO
+        # ====================================================
 
         nova_questao = gerar_questao(
-            tentativa["tipo"]
+
+            tentativa[
+                "tipo"
+            ],
+
+            tentativa.get(
+                "interacoes",
+                []
+            )
         )
 
+
+        # ====================================================
+        # VALIDAR QUESTÃO
+        # ====================================================
+
+        if (
+            not isinstance(
+                nova_questao,
+                dict
+            )
+            or
+            "pergunta" not in nova_questao
+            or
+            "resposta" not in nova_questao
+        ):
+
+            raise ValueError(
+
+                "O game.py retornou uma questão inválida."
+            )
+
+
+        # ====================================================
+        # ATUALIZAR SESSÃO
+        # ====================================================
+
         tentativa[
             "pergunta"
         ] = nova_questao[
             "pergunta"
         ]
 
+
         tentativa[
             "resposta"
         ] = nova_questao[
             "resposta"
         ]
+
 
         session[
             "tentativa"
         ] = tentativa
 
+
         session.modified = True
+
 
         db.session.commit()
 
+
+        # ====================================================
+        # DEVOLVER QUESTÃO SEM RESPOSTA
+        # ====================================================
+
         return jsonify(
 
-            terminou=False,
+            terminou=
+                False,
 
-            correto=acertou,
+            correto=
+                acertou,
 
-            mensagem=mensagem,
+            mensagem=
+                mensagem,
 
-            xp=current_user.xp,
+            xp=
+                current_user.xp,
 
-            moedas=current_user.moedas,
+            moedas=
+                current_user.moedas,
 
-            respondidas=tentativa[
-                "respondidas"
-            ],
+            respondidas=
+                tentativa[
+                    "respondidas"
+                ],
 
-            quantidade=tentativa[
-                "quantidade"
-            ],
+            quantidade=
+                tentativa[
+                    "quantidade"
+                ],
 
-            questao={
-                "pergunta":
-                    nova_questao[
-                        "pergunta"
-                    ]
-            }
+            questao=
+                questao_publica(
+                    nova_questao
+                )
         )
+
+
+    # ========================================================
+    # ERRO
+    # ========================================================
 
     except Exception as erro:
 
         db.session.rollback()
+
 
         print(
             "ERRO /api/responder:",
             erro
         )
 
+
         return jsonify(
-            erro=str(erro)
+
+            erro=
+                str(
+                    erro
+                )
+
         ), 500
 
 
@@ -1315,7 +2198,9 @@ def responder():
 # BIBLIOTECA
 # ============================================================
 
-@app.route("/biblioteca")
+@app.route(
+    "/biblioteca"
+)
 @login_required
 def biblioteca():
 
@@ -1323,111 +2208,155 @@ def biblioteca():
         current_user
     )
 
+
     progressos = (
         ProgressoAssunto.query
         .filter_by(
-            usuario_id=current_user.id
+
+            usuario_id=
+                current_user.id
         )
         .all()
     )
+
 
     etapas = (
         ProgressoEtapa.query
         .filter_by(
-            usuario_id=current_user.id
+
+            usuario_id=
+                current_user.id
         )
         .all()
     )
 
+
     total_assuntos = sum(
 
         len(
-            tema["assuntos"]
+            tema[
+                "assuntos"
+            ]
         )
 
-        for ano in CURRICULO.values()
+        for ano
+        in CURRICULO.values()
 
-        for tema in ano[
+        for tema
+        in ano[
             "temas"
         ].values()
     )
+
 
     assuntos_concluidos = sum(
 
         1
 
-        for progresso in progressos
+        for progresso
+        in progressos
 
         if progresso.concluido
     )
+
 
     etapas_concluidas = sum(
 
         1
 
-        for progresso in etapas
+        for progresso
+        in etapas
 
         if progresso.concluida
     )
 
-    progresso_geral = (
 
-        round(
+    if total_assuntos:
+
+        progresso_geral = round(
+
             assuntos_concluidos
+
             /
+
             total_assuntos
+
             *
+
             100
         )
 
-        if total_assuntos
+    else:
 
-        else 0
-    )
+        progresso_geral = 0
+
 
     historico = (
         Resposta.query
+
         .filter_by(
-            usuario_id=current_user.id
+
+            usuario_id=
+                current_user.id
         )
+
         .order_by(
+
             Resposta.criado_em.desc()
         )
-        .limit(10)
+
+        .limit(
+            10
+        )
+
         .all()
     )
+
 
     return render_template(
 
         "biblioteca.html",
 
-        total_assuntos=total_assuntos,
+        total_assuntos=
+            total_assuntos,
 
-        assuntos_concluidos=(
-            assuntos_concluidos
-        ),
+        assuntos_concluidos=
+            assuntos_concluidos,
 
-        etapas_concluidas=(
-            etapas_concluidas
-        ),
+        etapas_concluidas=
+            etapas_concluidas,
 
-        progresso_geral=(
-            progresso_geral
-        ),
+        progresso_geral=
+            progresso_geral,
 
-        historico=historico
+        historico=
+            historico
     )
 
 
 # ============================================================
-# EXECUTAR
+# INICIAR SERVIDOR
 # ============================================================
 
 if __name__ == "__main__":
+
+    print("")
+    print("==========================================")
+    print(" MATEMÁTICA KIDS")
+    print(" http://127.0.0.1:5000")
+    print("==========================================")
+    print("")
+
+
     socketio.run(
+
         app,
+
         debug=True,
+
         host="0.0.0.0",
+
         port=5000,
+
         allow_unsafe_werkzeug=True
     )

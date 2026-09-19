@@ -1,153 +1,557 @@
 {% extends "base.html" %}
 
+{% block title %}
+Biblioteca - FlashMatty
+{% endblock %}
+
+
 {% block content %}
-<script src="https://cdn.tailwindcss.com"></script>
-<div class="max-w-5xl mx-auto px-4 py-10">
 
-    <h1 class="text-4xl font-black">
-        Biblioteca 📚
-    </h1>
-
-    <p class="text-slate-500 mt-2">
-        Acompanhe seu desenvolvimento.
-    </p>
-
+<div
+    class="
+        min-h-screen
+        bg-slate-900
+        text-white
+        px-4
+        py-10
+    "
+>
 
     <div
         class="
-        grid
-        grid-cols-2
-        lg:grid-cols-4
-        gap-4
-        mt-8
+            max-w-5xl
+            mx-auto
         "
     >
 
-        <div class="bg-white border rounded-2xl p-5">
+        <!-- ================================================= -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================= -->
 
-            <p class="text-slate-500">
-                XP
+        <div>
+
+            <p
+                class="
+                    text-sm
+                    uppercase
+                    tracking-wider
+                    font-black
+                    text-indigo-400
+                "
+            >
+                Seu progresso
             </p>
 
-            <strong class="text-2xl">
-                {{ current_user.xp or 0 }}
-            </strong>
+
+            <h1
+                class="
+                    text-4xl
+                    md:text-5xl
+                    font-black
+                    mt-2
+                "
+            >
+                Biblioteca 📚
+            </h1>
+
+
+            <p
+                class="
+                    text-slate-400
+                    mt-3
+                    text-lg
+                "
+            >
+                Acompanhe seu desenvolvimento e veja suas atividades recentes.
+            </p>
 
         </div>
 
 
-        <div class="bg-white border rounded-2xl p-5">
+        <!-- ================================================= -->
+        <!-- RESUMO -->
+        <!-- ================================================= -->
 
-            <p class="text-slate-500">
-                Etapas
-            </p>
+        <div
+            class="
+                grid
+                grid-cols-2
+                lg:grid-cols-4
+                gap-4
+                mt-8
+            "
+        >
 
-            <strong class="text-2xl">
-                {{ etapas_concluidas }}
-            </strong>
-
-        </div>
-
-
-        <div class="bg-white border rounded-2xl p-5">
-
-            <p class="text-slate-500">
-                Assuntos
-            </p>
-
-            <strong class="text-2xl">
-
-                {{ assuntos_concluidos }}
-                /
-                {{ total_assuntos }}
-
-            </strong>
-
-        </div>
-
-
-        <div class="bg-white border rounded-2xl p-5">
-
-            <p class="text-slate-500">
-                Jornada
-            </p>
-
-            <strong class="text-2xl">
-                {{ progresso_geral }}%
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    <section class="mt-10">
-
-        <h2 class="text-2xl font-black">
-            Atividade recente
-        </h2>
-
-
-        <div class="space-y-3 mt-5">
-
-            {% for item in historico %}
+            <!-- XP -->
 
             <div
                 class="
-                bg-white
-                border
-                rounded-2xl
-                p-4
+                    bg-slate-800
+                    border
+                    border-slate-700
+                    rounded-2xl
+                    p-5
+                    shadow
                 "
             >
 
-                <div class="flex justify-between gap-4">
-
-                    <div>
-
-                        <p class="font-bold">
-                            {{ item.pergunta }}
-                        </p>
-
-                        <p class="text-sm text-slate-500 mt-1">
-
-                            Sua resposta:
-                            {{ item.resposta_usuario }}
-
-                        </p>
-
-                    </div>
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    XP
+                </p>
 
 
-                    {% if item.acertou %}
-
-                        <span class="text-green-500 text-2xl">
-                            ✓
-                        </span>
-
-                    {% else %}
-
-                        <span class="text-red-500 text-2xl">
-                            ✕
-                        </span>
-
-                    {% endif %}
-
-                </div>
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-indigo-400
+                    "
+                >
+                    ⭐ {{ current_user.xp or 0 }}
+                </strong>
 
             </div>
 
-            {% else %}
 
-            <p class="text-slate-500">
-                Você ainda não respondeu exercícios.
-            </p>
+            <!-- ETAPAS -->
 
-            {% endfor %}
+            <div
+                class="
+                    bg-slate-800
+                    border
+                    border-slate-700
+                    rounded-2xl
+                    p-5
+                    shadow
+                "
+            >
+
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Etapas
+                </p>
+
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-green-400
+                    "
+                >
+                    {{ etapas_concluidas }}
+                </strong>
+
+            </div>
+
+
+            <!-- ASSUNTOS -->
+
+            <div
+                class="
+                    bg-slate-800
+                    border
+                    border-slate-700
+                    rounded-2xl
+                    p-5
+                    shadow
+                "
+            >
+
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Assuntos
+                </p>
+
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-yellow-400
+                    "
+                >
+                    {{ assuntos_concluidos }}
+                    /
+                    {{ total_assuntos }}
+                </strong>
+
+            </div>
+
+
+            <!-- JORNADA -->
+
+            <div
+                class="
+                    bg-slate-800
+                    border
+                    border-slate-700
+                    rounded-2xl
+                    p-5
+                    shadow
+                "
+            >
+
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Jornada
+                </p>
+
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-purple-400
+                    "
+                >
+                    {{ progresso_geral }}%
+                </strong>
+
+            </div>
 
         </div>
 
-    </section>
+
+        <!-- ================================================= -->
+        <!-- BARRA GERAL -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                mt-8
+                bg-slate-800
+                border
+                border-slate-700
+                rounded-3xl
+                p-6
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    justify-between
+                    items-center
+                    gap-4
+                "
+            >
+
+                <div>
+
+                    <h2
+                        class="
+                            font-black
+                            text-lg
+                        "
+                    >
+                        Progresso geral
+                    </h2>
+
+
+                    <p
+                        class="
+                            text-sm
+                            text-slate-400
+                            mt-1
+                        "
+                    >
+                        Percentual de assuntos concluídos.
+                    </p>
+
+                </div>
+
+
+                <strong
+                    class="
+                        text-2xl
+                        text-indigo-400
+                    "
+                >
+                    {{ progresso_geral }}%
+                </strong>
+
+            </div>
+
+
+            <div
+                class="
+                    mt-5
+                    h-4
+                    bg-slate-700
+                    rounded-full
+                    overflow-hidden
+                "
+            >
+
+                <div
+                    class="
+                        h-full
+                        bg-indigo-500
+                        rounded-full
+                        transition-all
+                        duration-500
+                    "
+
+                    style="width: {{ progresso_geral }}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ATIVIDADE RECENTE -->
+        <!-- ================================================= -->
+
+        <section class="mt-10">
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                "
+            >
+
+                <h2
+                    class="
+                        text-2xl
+                        font-black
+                    "
+                >
+                    Atividade recente
+                </h2>
+
+
+                <span
+                    class="
+                        text-sm
+                        font-bold
+                        text-slate-500
+                    "
+                >
+                    Últimas respostas
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    space-y-3
+                    mt-5
+                "
+            >
+
+                {% for item in historico %}
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                            shadow
+                        "
+                    >
+
+                        <div
+                            class="
+                                flex
+                                justify-between
+                                items-start
+                                gap-4
+                            "
+                        >
+
+                            <div class="min-w-0 flex-1">
+
+                                <p
+                                    class="
+                                        font-black
+                                        text-white
+                                        leading-relaxed
+                                    "
+                                >
+                                    {{ item.pergunta }}
+                                </p>
+
+
+                                <p
+                                    class="
+                                        text-sm
+                                        text-slate-400
+                                        mt-2
+                                    "
+                                >
+                                    Sua resposta:
+                                    <span class="text-slate-200">
+                                        {{ item.resposta_usuario }}
+                                    </span>
+                                </p>
+
+
+                                {% if not item.acertou %}
+
+                                    <p
+                                        class="
+                                            text-sm
+                                            text-red-400
+                                            mt-1
+                                        "
+                                    >
+                                        Correta:
+                                        {{ item.resposta_correta }}
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if item.acertou %}
+
+                                <div
+                                    class="
+                                        shrink-0
+                                        w-12
+                                        h-12
+                                        rounded-full
+                                        bg-green-500/15
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-green-400
+                                        text-2xl
+                                        font-black
+                                    "
+                                >
+                                    ✓
+                                </div>
+
+                            {% else %}
+
+                                <div
+                                    class="
+                                        shrink-0
+                                        w-12
+                                        h-12
+                                        rounded-full
+                                        bg-red-500/15
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-red-400
+                                        text-2xl
+                                        font-black
+                                    "
+                                >
+                                    ✕
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-3xl
+                            p-8
+                            text-center
+                        "
+                    >
+
+                        <div class="text-5xl">
+                            📝
+                        </div>
+
+
+                        <h3
+                            class="
+                                mt-4
+                                font-black
+                                text-xl
+                            "
+                        >
+                            Nenhuma atividade ainda
+                        </h3>
+
+
+                        <p
+                            class="
+                                text-slate-400
+                                mt-2
+                            "
+                        >
+                            Suas respostas aparecerão aqui depois
+                            que você começar a praticar.
+                        </p>
+
+
+                        <a
+                            href="{{ url_for('jornada') }}"
+
+                            class="
+                                inline-block
+                                mt-5
+                                rounded-xl
+                                bg-indigo-600
+                                px-5
+                                py-3
+                                font-black
+                                text-white
+
+                                hover:bg-indigo-700
+                            "
+                        >
+                            Começar Jornada
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </div>
 
 </div>
 

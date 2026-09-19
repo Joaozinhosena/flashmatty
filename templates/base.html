@@ -19,65 +19,119 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
+    {% block head %}
+    {% endblock %}
+
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<body
+    class="
+        min-h-screen
+        bg-slate-50
+        text-slate-800
+    "
+>
+
 
 {% if current_user.is_authenticated %}
 
-<header class="bg-white border-b">
+<header
+    class="
+        bg-white
+        border-b
+        border-slate-200
+    "
+>
 
     <div
         class="
-        max-w-6xl
-        mx-auto
-        px-4
-        py-3
-        flex
-        flex-wrap
-        gap-4
-        items-center
-        justify-between
+            max-w-6xl
+            mx-auto
+            px-4
+            py-3
+
+            flex
+            flex-wrap
+            gap-4
+            items-center
+            justify-between
         "
     >
 
+        <!-- LOGO -->
+
         <a
             href="{{ url_for('dashboard') }}"
-            class="font-black text-xl text-indigo-600"
+
+            class="
+                font-black
+                text-xl
+                text-indigo-600
+            "
         >
             FlashMatty
         </a>
 
+
+        <!-- MENU -->
+
         <nav
             class="
-            flex
-            flex-wrap
-            items-center
-            gap-4
-            text-sm
-            font-bold
+                flex
+                flex-wrap
+                items-center
+                gap-4
+
+                text-sm
+                font-bold
             "
         >
 
-            <a href="{{ url_for('jornada') }}">
+            <a
+                href="{{ url_for('jornada') }}"
+                class="hover:text-indigo-600"
+            >
                 Jornada
             </a>
 
-            <a href="{{ url_for('biblioteca') }}">
+
+            <a
+                href="{{ url_for('biblioteca') }}"
+                class="hover:text-indigo-600"
+            >
                 Biblioteca
             </a>
 
-            <span>
-                ⭐ {{ current_user.xp or 0 }} XP
+
+            <span
+                class="
+                    text-indigo-600
+                "
+            >
+                ⭐
+                {{ current_user.xp or 0 }}
+                XP
             </span>
 
-            <span>
-                🪙 {{ current_user.moedas or 0 }}
+
+            <span
+                class="
+                    text-yellow-600
+                "
+            >
+                🪙
+                {{ current_user.moedas or 0 }}
             </span>
+
 
             <a
                 href="{{ url_for('logout') }}"
-                class="text-red-500"
+
+                class="
+                    text-red-500
+                    hover:text-red-600
+                "
             >
                 Sair
             </a>
@@ -91,22 +145,35 @@
 {% endif %}
 
 
+<!-- ========================================================= -->
+<!-- MENSAGENS FLASH -->
+<!-- ========================================================= -->
+
 {% with mensagens = get_flashed_messages() %}
 
     {% if mensagens %}
 
-        <div class="max-w-4xl mx-auto px-4 pt-4">
+        <div
+            class="
+                max-w-4xl
+                mx-auto
+                px-4
+                pt-4
+            "
+        >
 
             {% for mensagem in mensagens %}
 
                 <div
                     class="
-                    bg-yellow-100
-                    border
-                    border-yellow-300
-                    rounded-xl
-                    p-3
-                    mb-2
+                        bg-yellow-100
+                        border
+                        border-yellow-300
+                        text-yellow-900
+                        rounded-xl
+                        p-3
+                        mb-2
+                        font-bold
                     "
                 >
                     {{ mensagem }}
@@ -121,12 +188,25 @@
 {% endwith %}
 
 
+<!-- ========================================================= -->
+<!-- CONTEÚDO -->
+<!-- ========================================================= -->
+
 <main>
 
     {% block content %}
     {% endblock %}
 
 </main>
+
+
+<!-- ========================================================= -->
+<!-- SCRIPTS ESPECÍFICOS DE CADA PÁGINA -->
+<!-- ========================================================= -->
+
+{% block scripts %}
+{% endblock %}
+
 
 </body>
 

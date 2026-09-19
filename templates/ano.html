@@ -1,65 +1,236 @@
 {% extends "base.html" %}
 
+{% block title %}
+{{ ano.nome }} - FlashMatty
+{% endblock %}
+
+
 {% block content %}
 
-<body style="background-color:rgb(19 31 36);"></body>
-  
-</body>
+<div
+    class="
+        min-h-screen
+        bg-slate-900
+        text-white
+        px-4
+        py-10
+    "
+>
 
-<div class="max-w-5xl mx-auto px-4 py-10 ">
-
-    <a
-        href="{{ url_for('jornada') }}"
-        class="text-indigo-600 font-bold "
+    <div
+        class="
+            max-w-5xl
+            mx-auto
+        "
     >
-        ← Jornada
-    </a >
 
-    <h1 class="text-4xl font-black mt-5 ">
-        {{ ano.icone }} {{ ano.nome }}
-    </h1>
-
-
-    <div class="grid md:grid-cols-2 gap-5 mt-8  ">
-
-        {% for tema_id, tema in ano.temas.items() %}
+        <!-- ================================================= -->
+        <!-- VOLTAR -->
+        <!-- ================================================= -->
 
         <a
-            href="{{
-                url_for(
-                    'tema',
-                    ano_id=ano_id,
-                    tema_id=tema_id
-                )
-            }}"
-            class="
-            group
-            bg-white
-            border
-            rounded-3xl
-            p-6
-            hover:bg-indigo-500
+            href="{{ url_for('jornada') }}"
 
-           
+            class="
+                inline-flex
+                items-center
+                gap-2
+
+                text-indigo-400
+                hover:text-indigo-300
+
+                font-bold
+                transition
+            "
+        >
+            ← Jornada
+        </a>
+
+
+        <!-- ================================================= -->
+        <!-- CABEÇALHO DO ANO -->
+        <!-- ================================================= -->
+
+        <div class="mt-7">
+
+            <p
+                class="
+                    text-sm
+                    uppercase
+                    tracking-wider
+                    font-black
+                    text-indigo-400
+                "
+            >
+                Jornada de aprendizagem
+            </p>
+
+
+            <h1
+                class="
+                    text-4xl
+                    md:text-5xl
+                    font-black
+                    mt-2
+                    text-white
+                "
+            >
+                {{ ano.icone }}
+                {{ ano.nome }}
+            </h1>
+
+
+            {% if ano.descricao %}
+
+                <p
+                    class="
+                        mt-3
+                        max-w-2xl
+                        text-slate-400
+                        text-lg
+                    "
+                >
+                    {{ ano.descricao }}
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- TEMAS -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                grid
+                md:grid-cols-2
+                gap-5
+                mt-10
             "
         >
 
-            <div class="text-4xl group-hover:text-white">
-                {{ tema.icone }}
-            </div>
+            {% for tema_id, tema in ano.temas.items() %}
 
-            <h2 class="font-black text-2xl mt-3 group-hover:text-white">
-                {{ tema.nome }}
-            </h2>
+                <a
+                    href="{{
+                        url_for(
+                            'tema',
+                            ano_id=ano_id,
+                            tema_id=tema_id
+                        )
+                    }}"
 
-            <p class="text-slate-500 mt-2 group-hover:text-white">
-                {{ tema.assuntos|length }}
-                assuntos
-            </p>
+                    class="
+                        group
+                        relative
 
-        </a>
+                        bg-slate-800
+                        border
+                        border-slate-700
 
-        {% endfor %}
+                        rounded-3xl
+                        p-6
+
+                        shadow-lg
+
+                        transition
+                        duration-200
+
+                        hover:-translate-y-1
+                        hover:bg-indigo-600
+                        hover:border-indigo-500
+                        hover:shadow-xl
+                    "
+                >
+
+                    <!-- ÍCONE -->
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            justify-center
+
+                            w-16
+                            h-16
+
+                            rounded-2xl
+
+                            bg-slate-700
+
+                            text-4xl
+
+                            transition
+
+                            group-hover:bg-white/15
+                        "
+                    >
+                        {{ tema.icone }}
+                    </div>
+
+
+                    <!-- NOME -->
+
+                    <h2
+                        class="
+                            font-black
+                            text-2xl
+                            mt-5
+                            text-white
+                        "
+                    >
+                        {{ tema.nome }}
+                    </h2>
+
+
+                    <!-- QUANTIDADE -->
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-2
+
+                            group-hover:text-indigo-100
+                        "
+                    >
+                        {{ tema.assuntos|length }}
+
+                        {% if tema.assuntos|length == 1 %}
+                            assunto
+                        {% else %}
+                            assuntos
+                        {% endif %}
+                    </p>
+
+
+                    <!-- CTA -->
+
+                    <div
+                        class="
+                            mt-5
+
+                            inline-flex
+                            items-center
+                            gap-2
+
+                            text-sm
+                            font-black
+                            text-indigo-400
+
+                            group-hover:text-white
+                        "
+                    >
+                        Ver conteúdo
+                        <span>→</span>
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
 
     </div>
 

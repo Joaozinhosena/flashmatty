@@ -1,12 +1,234 @@
-def etapa(nome, tipo, quantidade=5, desafio=False):
+# ============================================================
+# INTERAÇÕES DISPONÍVEIS POR TIPO DE EXERCÍCIO
+# ============================================================
+
+def interacoes_para_tipo(tipo):
+
+    # --------------------------------------------------------
+    # FIGURAS PLANAS
+    # Pode mostrar desenho, fotos ou associação
+    # --------------------------------------------------------
+
+    if tipo == "figuras_nome":
+
+        return [
+            "multipla_escolha",
+            "imagem_escolha",
+            "associacao"
+        ]
+
+
+    # --------------------------------------------------------
+    # SÓLIDOS
+    # --------------------------------------------------------
+
+    if tipo == "solidos":
+
+        return [
+            "imagem_escolha",
+            "multipla_escolha"
+        ]
+
+
+    # --------------------------------------------------------
+    # COMPRIMENTO
+    # --------------------------------------------------------
+
+    if tipo == "comprimento":
+
+        return [
+            "imagem_escolha",
+            "multipla_escolha",
+            "numero"
+        ]
+
+
+    # --------------------------------------------------------
+    # MASSA
+    # --------------------------------------------------------
+
+    if tipo == "massa":
+
+        return [
+            "imagem_escolha",
+            "multipla_escolha",
+            "numero"
+        ]
+
+
+    # --------------------------------------------------------
+    # PROBABILIDADE
+    # --------------------------------------------------------
+
+    if tipo in (
+        "probabilidade_basica",
+        "probabilidade"
+    ):
+
+        return [
+            "imagem_escolha",
+            "multipla_escolha"
+        ]
+
+
+    # --------------------------------------------------------
+    # COMPARAÇÃO
+    # --------------------------------------------------------
+
+    if tipo == "comparacao":
+
+        return [
+            "multipla_escolha",
+            "ordenacao"
+        ]
+
+
+    # --------------------------------------------------------
+    # EQUIVALÊNCIA
+    # --------------------------------------------------------
+
+    if tipo == "equivalencia":
+
+        return [
+            "multipla_escolha",
+            "associacao"
+        ]
+
+
+    # --------------------------------------------------------
+    # TEXTOS / NOMES / CLASSIFICAÇÕES
+    # --------------------------------------------------------
+
+    if tipo in (
+        "figuras_desafio",
+        "angulos",
+        "grafico_basico",
+        "grafico",
+        "grafico_desafio"
+    ):
+
+        return [
+            "multipla_escolha"
+        ]
+
+
+    # --------------------------------------------------------
+    # RELÓGIO
+    # Pode perguntar horário ou conversão
+    # --------------------------------------------------------
+
+    if tipo == "tempo":
+
+        return [
+            "multipla_escolha",
+            "numero"
+        ]
+
+
+    # --------------------------------------------------------
+    # QUESTÕES VISUAIS PARA CRIANÇAS
+    # --------------------------------------------------------
+
+    if tipo in (
+        "adicao_visual",
+        "problema_adicao",
+
+        "subtracao_visual",
+        "problema_subtracao",
+
+        "composicao_visual",
+        "composicao",
+        "decomposicao",
+
+        "multiplicacao_visual",
+        "problema_multiplicacao",
+
+        "divisao_visual",
+        "problema_divisao",
+
+        "figuras_lados",
+        "figuras_planas",
+        "lados_vertices",
+
+        "dinheiro_basico",
+        "dinheiro",
+
+        "fracao_basica",
+        "fracao",
+
+        "poligonos",
+
+        "temperatura",
+
+        "perimetro",
+        "area",
+        "perimetro_area",
+
+        "plano_cartesiano",
+
+        "poliedros",
+
+        "volume"
+    ):
+
+        return [
+            "multipla_escolha",
+            "numero"
+        ]
+
+
+    # --------------------------------------------------------
+    # QUESTÕES NUMÉRICAS GERAIS
+    # --------------------------------------------------------
+
+    return [
+        "numero",
+        "multipla_escolha",
+        "verdadeiro_falso"
+    ]
+
+
+# ============================================================
+# ETAPA
+# ============================================================
+
+def etapa(
+    nome,
+    tipo,
+    quantidade=5,
+    desafio=False,
+    interacoes=None
+):
+
+    if interacoes is None:
+
+        interacoes = interacoes_para_tipo(
+            tipo
+        )
+
 
     return {
-        "nome": nome,
-        "tipo": tipo,
-        "quantidade": quantidade,
-        "desafio": desafio
+
+        "nome":
+            nome,
+
+        "tipo":
+            tipo,
+
+        "quantidade":
+            quantidade,
+
+        "desafio":
+            desafio,
+
+        "interacoes":
+            interacoes
     }
 
+
+# ============================================================
+# TRILHA
+# ============================================================
 
 def trilha(
     tipo1,
@@ -17,43 +239,57 @@ def trilha(
 ):
 
     tipo2 = tipo2 or tipo1
+
     tipo3 = tipo3 or tipo2
+
     tipo4 = tipo4 or tipo3
+
     desafio = desafio or tipo4
 
+
     return {
-        "1": etapa(
-            "Primeiros passos",
-            tipo1,
-            5
-        ),
 
-        "2": etapa(
-            "Treinando",
-            tipo2,
-            5
-        ),
+        "1":
+            etapa(
+                "Primeiros passos",
+                tipo1,
+                5
+            ),
 
-        "3": etapa(
-            "Praticando",
-            tipo3,
-            6
-        ),
+        "2":
+            etapa(
+                "Treinando",
+                tipo2,
+                5
+            ),
 
-        "4": etapa(
-            "Aplicando",
-            tipo4,
-            6
-        ),
+        "3":
+            etapa(
+                "Praticando",
+                tipo3,
+                6
+            ),
 
-        "5": etapa(
-            "Desafio final",
-            desafio,
-            8,
-            True
-        )
+        "4":
+            etapa(
+                "Aplicando",
+                tipo4,
+                6
+            ),
+
+        "5":
+            etapa(
+                "Desafio final",
+                desafio,
+                8,
+                True
+            )
     }
 
+
+# ============================================================
+# ASSUNTO
+# ============================================================
 
 def assunto(
     nome,
@@ -64,13 +300,24 @@ def assunto(
 ):
 
     return {
-        "nome": nome,
-        "descricao": descricao,
-        "explicacao": explicacao,
-        "exemplo": exemplo,
-        "etapas": trilha(*tipos)
-    }
 
+        "nome":
+            nome,
+
+        "descricao":
+            descricao,
+
+        "explicacao":
+            explicacao,
+
+        "exemplo":
+            exemplo,
+
+        "etapas":
+            trilha(
+                *tipos
+            )
+    }
 
 CURRICULO = {
 

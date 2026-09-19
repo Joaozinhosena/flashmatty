@@ -3,188 +3,295 @@
 {% block content %}
 
 <div
+    id="exercicio-app"
+
+    data-voltar="{{
+        url_for(
+            'assunto',
+            ano_id=session['tentativa']['ano'],
+            tema_id=session['tentativa']['tema'],
+            assunto_id=session['tentativa']['assunto']
+        )
+    }}"
+
     class="
-    max-w-2xl
-    mx-auto
-    px-4
-    py-10
+        max-w-3xl
+        mx-auto
+        px-4
+        py-10
     "
 >
 
-    <div
-        id="jogo"
-        data-voltar="{{
-            url_for(
-                'assunto',
-                ano_id=session['tentativa']['ano'],
-                tema_id=session['tentativa']['tema'],
-                assunto_id=session['tentativa']['assunto']
-            )
-        }}"
-    >
+    <!-- ===================================================== -->
+    <!-- TOPO -->
+    <!-- ===================================================== -->
 
-        <div
-            class="
+    <div
+        class="
             flex
             justify-between
             items-center
             gap-4
-            "
-        >
+        "
+    >
 
-            <a
-                href="{{
-                    url_for(
-                        'assunto',
-                        ano_id=session['tentativa']['ano'],
-                        tema_id=session['tentativa']['tema'],
-                        assunto_id=session['tentativa']['assunto']
-                    )
-                }}"
-                class="
+        <!-- VOLTAR -->
+
+        <a
+            href="{{
+                url_for(
+                    'assunto',
+                    ano_id=session['tentativa']['ano'],
+                    tema_id=session['tentativa']['tema'],
+                    assunto_id=session['tentativa']['assunto']
+                )
+            }}"
+
+            class="
                 text-slate-500
                 font-black
                 text-xl
-                "
-            >
-                ✕
-            </a>
+                hover:text-slate-800
+            "
+        >
+            ✕
+        </a>
 
+
+        <!-- PROGRESSO -->
+
+        <div class="flex-1">
 
             <div
                 class="
-                flex-1
-                bg-slate-200
-                h-4
-                rounded-full
-                overflow-hidden
+                    flex
+                    justify-between
+                    items-center
+                    mb-2
+                    text-xs
+                    font-black
+                    text-slate-500
                 "
             >
 
-                <div
-                    id="barraProgresso"
-                    class="
-                    bg-indigo-500
-                    h-full
-                    rounded-full
-                    "
-                    style="width:0%"
-                ></div>
+                <span>
+                    Progresso
+                </span>
+
+                <span id="texto-progresso">
+                    0/{{ etapa.quantidade }}
+                </span>
 
             </div>
 
 
-            <div class="font-black text-indigo-600">
-                ⭐ <span id="xp">{{ current_user.xp or 0 }}</span>
+            <div
+                class="
+                    bg-slate-200
+                    h-4
+                    rounded-full
+                    overflow-hidden
+                "
+            >
+
+                <div
+                    id="barra-progresso"
+
+                    class="
+                        bg-indigo-500
+                        h-full
+                        rounded-full
+                        transition-all
+                        duration-500
+                    "
+
+                    style="width: 0%"
+                ></div>
+
             </div>
 
         </div>
 
 
-        <div class="mt-10">
+        <!-- XP / MOEDAS -->
 
-            <p
-                class="
+        <div
+            class="
+                flex
+                flex-col
+                items-end
+                text-sm
+                font-black
+            "
+        >
+
+            <div class="text-indigo-600">
+
+                ⭐
+
+                <span id="xp-atual">
+                    {{ current_user.xp or 0 }}
+                </span>
+
+            </div>
+
+
+            <div class="text-yellow-600">
+
+                🪙
+
+                <span id="moedas">
+                    {{ current_user.moedas or 0 }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- CONTEÚDO -->
+    <!-- ===================================================== -->
+
+    <div
+        class="
+            mt-10
+            rounded-3xl
+            bg-white
+            border
+            border-slate-100
+            shadow-lg
+            p-5
+            md:p-8
+        "
+    >
+
+        <!-- NOME DA ETAPA -->
+
+        <p
+            class="
                 uppercase
                 tracking-wide
                 text-sm
                 font-black
                 text-indigo-600
-                "
-            >
-                {{ etapa.nome }}
-            </p>
+                text-center
+            "
+        >
+            {{ etapa.nome }}
+        </p>
 
 
-            <h1
-                id="pergunta"
-                class="
+        <!-- ================================================= -->
+        <!-- VISUAL -->
+        <!-- ================================================= -->
+
+        <div
+            id="visual"
+            class="mt-7 min-h-0"
+        ></div>
+
+
+        <!-- ================================================= -->
+        <!-- PERGUNTA -->
+        <!-- ================================================= -->
+
+        <h1
+            id="pergunta"
+
+            class="
                 text-2xl
                 md:text-4xl
                 font-black
-                mt-3
-                "
-            >
-                {{ questao.pergunta }}
-            </h1>
+                mt-6
+                text-center
+                text-slate-900
+            "
+        >
+            {{ questao_publica.pergunta }}
+        </h1>
 
 
-            <div class="mt-8">
+        <!-- ================================================= -->
+        <!-- RESPOSTA DINÂMICA -->
+        <!-- ================================================= -->
 
-                <label
-                    for="resposta"
-                    class="
-                    block
-                    font-bold
-                    mb-2
-                    "
-                >
-                    Sua resposta
-                </label>
+        <div
+            id="resposta-area"
+            class="mt-8"
+        ></div>
 
 
-                <input
-                    id="resposta"
-                    autocomplete="off"
-                    inputmode="text"
-                    class="
-                    w-full
-                    border-2
-                    border-slate-300
-                    rounded-2xl
-                    p-4
-                    text-xl
-                    font-bold
-                    focus:outline-none
-                    focus:border-indigo-500
-                    "
-                >
+        <!-- ================================================= -->
+        <!-- FEEDBACK -->
+        <!-- ================================================= -->
 
-            </div>
+        <div
+            id="feedback"
 
-
-            <div
-                id="feedback"
-                class="
-                mt-5
+            class="
+                mt-6
                 min-h-12
+                text-center
+                text-lg
                 font-black
-                "
-            ></div>
+            "
+        ></div>
 
 
-            <button
-                id="botaoResponder"
-                type="button"
-                class="
+        <!-- ================================================= -->
+        <!-- BOTÃO -->
+        <!-- ================================================= -->
+
+        <button
+            id="botaoResponder"
+
+            type="button"
+
+            class="
                 mt-6
                 w-full
                 bg-indigo-600
                 hover:bg-indigo-700
+                disabled:bg-indigo-300
+                disabled:cursor-not-allowed
                 text-white
                 font-black
                 text-lg
                 rounded-2xl
                 p-4
-                "
-            >
-                Conferir
-            </button>
-
-        </div>
+                transition
+                shadow-lg
+            "
+        >
+            Conferir 🚀
+        </button>
 
     </div>
 
 </div>
 
 
+<!-- ========================================================= -->
+<!-- QUESTÃO INICIAL -->
+<!-- ========================================================= -->
+
 <script
-    src="{{
-        url_for(
-            'static',
-            filename='js/etapa.js'
-        )
-    }}"
+    id="questao-inicial"
+    type="application/json"
+>
+{{ questao_publica | tojson }}
+</script>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
+
+<script
+    src="{{ url_for('static', filename='js/exercicio.js') }}?v=20260918-1"
 ></script>
 
 {% endblock %}

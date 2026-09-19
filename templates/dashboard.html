@@ -1,166 +1,535 @@
 {% extends "base.html" %}
 
 {% block title %}
-Início
+Início - FlashMatty
 {% endblock %}
 
 
 {% block content %}
-<body style="background-color:rgb(19 31 36);"></body>
-<div class="max-w-5xl mx-auto px-4 py-10">
 
-    <section
-        class="
-        bg-indigo-600
-        text-white
-        rounded-3xl
-        p-6
-        md:p-10
-        "
-    >
-
-        <p class="font-bold opacity-80">
-            Olá,
-        </p>
-
-        <h1 class="text-3xl md:text-5xl font-black">
-            {{ current_user.nome }} 👋
-        </h1>
-
-        <div class="flex flex-wrap gap-4 mt-8">
-
-            <div class="bg-white/10 rounded-xl p-4">
-                Nível
-                <strong class="block text-2xl">
-                    {{ current_user.nivel }}
-                </strong>
-            </div>
-
-            <div class="bg-white/10 rounded-xl p-4">
-                XP
-                <strong class="block text-2xl">
-                    {{ current_user.xp or 0 }}
-                </strong>
-            </div>
-
-            <div class="bg-white/10 rounded-xl p-4">
-                Precisão
-                <strong class="block text-2xl">
-                    {{ current_user.precisao }}%
-                </strong>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <div class="grid md:grid-cols-2 gap-5 mt-8">
-
-        <a
-            href="{{ url_for('jornada') }}"
-            class="
-            bg-white
-            border
-            rounded-3xl
-            p-7
-            hover:border-indigo-400
-            "
-        >
-
-            <div class="text-4xl">
-
-                 <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLuChs4XQuFEx06_gPUj5-QcZBbYaRIp502HHO9VdiOg2vVs--8_L6bZk&s=10"
-                alt="Pinguim"
-                class="
-                    w-full
-                    max-w-[260px]
-                    h-auto
-                    object-contain
-                "
-            >
-                
-            </div>
-
-            <h2 class="font-black text-2xl mt-3">
-                Jornada
-            </h2>
-
-            <p class="text-slate-500 mt-2">
-                Continue sua trilha de aprendizado.
-            </p>
-
-        </a>
-
-
-        <a
-            href="{{ url_for('biblioteca') }}"
-            class="
-            bg-white
-            border
-            rounded-3xl
-            p-7
-            hover:border-indigo-400
-            "
-        >
-
-            <div class="text-4xl">
-
-                 <img
-                src="https://64.media.tumblr.com/bbbf37b965bdac4fa6dbfeb18e8d707e/b04f5bab00b82903-11/s500x750/50d847950b13ca8dae47ad2a0ace031920da7d15.gifv"
-                alt="Pinguim"
-                class="
-                    w-full
-                    max-w-[360px]
-                    h-auto
-                    object-contain
-                "
-            >
-                
-            </div>
-
-            <h2 class="font-black text-2xl mt-3">
-                Biblioteca
-            </h2>
-
-            <p class="text-slate-500 mt-2">
-                Veja seu progresso.
-            </p>
-
-        </a>
-        
-
-
-
-        <a
-    href="{{ url_for('multiplayer.inicio') }}"
+<div
     class="
-    bg-white
-    border
-    rounded-3xl
-    p-7
-    hover:border-indigo-400
+        min-h-screen
+        bg-slate-900
+        text-white
+        px-4
+        py-10
     "
 >
 
-    <div class="text-4xl">
-        🎮
-    </div>
+    <div
+        class="
+            max-w-5xl
+            mx-auto
+        "
+    >
 
-    <h2 class="font-black text-2xl mt-3">
-        Jogar com amigos
-    </h2>
+        <!-- ================================================= -->
+        <!-- BOAS-VINDAS -->
+        <!-- ================================================= -->
 
-    <p class="text-slate-500 mt-2">
-        Crie uma sala e desafie seus amigos.
-    </p>
+        <section
+            class="
+                bg-indigo-600
+                text-white
+                rounded-3xl
+                p-6
+                md:p-10
+                shadow-xl
+            "
+        >
 
-</a>
+            <p
+                class="
+                    font-bold
+                    text-indigo-100
+                "
+            >
+                Olá,
+            </p>
 
 
+            <h1
+                class="
+                    text-3xl
+                    md:text-5xl
+                    font-black
+                    mt-1
+                "
+            >
+                {{ current_user.nome }} 👋
+            </h1>
 
-                                  
+
+            <p
+                class="
+                    mt-3
+                    text-indigo-100
+                    max-w-xl
+                "
+            >
+                Continue aprendendo matemática e avance
+                na sua jornada.
+            </p>
+
+
+            <!-- STATUS -->
+
+            <div
+                class="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-3
+                    gap-4
+                    mt-8
+                "
+            >
+
+                <!-- NÍVEL -->
+
+                <div
+                    class="
+                        bg-white/10
+                        border
+                        border-white/10
+                        rounded-2xl
+                        p-4
+                    "
+                >
+
+                    <span
+                        class="
+                            text-sm
+                            font-bold
+                            text-indigo-100
+                        "
+                    >
+                        Nível
+                    </span>
+
+
+                    <strong
+                        class="
+                            block
+                            text-2xl
+                            mt-1
+                        "
+                    >
+                        {{ current_user.nivel }}
+                    </strong>
+
+                </div>
+
+
+                <!-- XP -->
+
+                <div
+                    class="
+                        bg-white/10
+                        border
+                        border-white/10
+                        rounded-2xl
+                        p-4
+                    "
+                >
+
+                    <span
+                        class="
+                            text-sm
+                            font-bold
+                            text-indigo-100
+                        "
+                    >
+                        XP
+                    </span>
+
+
+                    <strong
+                        class="
+                            block
+                            text-2xl
+                            mt-1
+                        "
+                    >
+                        ⭐ {{ current_user.xp or 0 }}
+                    </strong>
+
+                </div>
+
+
+                <!-- PRECISÃO -->
+
+                <div
+                    class="
+                        bg-white/10
+                        border
+                        border-white/10
+                        rounded-2xl
+                        p-4
+                    "
+                >
+
+                    <span
+                        class="
+                            text-sm
+                            font-bold
+                            text-indigo-100
+                        "
+                    >
+                        Precisão
+                    </span>
+
+
+                    <strong
+                        class="
+                            block
+                            text-2xl
+                            mt-1
+                        "
+                    >
+                        {{ current_user.precisao }}%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- MENU -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                grid
+                md:grid-cols-2
+                gap-5
+                mt-8
+            "
+        >
+
+            <!-- ================================================= -->
+            <!-- JORNADA -->
+            <!-- ================================================= -->
+
+            <a
+                href="{{ url_for('jornada') }}"
+
+                class="
+                    group
+                    overflow-hidden
+
+                    bg-slate-800
+                    border
+                    border-slate-700
+
+                    rounded-3xl
+                    shadow-lg
+
+                    transition
+                    duration-200
+
+                    hover:-translate-y-1
+                    hover:border-indigo-500
+                    hover:shadow-xl
+                "
+            >
+
+                <div
+                    class="
+                        h-48
+                        bg-slate-700
+                        overflow-hidden
+                    "
+                >
+
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLuChs4XQuFEx06_gPUj5-QcZBbYaRIp502HHO9VdiOg2vVs--8_L6bZk&s=10"
+
+                        alt="Ilustração da Jornada"
+
+                        class="
+                            w-full
+                            h-full
+                            object-contain
+                            transition
+                            duration-300
+
+                            group-hover:scale-105
+                        "
+                    >
+
+                </div>
+
+
+                <div class="p-6">
+
+                    <h2
+                        class="
+                            font-black
+                            text-2xl
+                            text-white
+                        "
+                    >
+                        Jornada
+                    </h2>
+
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-2
+                        "
+                    >
+                        Continue sua trilha de aprendizado.
+                    </p>
+
+
+                    <div
+                        class="
+                            mt-5
+                            font-black
+                            text-indigo-400
+
+                            group-hover:text-indigo-300
+                        "
+                    >
+                        Continuar →
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <!-- ================================================= -->
+            <!-- BIBLIOTECA -->
+            <!-- ================================================= -->
+
+            <a
+                href="{{ url_for('biblioteca') }}"
+
+                class="
+                    group
+                    overflow-hidden
+
+                    bg-slate-800
+                    border
+                    border-slate-700
+
+                    rounded-3xl
+                    shadow-lg
+
+                    transition
+                    duration-200
+
+                    hover:-translate-y-1
+                    hover:border-indigo-500
+                    hover:shadow-xl
+                "
+            >
+
+                <div
+                    class="
+                        h-48
+                        bg-slate-700
+
+                        flex
+                        items-center
+                        justify-center
+                        overflow-hidden
+                    "
+                >
+
+                    <!--
+                    GIFV não é confiável em <img>.
+                    Por isso deixamos um ícone visual estável.
+                    -->
+
+                    <div
+                        class="
+                            text-8xl
+                            transition
+                            duration-300
+
+                            group-hover:scale-110
+                        "
+                    >
+                        📚
+                    </div>
+
+                </div>
+
+
+                <div class="p-6">
+
+                    <h2
+                        class="
+                            font-black
+                            text-2xl
+                            text-white
+                        "
+                    >
+                        Biblioteca
+                    </h2>
+
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-2
+                        "
+                    >
+                        Veja seu progresso e histórico.
+                    </p>
+
+
+                    <div
+                        class="
+                            mt-5
+                            font-black
+                            text-indigo-400
+
+                            group-hover:text-indigo-300
+                        "
+                    >
+                        Ver biblioteca →
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <!-- ================================================= -->
+            <!-- MULTIPLAYER -->
+            <!-- ================================================= -->
+
+            <a
+                href="{{ url_for('multiplayer.inicio') }}"
+
+                class="
+                    group
+
+                    md:col-span-2
+
+                    bg-gradient-to-r
+                    from-violet-600
+                    to-indigo-600
+
+                    border
+                    border-indigo-500
+
+                    rounded-3xl
+                    p-7
+
+                    shadow-lg
+
+                    transition
+                    duration-200
+
+                    hover:-translate-y-1
+                    hover:shadow-xl
+                "
+            >
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        sm:flex-row
+                        items-start
+                        sm:items-center
+                        gap-5
+                    "
+                >
+
+                    <div
+                        class="
+                            w-20
+                            h-20
+                            rounded-2xl
+
+                            bg-white/10
+
+                            flex
+                            items-center
+                            justify-center
+
+                            text-5xl
+                        "
+                    >
+                        🎮
+                    </div>
+
+
+                    <div class="flex-1">
+
+                        <p
+                            class="
+                                text-sm
+                                uppercase
+                                tracking-wider
+                                font-black
+                                text-indigo-200
+                            "
+                        >
+                            Multiplayer
+                        </p>
+
+
+                        <h2
+                            class="
+                                font-black
+                                text-2xl
+                                md:text-3xl
+                                text-white
+                                mt-1
+                            "
+                        >
+                            Jogar com amigos
+                        </h2>
+
+
+                        <p
+                            class="
+                                text-indigo-100
+                                mt-2
+                            "
+                        >
+                            Crie uma sala e desafie seus amigos
+                            em uma disputa de matemática.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            bg-white
+                            text-indigo-700
+
+                            rounded-2xl
+                            px-6
+                            py-3
+
+                            font-black
+
+                            transition
+
+                            group-hover:scale-105
+                        "
+                    >
+                        Jogar →
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
 
     </div>
 

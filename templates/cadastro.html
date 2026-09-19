@@ -1,28 +1,22 @@
-<script src="https://cdn.tailwindcss.com"></script>
-
 {% extends "base.html" %}
 
 {% block title %}
-Criar conta
+Criar conta - FlashMatty
 {% endblock %}
 
 
 {% block content %}
 
-<main
+<div
     class="
-        min-h-[85vh]
-        w-full
+        min-h-screen
+        bg-slate-900
+        px-4
+        py-8
+
         flex
         items-center
         justify-center
-        overflow-hidden
-
-        px-4
-        py-8 
-
-        sm:px-6
-        lg:px-8
     "
 >
 
@@ -43,10 +37,9 @@ Criar conta
         "
     >
 
-
-        <!-- ====================================== -->
+        <!-- ================================================= -->
         <!-- PINGUIM ESQUERDO -->
-        <!-- ====================================== -->
+        <!-- ================================================= -->
 
         <div
             class="
@@ -59,7 +52,9 @@ Criar conta
 
             <img
                 src="https://media1.tenor.com/m/SQ-iPKrB7Q4AAAAd/penguin.gif"
+
                 alt="Pinguim"
+
                 class="
                     w-full
                     max-w-[260px]
@@ -71,19 +66,22 @@ Criar conta
         </div>
 
 
-        <!-- ====================================== -->
+        <!-- ================================================= -->
         <!-- FORMULÁRIO -->
-        <!-- ====================================== -->
+        <!-- ================================================= -->
 
         <section
             class="
-                bg-blue-600
-
                 w-full
                 max-w-md
 
+                bg-indigo-600
+
                 rounded-3xl
-                shadow-xl
+                shadow-2xl
+
+                border
+                border-indigo-500
 
                 p-5
                 sm:p-7
@@ -91,9 +89,11 @@ Criar conta
             "
         >
 
-            <div class="text-center">
+            <!-- ================================================= -->
+            <!-- CABEÇALHO -->
+            <!-- ================================================= -->
 
-                <!-- ÍCONE SOMENTE NO CELULAR -->
+            <div class="text-center">
 
                 <div
                     class="
@@ -102,8 +102,21 @@ Criar conta
                         mb-3
                     "
                 >
-                 <!--🐧-->   
+                    🐧
                 </div>
+
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        tracking-widest
+                        font-black
+                        text-indigo-200
+                    "
+                >
+                    FlashMatty
+                </p>
 
 
                 <h1
@@ -113,6 +126,8 @@ Criar conta
 
                         font-black
                         text-white
+
+                        mt-1
                     "
                 >
                     Criar conta
@@ -124,59 +139,34 @@ Criar conta
                         text-sm
                         sm:text-base
 
-                        text-blue-100
+                        text-indigo-100
+
                         mt-2
                         mb-7
                     "
                 >
-                    Insira seus dados para começar
+                    Insira seus dados para começar sua jornada.
                 </p>
 
             </div>
 
 
-            <!-- MENSAGENS DO FLASK -->
+            <!-- ================================================= -->
+            <!-- FORMULÁRIO -->
+            <!-- ================================================= -->
 
-            {% with mensagens = get_flashed_messages() %}
-
-                {% if mensagens %}
-
-                    <div class="space-y-2 mb-5">
-
-                        {% for mensagem in mensagens %}
-
-                            <div
-                                class="
-                                    bg-red-100
-                                    text-red-700
-                                    font-bold
-                                    text-sm
-                                    rounded-xl
-                                    px-4
-                                    py-3
-                                "
-                            >
-                                {{ mensagem }}
-                            </div>
-
-                        {% endfor %}
-
-                    </div>
-
-                {% endif %}
-
-            {% endwith %}
-
-
-            <form method="POST">
-
+            <form
+                method="POST"
+                class="space-y-4"
+            >
 
                 <!-- NOME -->
 
-                <div class="mb-4">
+                <div>
 
                     <label
                         for="nome"
+
                         class="
                             block
                             font-bold
@@ -187,21 +177,25 @@ Criar conta
                         Nome
                     </label>
 
+
                     <input
                         id="nome"
                         name="nome"
                         type="text"
+
                         required
+
                         autocomplete="name"
+
                         placeholder="Digite seu nome"
 
                         class="
                             w-full
-                            min-w-0
 
                             bg-white
+
                             border-2
-                            border-blue-400
+                            border-indigo-300
 
                             focus:border-yellow-300
                             focus:ring-4
@@ -213,9 +207,10 @@ Criar conta
                             py-3
 
                             text-base
-                            text-gray-800
+                            text-slate-800
 
                             rounded-xl
+
                             transition
                         "
                     >
@@ -225,10 +220,11 @@ Criar conta
 
                 <!-- USUÁRIO -->
 
-                <div class="mb-4">
+                <div>
 
                     <label
                         for="username"
+
                         class="
                             block
                             font-bold
@@ -239,21 +235,25 @@ Criar conta
                         Usuário
                     </label>
 
+
                     <input
                         id="username"
                         name="username"
                         type="text"
+
                         required
+
                         autocomplete="username"
+
                         placeholder="Escolha um usuário"
 
                         class="
                             w-full
-                            min-w-0
 
                             bg-white
+
                             border-2
-                            border-blue-400
+                            border-indigo-300
 
                             focus:border-yellow-300
                             focus:ring-4
@@ -265,9 +265,10 @@ Criar conta
                             py-3
 
                             text-base
-                            text-gray-800
+                            text-slate-800
 
                             rounded-xl
+
                             transition
                         "
                     >
@@ -277,10 +278,11 @@ Criar conta
 
                 <!-- SENHA -->
 
-                <div class="mb-4">
+                <div>
 
                     <label
                         for="senha"
+
                         class="
                             block
                             font-bold
@@ -291,48 +293,79 @@ Criar conta
                         Senha
                     </label>
 
-                    <input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        required
-                        autocomplete="new-password"
-                        placeholder="Crie uma senha"
 
-                        class="
-                            w-full
-                            min-w-0
+                    <div class="relative">
 
-                            bg-white
-                            border-2
-                            border-blue-400
+                        <input
+                            id="senha"
+                            name="senha"
+                            type="password"
 
-                            focus:border-yellow-300
-                            focus:ring-4
-                            focus:ring-yellow-300/20
+                            required
 
-                            outline-none
+                            autocomplete="new-password"
 
-                            px-4
-                            py-3
+                            placeholder="Crie uma senha"
 
-                            text-base
-                            text-gray-800
+                            class="
+                                w-full
 
-                            rounded-xl
-                            transition
-                        "
-                    >
+                                bg-white
+
+                                border-2
+                                border-indigo-300
+
+                                focus:border-yellow-300
+                                focus:ring-4
+                                focus:ring-yellow-300/20
+
+                                outline-none
+
+                                px-4
+                                py-3
+                                pr-14
+
+                                text-base
+                                text-slate-800
+
+                                rounded-xl
+
+                                transition
+                            "
+                        >
+
+
+                        <button
+                            type="button"
+                            id="mostrar-senha"
+
+                            class="
+                                absolute
+                                right-4
+                                top-1/2
+                                -translate-y-1/2
+
+                                text-slate-500
+                                hover:text-indigo-600
+
+                                font-black
+                            "
+                        >
+                            👁️
+                        </button>
+
+                    </div>
 
                 </div>
 
 
                 <!-- CONFIRMAR SENHA -->
 
-                <div class="mb-6">
+                <div>
 
                     <label
                         for="confirmar_senha"
+
                         class="
                             block
                             font-bold
@@ -343,40 +376,84 @@ Criar conta
                         Confirmar senha
                     </label>
 
-                    <input
-                        id="confirmar_senha"
-                        name="confirmar_senha"
-                        type="password"
-                        required
-                        autocomplete="new-password"
-                        placeholder="Digite a senha novamente"
 
-                        class="
-                            w-full
-                            min-w-0
+                    <div class="relative">
 
-                            bg-white
-                            border-2
-                            border-blue-400
+                        <input
+                            id="confirmar_senha"
+                            name="confirmar_senha"
+                            type="password"
 
-                            focus:border-yellow-300
-                            focus:ring-4
-                            focus:ring-yellow-300/20
+                            required
 
-                            outline-none
+                            autocomplete="new-password"
 
-                            px-4
-                            py-3
+                            placeholder="Digite a senha novamente"
 
-                            text-base
-                            text-gray-800
+                            class="
+                                w-full
 
-                            rounded-xl
-                            transition
-                        "
-                    >
+                                bg-white
+
+                                border-2
+                                border-indigo-300
+
+                                focus:border-yellow-300
+                                focus:ring-4
+                                focus:ring-yellow-300/20
+
+                                outline-none
+
+                                px-4
+                                py-3
+                                pr-14
+
+                                text-base
+                                text-slate-800
+
+                                rounded-xl
+
+                                transition
+                            "
+                        >
+
+
+                        <button
+                            type="button"
+                            id="mostrar-confirmacao"
+
+                            class="
+                                absolute
+                                right-4
+                                top-1/2
+                                -translate-y-1/2
+
+                                text-slate-500
+                                hover:text-indigo-600
+
+                                font-black
+                            "
+                        >
+                            👁️
+                        </button>
+
+                    </div>
 
                 </div>
+
+
+                <!-- AVISO -->
+
+                <p
+                    id="aviso-senha"
+
+                    class="
+                        min-h-5
+                        text-sm
+                        font-bold
+                        text-yellow-200
+                    "
+                ></p>
 
 
                 <!-- BOTÃO -->
@@ -387,8 +464,9 @@ Criar conta
                     class="
                         w-full
 
-                        bg-indigo-700
-                        hover:bg-indigo-800
+                        bg-slate-900
+                        hover:bg-slate-800
+
                         active:scale-[0.98]
 
                         text-white
@@ -401,88 +479,67 @@ Criar conta
 
                         rounded-xl
 
-                        shadow-md
+                        shadow-lg
 
                         transition
                     "
                 >
-                    Criar minha conta 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    
+                    Criar minha conta 🚀
                 </button>
 
             </form>
 
 
+            <!-- ================================================= -->
             <!-- LOGIN -->
+            <!-- ================================================= -->
 
-            <a
-                href="{{ url_for('login') }}"
-
+            <div
                 class="
-                    block
-                    text-center
-
-                    text-yellow-300
-                    hover:text-yellow-200
-
-                    font-bold
-
                     mt-6
-                    transition
+                    pt-5
+                    border-t
+                    border-white/20
+                    text-center
                 "
             >
-                Já tenho uma conta
-            </a>
+
+                <p
+                    class="
+                        text-sm
+                        text-indigo-100
+                    "
+                >
+                    Já possui uma conta?
+                </p>
+
+
+                <a
+                    href="{{ url_for('login') }}"
+
+                    class="
+                        inline-block
+                        mt-2
+
+                        text-yellow-300
+                        hover:text-yellow-200
+
+                        font-black
+
+                        transition
+                    "
+                >
+                    Entrar na minha conta →
+                </a>
+
+            </div>
 
         </section>
 
 
-        <!-- ====================================== -->
-        <!-- GIF DIREITO -->
-        <!-- ====================================== -->
+        <!-- ================================================= -->
+        <!-- PERSONAGEM DIREITO -->
+        <!-- ================================================= -->
 
         <div
             class="
@@ -495,6 +552,7 @@ Criar conta
 
             <img
                 src="https://i.pinimg.com/originals/a4/95/9d/a4959df7cd7900c5df9f3dadab08d7aa.gif"
+
                 alt="Personagem animado"
 
                 class="
@@ -508,9 +566,9 @@ Criar conta
         </div>
 
 
-        <!-- ====================================== -->
+        <!-- ================================================= -->
         <!-- PINGUIM MOBILE -->
-        <!-- ====================================== -->
+        <!-- ================================================= -->
 
         <div
             class="
@@ -524,6 +582,7 @@ Criar conta
 
             <img
                 src="https://media1.tenor.com/m/SQ-iPKrB7Q4AAAAd/penguin.gif"
+
                 alt="Pinguim"
 
                 class="
@@ -538,6 +597,146 @@ Criar conta
 
     </div>
 
-</main>
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const senha =
+            document.getElementById(
+                "senha"
+            );
+
+        const confirmar =
+            document.getElementById(
+                "confirmar_senha"
+            );
+
+        const mostrarSenha =
+            document.getElementById(
+                "mostrar-senha"
+            );
+
+        const mostrarConfirmacao =
+            document.getElementById(
+                "mostrar-confirmacao"
+            );
+
+        const aviso =
+            document.getElementById(
+                "aviso-senha"
+            );
+
+
+        function alternarSenha(
+            campo,
+            botao
+        ) {
+
+            if (
+                campo.type ===
+                "password"
+            ) {
+
+                campo.type =
+                    "text";
+
+                botao.textContent =
+                    "🙈";
+
+            } else {
+
+                campo.type =
+                    "password";
+
+                botao.textContent =
+                    "👁️";
+            }
+        }
+
+
+        mostrarSenha.addEventListener(
+            "click",
+            () => {
+
+                alternarSenha(
+                    senha,
+                    mostrarSenha
+                );
+            }
+        );
+
+
+        mostrarConfirmacao.addEventListener(
+            "click",
+            () => {
+
+                alternarSenha(
+                    confirmar,
+                    mostrarConfirmacao
+                );
+            }
+        );
+
+
+        function verificarSenhas() {
+
+            if (
+                confirmar.value === ""
+            ) {
+
+                aviso.textContent =
+                    "";
+
+                return;
+            }
+
+
+            if (
+                senha.value ===
+                confirmar.value
+            ) {
+
+                aviso.textContent =
+                    "✓ As senhas são iguais.";
+
+                aviso.className =
+                    "min-h-5 text-sm font-bold text-green-300";
+
+            } else {
+
+                aviso.textContent =
+                    "As senhas ainda não são iguais.";
+
+                aviso.className =
+                    "min-h-5 text-sm font-bold text-yellow-200";
+            }
+        }
+
+
+        senha.addEventListener(
+            "input",
+            verificarSenhas
+        );
+
+
+        confirmar.addEventListener(
+            "input",
+            verificarSenhas
+        );
+
+    }
+);
+
+</script>
 
 {% endblock %}

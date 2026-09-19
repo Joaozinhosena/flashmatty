@@ -1,167 +1,257 @@
-const input = document.getElementById("resposta");
+// ============================================================
+// GAME.JS
+// ============================================================
+//
+// Arquivo auxiliar do sistema de exercícios.
+//
+// IMPORTANTE:
+// A lógica principal das atividades agora fica em:
+//
+// static/js/exercicio.js
+//
+// Este arquivo NÃO deve:
+// - enviar /api/responder
+// - controlar o botão Conferir
+// - criar listener no campo #resposta
+// - trocar questões
+//
+// Isso evita conflito com o sistema dinâmico.
+// ============================================================
 
-let bloqueado = false;
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-
-input.addEventListener("keydown", function(event) {
-
-    if (event.key === "Enter") {
-        responder();
-    }
-
-});
-
-
-async function responder() {
-
-    if (bloqueado) {
-        return;
-    }
-
-
-    const valor = input.value.trim();
-
-
-    if (valor === "") {
-
-        mostrarFeedback(
-            "Digite uma resposta ",
-            "text-orange-500"
-        );
-
-        return;
-    }
-
-
-    bloqueado = true;
-
-
-    try {
-
-        const response = await fetch(
-            "/api/responder",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    resposta: valor
-                })
-            }
+        console.log(
+            "game.js carregado"
         );
 
 
-        const dados = await response.json();
+        // ====================================================
+        // VERIFICAR SE É A NOVA TELA DE EXERCÍCIOS
+        // ====================================================
 
-
-        if (!response.ok) {
-
-            mostrarFeedback(
-                dados.erro || "Ocorreu um erro.",
-                "text-red-500"
+        const exercicioApp =
+            document.getElementById(
+                "exercicio-app"
             );
 
-            bloqueado = false;
+
+        if (exercicioApp) {
+
+            console.log(
+                "Sistema dinâmico detectado. " +
+                "O controle da atividade será feito por exercicio.js."
+            );
 
             return;
         }
 
 
-        if (dados.correto) {
+        // ====================================================
+        // OUTRAS PÁGINAS
+        // ====================================================
+        //
+        // Se no futuro game.js for utilizado em outra tela,
+        // o código específico poderá ser colocado aqui.
+        //
+        // ====================================================
 
-            mostrarFeedback(
-                `${dados.mensagem}
-                +${dados.xp_ganho} XP
-                ⭐`,
-                "text-green-500"
+    }
+);
+
+
+// ============================================================
+// FUNÇÕES AUXILIARES GERAIS
+// ============================================================
+
+function atualizarElemento(
+    id,
+    valor
+) {
+
+    const elemento =
+        document.getElementById(
+            id
+        );
+
+
+    if (!elemento) {
+
+        return;
+    }
+
+
+    elemento.textContent =
+        valor ?? "";
+}
+
+
+// ============================================================
+// XP
+// ============================================================
+
+function atualizarXP(
+    valor
+) {
+
+    atualizarElemento(
+        "xp-atual",
+        valor
+    );
+
+
+    // Compatibilidade com páginas antigas
+    atualizarElemento(
+        "xp",
+        valor
+    );
+}
+
+
+// ============================================================
+// MOEDAS
+// ============================================================
+
+function atualizarMoedas(
+    valor
+) {
+
+    atualizarElemento(
+        "moedas",
+        valor
+    );
+}
+
+
+// ============================================================
+// PROGRESSO
+// ============================================================
+
+function atualizarBarraProgresso(
+    respondidas,
+    quantidade
+) {
+
+    const barra =
+        document.getElementById(
+            "barra-progresso"
+        );
+
+
+    const texto =
+        document.getElementById(
+            "texto-progresso"
+        );
+
+
+    const respondidasNumero =
+        Number(
+            respondidas || 0
+        );
+
+
+    const quantidadeNumero =
+        Math.max(
+            1,
+            Number(
+                quantidade || 1
+            )
+        );
+
+
+    const percentual =
+        Math.min(
+            100,
+            Math.round(
+                (
+                    respondidasNumero /
+                    quantidadeNumero
+                ) *
+                100
+            )
+        );
+
+
+    if (barra) {
+
+        barra.style.width =
+            `${percentual}%`;
+    }
+
+
+    if (texto) {
+
+        texto.textContent =
+            `${respondidasNumero}/${quantidadeNumero}`;
+    }
+}
+
+
+// ============================================================
+// FEEDBACK GENÉRICO
+// ============================================================
+
+function mostrarFeedbackGlobal(
+    mensagem,
+    tipo = ""
+) {
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+
+    if (!feedback) {
+
+        return;
+    }
+
+
+    feedback.textContent =
+        mensagem || "";
+
+
+    feedback.className =
+        "mt-5 min-h-10 text-center text-lg font-black";
+
+
+    switch (tipo) {
+
+        case "sucesso":
+
+            feedback.classList.add(
+                "text-green-600"
             );
 
-        } else {
+            break;
 
-            mostrarFeedback(
-                dados.mensagem,
+
+        case "erro":
+
+            feedback.classList.add(
                 "text-red-500"
             );
 
-        }
+            break;
 
 
-        atualizarStatus(dados);
+        case "aviso":
 
-
-        setTimeout(() => {
-
-            atualizarQuestao(
-                dados.questao
+            feedback.classList.add(
+                "text-orange-500"
             );
 
-            input.value = "";
-
-            input.focus();
-
-            mostrarFeedback("", "");
-
-            bloqueado = false;
-
-        }, 1200);
+            break;
 
 
-    } catch (erro) {
+        default:
 
-        console.error(erro);
+            feedback.classList.add(
+                "text-slate-500"
+            );
 
-        mostrarFeedback(
-            "Não foi possível enviar a resposta.",
-            "text-red-500"
-        );
-
-        bloqueado = false;
+            break;
     }
-
-}
-
-
-function atualizarQuestao(questao) {
-
-    document.getElementById(
-        "tituloQuestao"
-    ).innerText = questao.titulo;
-
-    document.getElementById(
-        "pergunta"
-    ).innerText = questao.pergunta;
-
-}
-
-function atualizarStatus(dados) {
-
-    document.getElementById("xp").innerText =
-        dados.xp;
-
-    document.getElementById("nivel").innerText =
-        dados.nivel;
-
-    document.getElementById("moedas").innerText =
-        dados.moedas;
-
-    document.getElementById("sequencia").innerText =
-        "🔥 " + dados.sequencia;
-
-}
-
-
-function mostrarFeedback(texto, classe) {
-
-    const feedback =
-        document.getElementById("feedback");
-
-    feedback.className =
-        "min-h-[70px] mt-6 text-xl font-black " +
-        classe;
-
-    feedback.innerText = texto;
-
 }

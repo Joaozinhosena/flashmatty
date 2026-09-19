@@ -1,204 +1,470 @@
 {% extends "base.html" %}
 
+{% block title %}
+{{ assunto.nome }} - FlashMatty
+{% endblock %}
+
+
 {% block content %}
-<body style="background-color:rgb(19 31 36);"></body>
-<div class="max-w-2xl mx-auto px-4 py-10">
 
-    <a
-        href="{{
-            url_for(
-                'tema',
-                ano_id=ano_id,
-                tema_id=tema_id
-            )
-        }}"
-        class="text-indigo-600 font-bold"
-    >
-        ← {{ tema.nome }}
-    </a>
-
-
-    <div class="mt-6 text-center">
-
-        <h1 class="text-3xl md:text-4xl font-black">
-            {{ assunto.nome }}
-        </h1>
-
-        <p class="text-slate-500 mt-2">
-            {{ assunto.descricao }}
-        </p>
-
-    </div>
-
-
-    {% if progresso_assunto and progresso_assunto.concluido %}
+<div
+    class="
+        min-h-screen
+        bg-slate-900
+        text-white
+        px-4
+        py-10
+    "
+>
 
     <div
         class="
-        mt-6
-        bg-green-100
-        border
-        border-green-300
-        rounded-2xl
-        p-4
-        text-center
-        font-black
-        text-green-700
+            max-w-2xl
+            mx-auto
         "
     >
-        🏆 Assunto concluído!
-    </div>
 
-    {% endif %}
+        <!-- ================================================= -->
+        <!-- VOLTAR -->
+        <!-- ================================================= -->
+
+        <a
+            href="{{
+                url_for(
+                    'tema',
+                    ano_id=ano_id,
+                    tema_id=tema_id
+                )
+            }}"
+
+            class="
+                inline-flex
+                items-center
+                gap-2
+                text-indigo-400
+                hover:text-indigo-300
+                font-bold
+                transition
+            "
+        >
+            ← {{ tema.nome }}
+        </a>
 
 
-    <!-- TRILHA -->
+        <!-- ================================================= -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================= -->
 
-    <div class="mt-12">
+        <div
+            class="
+                mt-8
+                text-center
+            "
+        >
 
-        {% for etapa_id, etapa in assunto.etapas.items() %}
+            <h1
+                class="
+                    text-3xl
+                    md:text-4xl
+                    font-black
+                    text-white
+                "
+            >
+                {{ assunto.nome }}
+            </h1>
 
-            {% set info = progressos.get(etapa_id) %}
 
-            {% set progresso = info.progresso %}
+            <p
+                class="
+                    text-slate-400
+                    mt-3
+                "
+            >
+                {{ assunto.descricao }}
+            </p>
 
-            {% set liberada = info.liberada %}
+        </div>
 
 
-            <div class="flex flex-col items-center">
+        <!-- ================================================= -->
+        <!-- ASSUNTO CONCLUÍDO -->
+        <!-- ================================================= -->
 
-                {% if progresso and progresso.concluida %}
+        {% if progresso_assunto and progresso_assunto.concluido %}
 
-                    <a
-                        href="{{
-                            url_for(
-                                'etapa',
-                                ano_id=ano_id,
-                                tema_id=tema_id,
-                                assunto_id=assunto_id,
-                                etapa_id=etapa_id
-                            )
-                        }}"
-                        class="
-                        w-24
-                        h-24
-                        rounded-full
-                        bg-green-500
-                        border-b-8
-                        border-green-700
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        text-4xl
+        <div
+            class="
+                mt-7
+                bg-green-500/10
+                border
+                border-green-500/40
+                rounded-2xl
+                p-4
+                text-center
+                font-black
+                text-green-400
+            "
+        >
+            🏆 Assunto concluído!
+        </div>
+
+        {% endif %}
+
+
+        <!-- ================================================= -->
+        <!-- EXPLICAÇÃO -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                mt-8
+                rounded-3xl
+                border
+                border-slate-700
+                bg-slate-800
+                p-5
+            "
+        >
+
+            <p
+                class="
+                    text-xs
+                    uppercase
+                    tracking-wider
+                    font-black
+                    text-indigo-400
+                "
+            >
+                O que você vai aprender
+            </p>
+
+
+            <p
+                class="
+                    mt-2
+                    text-slate-300
+                    leading-relaxed
+                "
+            >
+                {{ assunto.explicacao }}
+            </p>
+
+
+            {% if assunto.exemplo %}
+
+            <div
+                class="
+                    mt-4
+                    rounded-2xl
+                    bg-slate-700/60
+                    p-4
+                "
+            >
+
+                <span
+                    class="
+                        text-xs
+                        uppercase
                         font-black
-                        "
-                    >
-                        ✓
-                    </a>
+                        text-slate-400
+                    "
+                >
+                    Exemplo
+                </span>
 
 
-                {% elif liberada %}
-
-                    <a
-                        href="{{
-                            url_for(
-                                'etapa',
-                                ano_id=ano_id,
-                                tema_id=tema_id,
-                                assunto_id=assunto_id,
-                                etapa_id=etapa_id
-                            )
-                        }}"
-                        class="
-                        w-24
-                        h-24
-                        rounded-full
-                        bg-indigo-500
-                        border-b-8
-                        border-indigo-700
+                <p
+                    class="
+                        mt-1
+                        font-bold
                         text-white
+                    "
+                >
+                    {{ assunto.exemplo }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- TRILHA -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                mt-12
+                pb-16
+            "
+        >
+
+            {% for etapa_id, etapa in assunto.etapas.items() %}
+
+                {% set info = progressos.get(etapa_id) %}
+
+                {% set progresso = info.progresso if info else none %}
+
+                {% set liberada = info.liberada if info else false %}
+
+
+                <div
+                    class="
                         flex
+                        flex-col
                         items-center
-                        justify-center
-                        text-4xl
-                        font-black
-                        "
-                    >
+                    "
+                >
 
-                        {% if etapa.desafio %}
-                            ★
-                        {% else %}
-                            {{ etapa_id }}
-                        {% endif %}
+                    <!-- ===================================== -->
+                    <!-- ETAPA CONCLUÍDA -->
+                    <!-- ===================================== -->
 
-                    </a>
+                    {% if progresso and progresso.concluida %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'etapa',
+                                    ano_id=ano_id,
+                                    tema_id=tema_id,
+                                    assunto_id=assunto_id,
+                                    etapa_id=etapa_id
+                                )
+                            }}"
+
+                            class="
+                                group
+                                relative
+                                w-24
+                                h-24
+                                rounded-full
+                                bg-green-500
+                                border-b-8
+                                border-green-700
+                                text-white
+                                flex
+                                items-center
+                                justify-center
+                                text-4xl
+                                font-black
+                                shadow-lg
+                                transition
+                                duration-200
+
+                                hover:-translate-y-1
+                                hover:bg-green-400
+                            "
+                        >
+                            ✓
+                        </a>
 
 
-                {% else %}
+                    <!-- ===================================== -->
+                    <!-- ETAPA LIBERADA -->
+                    <!-- ===================================== -->
+
+                    {% elif liberada %}
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'etapa',
+                                    ano_id=ano_id,
+                                    tema_id=tema_id,
+                                    assunto_id=assunto_id,
+                                    etapa_id=etapa_id
+                                )
+                            }}"
+
+                            class="
+                                group
+                                relative
+                                w-24
+                                h-24
+                                rounded-full
+                                bg-indigo-500
+                                border-b-8
+                                border-indigo-700
+                                text-white
+                                flex
+                                items-center
+                                justify-center
+                                text-4xl
+                                font-black
+                                shadow-lg
+                                transition
+                                duration-200
+
+                                hover:-translate-y-1
+                                hover:bg-indigo-400
+                            "
+                        >
+
+                            {% if etapa.desafio %}
+
+                                ★
+
+                            {% else %}
+
+                                {{ etapa_id }}
+
+                            {% endif %}
+
+                        </a>
+
+
+                    <!-- ===================================== -->
+                    <!-- ETAPA BLOQUEADA -->
+                    <!-- ===================================== -->
+
+                    {% else %}
+
+                        <div
+                            class="
+                                w-24
+                                h-24
+                                rounded-full
+                                bg-slate-700
+                                border-b-8
+                                border-slate-800
+                                text-slate-400
+                                flex
+                                items-center
+                                justify-center
+                                text-3xl
+                                cursor-not-allowed
+                            "
+                        >
+                            🔒
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- ===================================== -->
+                    <!-- INFORMAÇÕES DA ETAPA -->
+                    <!-- ===================================== -->
 
                     <div
                         class="
-                        w-24
-                        h-24
-                        rounded-full
-                        bg-slate-300
-                        border-b-8
-                        border-slate-400
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        text-3xl
+                            text-center
+                            mt-4
                         "
                     >
-                        🔒
+
+                        <h3
+                            class="
+                                font-black
+                                text-white
+                            "
+                        >
+                            {{ etapa.nome }}
+                        </h3>
+
+
+                        <p
+                            class="
+                                text-sm
+                                text-slate-400
+                                mt-1
+                            "
+                        >
+                            {{ etapa.quantidade }}
+                            questões
+                        </p>
+
+
+                        {% if progresso %}
+
+                            <p
+                                class="
+                                    text-xs
+                                    text-slate-500
+                                    mt-1
+                                "
+                            >
+                                Melhor:
+                                {{ progresso.melhor_pontuacao or 0 }}%
+                            </p>
+
+                        {% endif %}
+
+
+                        {% if progresso and progresso.concluida %}
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-xs
+                                    font-black
+                                    text-green-400
+                                "
+                            >
+                                Concluída ✓
+                            </p>
+
+                        {% elif liberada %}
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-xs
+                                    font-black
+                                    text-indigo-400
+                                "
+                            >
+                                Disponível
+                            </p>
+
+                        {% else %}
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-xs
+                                    font-black
+                                    text-slate-600
+                                "
+                            >
+                                Bloqueada
+                            </p>
+
+                        {% endif %}
+
                     </div>
 
-                {% endif %}
 
+                    <!-- ===================================== -->
+                    <!-- CONECTOR DA TRILHA -->
+                    <!-- ===================================== -->
 
-                <div class="text-center mt-3">
+                    {% if not loop.last %}
 
-                    <h3 class="font-black">
-                        {{ etapa.nome }}
-                    </h3>
+                        <div
+                            class="
+                                w-2
+                                h-14
+                                rounded-full
+                                my-3
 
-                    <p class="text-sm text-slate-500">
-                        {{ etapa.quantidade }}
-                        questões
-                    </p>
-
-
-                    {% if progresso %}
-
-                    <p class="text-xs text-slate-400 mt-1">
-                        Melhor:
-                        {{ progresso.melhor_pontuacao or 0 }}%
-                    </p>
+                                {% if progresso and progresso.concluida %}
+                                    bg-green-600
+                                {% else %}
+                                    bg-slate-700
+                                {% endif %}
+                            "
+                        ></div>
 
                     {% endif %}
 
                 </div>
 
+            {% endfor %}
 
-                {% if not loop.last %}
-
-                <div
-                    class="
-                    w-2
-                    h-14
-                    bg-slate-200
-                    rounded-full
-                    my-3
-                    "
-                ></div>
-
-                {% endif %}
-
-            </div>
-
-        {% endfor %}
+        </div>
 
     </div>
 

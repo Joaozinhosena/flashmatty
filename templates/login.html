@@ -1,153 +1,503 @@
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-
 {% extends "base.html" %}
 
 {% block title %}
-Entrar | Matemática
+Entrar - FlashMatty
 {% endblock %}
 
 
 {% block content %}
 
-
-
-
-<!--container do plano de fundo principal-->
 <div
     class="
-    min-h-[85vh]
-    flex
-    bg-blue-700
-    items-center
-    justify-center
-    p-5
+        min-h-screen
+        bg-slate-900
+        px-4
+        py-8
+
+        flex
+        items-center
+        justify-center
     "
 >
 
+    <div
+        class="
+            w-full
+            max-w-5xl
 
-<!--container do recebiemento de resposta-->
-<div
-    class="
-    bg-white
-    rounded-3xl
-    shadow-xl
-    p-8
-    w-full
-    max-w-md
-    "
->
+            grid
+            lg:grid-cols-2
+            gap-8
+            items-center
+        "
+    >
 
-    <div class="text-center mb-8">
+        <!-- ================================================= -->
+        <!-- APRESENTAÇÃO -->
+        <!-- ================================================= -->
 
-
-        <!--container com logo marca -->
-        <div class="text-7xl">
-            
-            <img class="h-50 " src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qcrWvK9QRTTjtVMYb2CwiN-dgTmbJYky8sh1dT8u-A&s=10">
-        </div>
-
-        <!--texto principal-->
-        <h1
+        <div
             class="
-            text-3xl
-            font-black
-            text-blue-400
-            mt-3
+                hidden
+                lg:block
             "
         >
-             FlashMatty
-        </h1>
+
+            <p
+                class="
+                    text-sm
+                    uppercase
+                    tracking-widest
+                    font-black
+                    text-indigo-400
+                "
+            >
+                Bem-vindo ao
+            </p>
 
 
-        <!--paragrafo texto princiapl-->
-        <p class="text-gray-500 mt-2">
-            aprenda matematica de um jeito insano
-        </p>
+            <h1
+                class="
+                    text-5xl
+                    xl:text-6xl
+                    font-black
+                    text-white
+                    mt-2
+                "
+            >
+                FlashMatty
+            </h1>
+
+
+            <p
+                class="
+                    text-slate-400
+                    text-xl
+                    mt-5
+                    max-w-lg
+                "
+            >
+                Aprenda matemática, avance pela sua jornada,
+                ganhe XP e desafie seus amigos.
+            </p>
+
+
+            <div
+                class="
+                    mt-10
+                    flex
+                    justify-center
+                    lg:justify-start
+                "
+            >
+
+                <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qcrWvK9QRTTjtVMYb2CwiN-dgTmbJYky8sh1dT8u-A&s=10"
+
+                    alt="Mascote FlashMatty"
+
+                    class="
+                        w-full
+                        max-w-[300px]
+                        h-auto
+                        object-contain
+                    "
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- LOGIN -->
+        <!-- ================================================= -->
+
+        <section
+            class="
+                w-full
+                max-w-md
+                mx-auto
+
+                bg-white
+
+                rounded-3xl
+                shadow-2xl
+
+                p-6
+                sm:p-8
+            "
+        >
+
+            <!-- LOGO MOBILE -->
+
+            <div
+                class="
+                    lg:hidden
+                    flex
+                    justify-center
+                    mb-4
+                "
+            >
+
+                <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qcrWvK9QRTTjtVMYb2CwiN-dgTmbJYky8sh1dT8u-A&s=10"
+
+                    alt="Mascote FlashMatty"
+
+                    class="
+                        w-32
+                        h-32
+                        object-contain
+                    "
+                >
+
+            </div>
+
+
+            <!-- CABEÇALHO -->
+
+            <div class="text-center">
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        tracking-widest
+                        font-black
+                        text-indigo-500
+                    "
+                >
+                    FlashMatty
+                </p>
+
+
+                <h1
+                    class="
+                        text-3xl
+                        font-black
+                        text-slate-900
+                        mt-1
+                    "
+                >
+                    Entrar
+                </h1>
+
+
+                <p
+                    class="
+                        text-slate-500
+                        mt-2
+                    "
+                >
+                    Continue de onde você parou.
+                </p>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- FORMULÁRIO -->
+            <!-- ================================================= -->
+
+            <form
+                method="POST"
+                class="mt-8"
+            >
+
+                <!-- USUÁRIO -->
+
+                <div>
+
+                    <label
+                        for="username"
+
+                        class="
+                            block
+                            font-bold
+                            text-slate-700
+                            mb-2
+                        "
+                    >
+                        Usuário
+                    </label>
+
+
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+
+                        required
+
+                        autocomplete="username"
+
+                        autofocus
+
+                        placeholder="Digite seu usuário"
+
+                        class="
+                            w-full
+
+                            border-2
+                            border-slate-200
+
+                            rounded-xl
+
+                            px-4
+                            py-3
+
+                            text-slate-800
+                            font-bold
+
+                            outline-none
+
+                            transition
+
+                            focus:border-indigo-500
+                            focus:ring-4
+                            focus:ring-indigo-100
+                        "
+                    >
+
+                </div>
+
+
+                <!-- SENHA -->
+
+                <div class="mt-5">
+
+                    <label
+                        for="senha"
+
+                        class="
+                            block
+                            font-bold
+                            text-slate-700
+                            mb-2
+                        "
+                    >
+                        Senha
+                    </label>
+
+
+                    <div class="relative">
+
+                        <input
+                            id="senha"
+                            name="senha"
+                            type="password"
+
+                            required
+
+                            autocomplete="current-password"
+
+                            placeholder="Digite sua senha"
+
+                            class="
+                                w-full
+
+                                border-2
+                                border-slate-200
+
+                                rounded-xl
+
+                                px-4
+                                py-3
+                                pr-14
+
+                                text-slate-800
+                                font-bold
+
+                                outline-none
+
+                                transition
+
+                                focus:border-indigo-500
+                                focus:ring-4
+                                focus:ring-indigo-100
+                            "
+                        >
+
+
+                        <button
+                            id="mostrar-senha"
+
+                            type="button"
+
+                            aria-label="Mostrar senha"
+
+                            class="
+                                absolute
+                                right-4
+                                top-1/2
+                                -translate-y-1/2
+
+                                text-slate-500
+                                hover:text-indigo-600
+
+                                transition
+                            "
+                        >
+                            👁️
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+
+                    class="
+                        w-full
+
+                        bg-indigo-600
+                        hover:bg-indigo-700
+
+                        active:scale-[0.98]
+
+                        text-white
+                        text-lg
+                        font-black
+
+                        rounded-xl
+
+                        px-4
+                        py-4
+
+                        mt-7
+
+                        shadow-lg
+
+                        transition
+                    "
+                >
+                    Entrar 🚀
+                </button>
+
+            </form>
+
+
+            <!-- ================================================= -->
+            <!-- CADASTRO -->
+            <!-- ================================================= -->
+
+            <div
+                class="
+                    text-center
+                    mt-7
+                    pt-6
+                    border-t
+                    border-slate-200
+                "
+            >
+
+                <p class="text-slate-500">
+                    Ainda não possui uma conta?
+                </p>
+
+
+                <a
+                    href="{{ url_for('cadastro') }}"
+
+                    class="
+                        inline-block
+                        mt-2
+
+                        text-indigo-600
+                        hover:text-indigo-700
+
+                        font-black
+
+                        transition
+                    "
+                >
+                    Criar minha conta →
+                </a>
+
+            </div>
+
+        </section>
 
     </div>
 
-
-    <!--inicializacao do formulario com metodo post para envio de dados do cliente ate o modelo de tratamento de dados-->
-    <form method="POST">
-
-        <label class="font-bold">
-            Usuário
-        </label>
-
-        <input
-            name="username"
-            required
-            autocomplete="username"
-            class="
-            w-full
-            border-2
-            rounded-xl
-            p-3
-            mt-2
-            mb-5
-            focus:border-indigo-500
-            outline-none
-            "
-        >
-
-
-        <label class="font-bold">
-            Senha
-        </label>
-
-        <input
-            name="senha"
-            type="password"
-            required
-            autocomplete="current-password"
-            class="
-            w-full
-            border-2
-            rounded-xl
-            p-3
-            mt-2
-            mb-6
-            focus:border-indigo-500
-            outline-none
-            "
-        >
-
-
-        <button
-            class="
-
-            w-full
-            bg-blue-700
-            hover:bg-indigo-700
-            text-white
-            font-black
-            p-4
-            rounded-xl
-            "
-        >
-            Entrar 
-        </button>
-
-    </form>
-
-
-    <p class="text-center mt-6">
-
-        Ainda não possui uma conta?
-
-        <a
-            href="{{ url_for('cadastro') }}"
-            class="text-indigo-600 font-bold"
-        >
-            Criar conta
-        </a>
-
-    </p>
-
 </div>
 
-</div>
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const campoSenha =
+            document.getElementById(
+                "senha"
+            );
+
+
+        const botaoMostrar =
+            document.getElementById(
+                "mostrar-senha"
+            );
+
+
+        if (
+            !campoSenha ||
+            !botaoMostrar
+        ) {
+
+            return;
+        }
+
+
+        botaoMostrar.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    campoSenha.type ===
+                    "password"
+                ) {
+
+                    campoSenha.type =
+                        "text";
+
+                    botaoMostrar.textContent =
+                        "🙈";
+
+                    botaoMostrar.setAttribute(
+                        "aria-label",
+                        "Ocultar senha"
+                    );
+
+                } else {
+
+                    campoSenha.type =
+                        "password";
+
+                    botaoMostrar.textContent =
+                        "👁️";
+
+                    botaoMostrar.setAttribute(
+                        "aria-label",
+                        "Mostrar senha"
+                    );
+                }
+            }
+        );
+
+    }
+);
+
+</script>
 
 {% endblock %}
