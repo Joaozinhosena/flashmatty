@@ -1,54 +1,251 @@
 {% extends "base.html" %}
 
+{% block title %}
+Resultado da partida | Matemática
+{% endblock %}
+
+
 {% block content %}
 
 <div
     id="resultado"
     data-codigo="{{ codigo }}"
+
     class="
-    max-w-3xl
-    mx-auto
-    px-4
-    py-12
-    text-center
+        max-w-3xl
+        mx-auto
+        px-4
+        py-8
+        md:py-12
     "
 >
 
-    <div class="text-7xl">
-        🏆
-    </div>
 
-    <h1 class="text-4xl font-black mt-4">
-        Fim da partida!
-    </h1>
-
+    <!-- CABEÇALHO -->
     <div
-        id="podio"
-        class="mt-10"
-    >
-        Carregando resultado...
-    </div>
-
-
-    <a
-        href="{{ url_for('multiplayer.inicio') }}"
         class="
-        block
-        bg-indigo-600
-        text-white
-        rounded-2xl
-        p-4
-        mt-10
-        font-black
+            text-center
+            bg-gradient-to-br
+            from-amber-400
+            to-orange-500
+            text-white
+            rounded-3xl
+            px-6
+            py-10
+            shadow-lg
         "
     >
-        Jogar novamente
+
+        <div
+            class="
+                text-7xl
+                md:text-8xl
+            "
+        >
+            🏆
+        </div>
+
+
+        <h1
+            class="
+                text-4xl
+                md:text-5xl
+                font-black
+                mt-5
+            "
+        >
+            Fim da partida!
+        </h1>
+
+
+        <p
+            class="
+                text-white/90
+                mt-3
+                text-base
+                md:text-lg
+            "
+        >
+            Confira a classificação final.
+        </p>
+
+
+        <!-- CÓDIGO DA SALA -->
+        <div
+            class="
+                inline-flex
+                items-center
+                gap-2
+                bg-white/20
+                rounded-full
+                px-4
+                py-2
+                mt-5
+                text-sm
+                font-bold
+            "
+        >
+            🎮 Sala
+            <span class="tracking-widest">
+                {{ codigo }}
+            </span>
+        </div>
+
+    </div>
+
+
+
+    <!-- RANKING -->
+    <section
+        class="
+            bg-white
+            border
+            border-slate-200
+            rounded-3xl
+            p-5
+            md:p-7
+            mt-7
+            shadow-sm
+        "
+    >
+
+        <div
+            class="
+                flex
+                items-center
+                justify-between
+                gap-4
+                mb-6
+            "
+        >
+
+            <div>
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        font-black
+                        text-slate-400
+                    "
+                >
+                    Classificação
+                </p>
+
+                <h2
+                    class="
+                        text-2xl
+                        md:text-3xl
+                        font-black
+                        text-slate-900
+                        mt-1
+                    "
+                >
+                    Ranking final
+                </h2>
+
+            </div>
+
+
+            <div
+                class="
+                    bg-amber-50
+                    border
+                    border-amber-100
+                    rounded-2xl
+                    px-4
+                    py-2
+                    text-2xl
+                "
+            >
+                🏅
+            </div>
+
+        </div>
+
+
+
+        <!-- RANKING INSERIDO PELO JAVASCRIPT -->
+        <div
+            id="podio"
+            class="space-y-3"
+        >
+
+            <!-- CARREGAMENTO -->
+            <div
+                class="
+                    text-center
+                    py-12
+                    text-slate-400
+                "
+            >
+
+                <div class="text-5xl animate-pulse">
+                    🏆
+                </div>
+
+                <p class="font-bold mt-4">
+                    Carregando resultado...
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- BOTÃO JOGAR NOVAMENTE -->
+    <a
+        href="{{ url_for('multiplayer.inicio') }}"
+
+        class="
+            flex
+            items-center
+            justify-center
+            gap-3
+            w-full
+            bg-indigo-600
+            hover:bg-indigo-700
+            active:scale-[0.99]
+            text-white
+            rounded-2xl
+            p-5
+            mt-6
+            text-lg
+            font-black
+            shadow-lg
+            transition
+            duration-200
+        "
+    >
+        🔄 Jogar novamente
     </a>
+
+
+    <p
+        class="
+            text-center
+            text-sm
+            text-slate-400
+            mt-5
+        "
+    >
+        Crie uma nova sala para começar outra partida.
+    </p>
 
 </div>
 
 
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<!-- SOCKET.IO -->
+<script
+    src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+></script>
+
+
 
 <script>
 
@@ -57,28 +254,60 @@ const resultado =
         "resultado"
     );
 
+
 const codigo =
     resultado.dataset.codigo;
+
 
 const podio =
     document.getElementById(
         "podio"
     );
 
+
 const socket =
     io();
 
 
+
+/* ==========================================
+   EVITA INSERÇÃO DE HTML PELO NOME
+========================================== */
+
+function escaparHtml(valor) {
+
+    const elemento =
+        document.createElement("div");
+
+    elemento.textContent =
+        valor ?? "";
+
+    return elemento.innerHTML;
+
+}
+
+
+
+/* ==========================================
+   CONEXÃO
+========================================== */
+
 socket.on(
     "connect",
+
     () => {
 
-        /*
-        A página final pode ter sido
-        carregada depois do último evento.
+        console.log(
+            "Conectado ao servidor."
+        );
 
-        Por enquanto mostramos o resultado
-        quando o servidor enviar novamente.
+
+        /*
+        Solicita o ranking novamente.
+
+        Isso é importante porque o jogador
+        pode abrir resultado.html depois que
+        o evento final já foi enviado.
         */
 
         socket.emit(
@@ -87,13 +316,70 @@ socket.on(
                 codigo: codigo
             }
         );
+
     }
 );
 
 
+
+/* ==========================================
+   RANKING FINAL
+========================================== */
+
 socket.on(
     "ranking_final",
+
     dados => {
+
+        if (
+            !dados ||
+            !Array.isArray(dados.ranking)
+        ) {
+
+            podio.innerHTML = `
+                <div
+                    class="
+                        text-center
+                        py-10
+                        text-slate-500
+                    "
+                >
+                    Não foi possível carregar
+                    o ranking da partida.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        if (
+            dados.ranking.length === 0
+        ) {
+
+            podio.innerHTML = `
+                <div
+                    class="
+                        text-center
+                        py-10
+                        text-slate-400
+                    "
+                >
+
+                    <div class="text-5xl">
+                        🤔
+                    </div>
+
+                    <p class="font-bold mt-3">
+                        Nenhum resultado encontrado.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
 
         let html = "";
 
@@ -101,91 +387,252 @@ socket.on(
         dados.ranking.forEach(
             jogador => {
 
+                const posicao =
+                    Number(
+                        jogador.posicao
+                    );
+
+
                 let medalha =
-                    `${jogador.posicao}º`;
+                    `${posicao}º`;
+
+
+                let classePosicao =
+                    "bg-slate-100 text-slate-700";
+
+
+                let classeCard =
+                    "border-slate-200";
 
 
                 if (
-                    jogador.posicao === 1
+                    posicao === 1
                 ) {
+
                     medalha = "🥇";
+
+                    classePosicao =
+                        "bg-amber-50 text-amber-700";
+
+                    classeCard =
+                        "border-amber-300";
+
                 }
 
-                if (
-                    jogador.posicao === 2
+
+                else if (
+                    posicao === 2
                 ) {
+
                     medalha = "🥈";
+
+                    classePosicao =
+                        "bg-slate-100 text-slate-700";
+
+                    classeCard =
+                        "border-slate-300";
+
                 }
 
-                if (
-                    jogador.posicao === 3
+
+                else if (
+                    posicao === 3
                 ) {
+
                     medalha = "🥉";
+
+                    classePosicao =
+                        "bg-orange-50 text-orange-700";
+
+                    classeCard =
+                        "border-orange-200";
+
                 }
+
+
+                const nome =
+                    escaparHtml(
+                        jogador.nome || "Jogador"
+                    );
+
+
+                const acertos =
+                    Number(
+                        jogador.acertos || 0
+                    );
+
+
+                const pontos =
+                    Number(
+                        jogador.pontos || 0
+                    );
 
 
                 html += `
+
                     <div
                         class="
-                        flex
-                        items-center
-                        justify-between
-                        gap-4
-                        bg-white
-                        border
-                        rounded-2xl
-                        p-5
-                        mb-3
+                            flex
+                            items-center
+                            justify-between
+                            gap-4
+                            bg-white
+                            border-2
+                            ${classeCard}
+                            rounded-2xl
+                            p-4
+                            md:p-5
+                            transition
+                            hover:shadow-md
                         "
                     >
 
+
                         <div
                             class="
-                            flex
-                            items-center
-                            gap-4
+                                flex
+                                items-center
+                                gap-4
+                                min-w-0
                             "
                         >
 
-                            <div class="text-3xl">
+
+                            <!-- POSIÇÃO -->
+
+                            <div
+                                class="
+                                    ${classePosicao}
+                                    w-12
+                                    h-12
+                                    md:w-14
+                                    md:h-14
+                                    rounded-2xl
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-2xl
+                                    md:text-3xl
+                                    font-black
+                                    shrink-0
+                                "
+                            >
                                 ${medalha}
                             </div>
 
-                            <div class="text-left">
 
-                                <strong class="text-lg">
-                                    ${jogador.nome}
+
+                            <!-- JOGADOR -->
+
+                            <div
+                                class="
+                                    text-left
+                                    min-w-0
+                                "
+                            >
+
+                                <strong
+                                    class="
+                                        block
+                                        text-base
+                                        md:text-lg
+                                        text-slate-900
+                                        truncate
+                                    "
+                                >
+                                    ${nome}
                                 </strong>
 
-                                <p class="text-sm text-slate-500">
-                                    ${jogador.acertos}
-                                    acertos
+
+                                <p
+                                    class="
+                                        text-sm
+                                        text-slate-500
+                                        mt-1
+                                    "
+                                >
+                                    ✅ ${acertos}
+                                    ${
+                                        acertos === 1
+                                        ? "acerto"
+                                        : "acertos"
+                                    }
                                 </p>
 
                             </div>
 
                         </div>
 
-                        <strong
+
+
+                        <!-- PONTUAÇÃO -->
+
+                        <div
                             class="
-                            text-xl
-                            text-indigo-600
+                                text-right
+                                shrink-0
                             "
                         >
-                            ${jogador.pontos}
-                        </strong>
+
+                            <strong
+                                class="
+                                    block
+                                    text-xl
+                                    md:text-2xl
+                                    text-indigo-600
+                                    font-black
+                                "
+                            >
+                                ${pontos}
+                            </strong>
+
+
+                            <span
+                                class="
+                                    text-xs
+                                    text-slate-400
+                                    font-bold
+                                "
+                            >
+                                PONTOS
+                            </span>
+
+                        </div>
 
                     </div>
+
                 `;
+
             }
         );
 
 
         podio.innerHTML =
             html;
+
+    }
+);
+
+
+
+/* ==========================================
+   ERRO DE CONEXÃO
+========================================== */
+
+socket.on(
+    "connect_error",
+
+    erro => {
+
+        console.error(
+            "Erro de conexão:",
+            erro
+        );
+
     }
 );
 
 </script>
+
 
 {% endblock %}

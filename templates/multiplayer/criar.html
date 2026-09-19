@@ -1,47 +1,139 @@
 {% extends "base.html" %}
 
+{% block title %}
+Criar partida | Multiplayer
+{% endblock %}
+
 {% block content %}
 
-<div class="max-w-xl mx-auto px-4 py-10">
+<div
+    class="
+        max-w-xl
+        mx-auto
+        px-4
+        py-8
+        md:py-12
+    "
+>
 
+    <!-- VOLTAR -->
     <a
         href="{{ url_for('multiplayer.inicio') }}"
-        class="font-bold text-indigo-600"
+        class="
+            inline-flex
+            items-center
+            gap-2
+            font-bold
+            text-indigo-600
+            hover:text-indigo-700
+            transition
+        "
     >
         ← Voltar
     </a>
 
-    <h1 class="text-4xl font-black mt-5">
-        Criar partida 
-    </h1>
+
+    <!-- CABEÇALHO -->
+    <div class="text-center mt-6">
+
+        <div
+            class="
+                w-24
+                h-24
+                mx-auto
+                rounded-full
+                bg-indigo-50
+                flex
+                items-center
+                justify-center
+                text-6xl
+            "
+        >
+            👑
+        </div>
+
+        <h1
+            class="
+                text-4xl
+                md:text-5xl
+                font-black
+                text-slate-900
+                mt-5
+            "
+        >
+            Criar partida
+        </h1>
+
+        <p
+            class="
+                text-slate-500
+                mt-2
+            "
+        >
+            Configure sua sala antes de convidar os jogadores.
+        </p>
+
+    </div>
 
 
+    <!-- FORMULÁRIO -->
     <form
         method="POST"
         class="
-        bg-white
-        border
-        rounded-3xl
-        p-6
-        mt-8
-        space-y-6
+            bg-white
+            border
+            border-slate-200
+            rounded-3xl
+            p-6
+            md:p-7
+            mt-8
+            space-y-6
+            shadow-sm
         "
     >
 
+        <!-- CONTEÚDO -->
         <div>
 
-            <label class="font-black">
+            <label
+                for="assunto"
+                class="
+                    block
+                    font-black
+                    text-slate-800
+                "
+            >
                 Conteúdo
             </label>
 
-            <select
-                name="assunto"
+            <p
                 class="
-                w-full
-                border
-                rounded-xl
-                p-4
-                mt-2
+                    text-sm
+                    text-slate-400
+                    mt-1
+                "
+            >
+                Escolha o tipo de questão da partida.
+            </p>
+
+            <select
+                id="assunto"
+                name="assunto"
+
+                class="
+                    w-full
+                    border
+                    border-slate-200
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-100
+                    outline-none
+                    rounded-2xl
+                    p-4
+                    mt-3
+                    bg-white
+                    font-bold
+                    transition
                 "
             >
 
@@ -90,20 +182,48 @@
         </div>
 
 
+        <!-- RODADAS -->
         <div>
 
-            <label class="font-black">
+            <label
+                for="quantidade"
+                class="
+                    block
+                    font-black
+                    text-slate-800
+                "
+            >
                 Rodadas
             </label>
 
-            <select
-                name="quantidade"
+            <p
                 class="
-                w-full
-                border
-                rounded-xl
-                p-4
-                mt-2
+                    text-sm
+                    text-slate-400
+                    mt-1
+                "
+            >
+                Escolha quantas questões serão disputadas.
+            </p>
+
+            <select
+                id="quantidade"
+                name="quantidade"
+
+                class="
+                    w-full
+                    border
+                    border-slate-200
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-100
+                    outline-none
+                    rounded-2xl
+                    p-4
+                    mt-3
+                    bg-white
+                    font-bold
+                    transition
                 "
             >
 
@@ -131,40 +251,68 @@
         </div>
 
 
+        <!-- TEMPO POR QUESTÃO -->
         <div>
 
-            <label class="font-black">
+            <label
+                for="tempo"
+                class="
+                    block
+                    font-black
+                    text-slate-800
+                "
+            >
                 Tempo por questão
             </label>
 
-            <select
-                name="tempo"
+            <p
                 class="
-                w-full
-                border
-                rounded-xl
-                p-4
-                mt-2
+                    text-sm
+                    text-slate-400
+                    mt-1
+                "
+            >
+                Defina quanto tempo cada jogador terá para responder.
+            </p>
+
+            <select
+                id="tempo"
+                name="tempo"
+
+                class="
+                    w-full
+                    border
+                    border-slate-200
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-100
+                    outline-none
+                    rounded-2xl
+                    p-4
+                    mt-3
+                    bg-white
+                    font-bold
+                    transition
                 "
             >
 
                 <option value="10">
-                    10 segundos
+                    ⚡ 10 segundos
                 </option>
 
                 <option
                     value="20"
                     selected
                 >
-                    20 segundos
+                    ⏱️ 20 segundos
                 </option>
 
                 <option value="30">
-                    30 segundos
+                    ⏳ 30 segundos
                 </option>
 
                 <option value="45">
-                    45 segundos
+                    🧠 45 segundos
                 </option>
 
             </select>
@@ -172,17 +320,77 @@
         </div>
 
 
-        <button
+        <!-- RESUMO -->
+        <div
             class="
-            w-full
-            bg-indigo-600
-            text-white
-            font-black
-            rounded-2xl
-            p-4
+                bg-indigo-50
+                border
+                border-indigo-100
+                rounded-2xl
+                p-4
             "
         >
-            Criar sala
+
+            <div
+                class="
+                    flex
+                    items-start
+                    gap-3
+                "
+            >
+
+                <div class="text-2xl">
+                    🎮
+                </div>
+
+                <div>
+
+                    <p
+                        class="
+                            font-black
+                            text-indigo-800
+                        "
+                    >
+                        Pronto para começar
+                    </p>
+
+                    <p
+                        class="
+                            text-sm
+                            text-indigo-600
+                            mt-1
+                        "
+                    >
+                        Após criar a sala, será gerado um código para você compartilhar com seus amigos.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOTÃO -->
+        <button
+            type="submit"
+
+            class="
+                w-full
+                bg-indigo-600
+                hover:bg-indigo-700
+                active:scale-[0.99]
+                text-white
+                font-black
+                rounded-2xl
+                p-5
+                text-lg
+                shadow-lg
+                transition
+                duration-200
+            "
+        >
+            👑 Criar sala
         </button>
 
     </form>

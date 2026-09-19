@@ -2342,7 +2342,7 @@ if __name__ == "__main__":
 
     print("")
     print("==========================================")
-    print(" MATEMÁTICA KIDS")
+    print(" flashmatty")
     print(" http://127.0.0.1:5000")
     print("==========================================")
     print("")

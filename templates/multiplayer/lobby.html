@@ -1,128 +1,382 @@
 {% extends "base.html" %}
 
+{% block title %}
+Sala {{ codigo }} | Multiplayer
+{% endblock %}
+
 {% block content %}
 
 <div
     id="lobby"
+
     data-codigo="{{ codigo }}"
     data-jogador="{{ jogador_id }}"
     data-host="{{ 'true' if host else 'false' }}"
-    class="max-w-4xl mx-auto px-4 py-10"
+
+    class="
+        max-w-4xl
+        mx-auto
+        px-4
+        py-8
+        md:py-12
+    "
 >
 
-    <div class="text-center">
 
-        <p class="text-slate-500 font-bold">
-            CÓDIGO DA SALA
+    <!-- CABEÇALHO DA SALA -->
+    <div
+        class="
+            bg-gradient-to-br
+            from-indigo-600
+            to-violet-600
+            text-white
+            rounded-3xl
+            p-8
+            md:p-10
+            shadow-lg
+            text-center
+        "
+    >
+
+        <p
+            class="
+                text-indigo-100
+                font-black
+                text-sm
+                tracking-widest
+                uppercase
+            "
+        >
+            Código da sala
         </p>
+
 
         <h1
             class="
-            text-5xl
-            md:text-7xl
-            font-black
-            tracking-widest
-            mt-2
+                text-5xl
+                sm:text-6xl
+                md:text-7xl
+                font-black
+                tracking-[0.15em]
+                mt-3
+                break-all
             "
         >
             {{ codigo }}
         </h1>
 
-        <p class="text-slate-500 mt-3">
-            Compartilhe este código com seus amigos.
+
+        <p
+            class="
+                text-indigo-100
+                mt-4
+                text-sm
+                md:text-base
+            "
+        >
+            Compartilhe este código com seus amigos para eles entrarem na partida.
         </p>
+
+
+        <!-- TIPO DE JOGADOR -->
+        <div class="mt-5">
+
+            {% if host %}
+
+                <span
+                    class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        bg-white/15
+                        px-4
+                        py-2
+                        rounded-full
+                        font-bold
+                        text-sm
+                    "
+                >
+                    👑 Você é o anfitrião
+                </span>
+
+            {% else %}
+
+                <span
+                    class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        bg-white/15
+                        px-4
+                        py-2
+                        rounded-full
+                        font-bold
+                        text-sm
+                    "
+                >
+                    🎮 Você entrou na sala
+                </span>
+
+            {% endif %}
+
+        </div>
 
     </div>
 
 
+
+    <!-- LISTA DE JOGADORES -->
     <div
         class="
-        bg-white
-        border
-        rounded-3xl
-        p-6
-        mt-10
+            bg-white
+            border
+            border-slate-200
+            rounded-3xl
+            p-5
+            md:p-7
+            mt-7
+            shadow-sm
         "
     >
 
-        <div class="flex justify-between">
+        <div
+            class="
+                flex
+                items-center
+                justify-between
+                gap-4
+            "
+        >
 
-            <h2 class="text-2xl font-black">
-                Jogadores
-            </h2>
+            <div>
 
-            <span
-                id="quantidadeJogadores"
-                class="font-black text-indigo-600"
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        font-black
+                        text-slate-400
+                    "
+                >
+                    Participantes
+                </p>
+
+                <h2
+                    class="
+                        text-2xl
+                        md:text-3xl
+                        font-black
+                        text-slate-900
+                        mt-1
+                    "
+                >
+                    Jogadores
+                </h2>
+
+            </div>
+
+
+            <!-- QUANTIDADE -->
+            <div
+                class="
+                    flex
+                    items-center
+                    gap-2
+                    bg-indigo-50
+                    border
+                    border-indigo-100
+                    rounded-2xl
+                    px-4
+                    py-2
+                "
             >
-                0
-            </span>
+
+                <span>
+                    👥
+                </span>
+
+                <span
+                    id="quantidadeJogadores"
+                    class="
+                        font-black
+                        text-indigo-600
+                        text-lg
+                    "
+                >
+                    0
+                </span>
+
+            </div>
 
         </div>
 
 
+
+        <!-- JOGADORES ENTRAM AQUI PELO JS -->
         <div
             id="listaJogadores"
             class="
-            grid
-            grid-cols-2
-            md:grid-cols-3
-            gap-3
-            mt-6
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                md:grid-cols-3
+                gap-3
+                mt-6
             "
-        ></div>
+        >
+        </div>
+
+
+        <!-- TEXTO AUXILIAR -->
+        <div
+            id="mensagemListaVazia"
+            class="
+                text-center
+                text-slate-400
+                py-8
+            "
+        >
+
+            <div class="text-4xl">
+                👀
+            </div>
+
+            <p class="mt-3 font-bold">
+                Aguardando jogadores...
+            </p>
+
+        </div>
 
     </div>
+
 
 
     {% if host %}
 
-    <button
-        id="iniciarPartida"
-        type="button"
-        class="
-        w-full
-        bg-green-500
-        text-white
-        rounded-2xl
-        p-5
-        mt-6
-        text-xl
-        font-black
-        "
-    >
-        ▶ Iniciar partida
-    </button>
+        <!-- BOTÃO DO HOST -->
+        <button
+            id="iniciarPartida"
+            type="button"
+
+            class="
+                w-full
+                bg-green-500
+                hover:bg-green-600
+                active:scale-[0.99]
+                text-white
+                rounded-2xl
+                p-5
+                mt-6
+                text-xl
+                font-black
+                shadow-lg
+                transition
+                duration-200
+                disabled:bg-slate-300
+                disabled:text-slate-500
+                disabled:cursor-not-allowed
+                disabled:shadow-none
+            "
+        >
+            ▶ Iniciar partida
+        </button>
+
+
+        <p
+            class="
+                text-center
+                text-sm
+                text-slate-400
+                mt-3
+            "
+        >
+            Quando todos estiverem prontos, inicie a partida.
+        </p>
+
 
     {% else %}
 
-    <div
-        class="
-        text-center
-        bg-indigo-50
-        rounded-2xl
-        p-5
-        mt-6
-        font-bold
-        "
-    >
-        ⏳ Aguardando o anfitrião iniciar...
-    </div>
+        <!-- AGUARDANDO HOST -->
+        <div
+            class="
+                bg-indigo-50
+                border
+                border-indigo-100
+                rounded-2xl
+                p-5
+                mt-6
+                text-center
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-center
+                    gap-3
+                    font-black
+                    text-indigo-700
+                "
+            >
+
+                <span class="text-2xl animate-pulse">
+                    ⏳
+                </span>
+
+                <span>
+                    Aguardando o anfitrião iniciar...
+                </span>
+
+            </div>
+
+
+            <p
+                class="
+                    text-sm
+                    text-indigo-500
+                    mt-2
+                "
+            >
+                A partida começará automaticamente.
+            </p>
+
+        </div>
 
     {% endif %}
+
+
+
+    <!-- RODAPÉ DA SALA -->
+    <div
+        class="
+            mt-8
+            text-center
+            text-sm
+            text-slate-400
+        "
+    >
+        Não feche esta página enquanto estiver na sala.
+    </div>
 
 </div>
 
 
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
+<!-- SOCKET.IO -->
 <script
-    src="{{
-        url_for(
-            'static',
-            filename='js/multiplayer/lobby.js'
-        )
-    }}"
+    src="https://cdn.socket.io/4.8.1/socket.io.min.js"
 ></script>
+
+
+<!-- JAVASCRIPT DO LOBBY -->
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/multiplayer/lobby.js'
+    ) }}"
+></script>
+
 
 {% endblock %}

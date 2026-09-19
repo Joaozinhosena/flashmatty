@@ -1,99 +1,274 @@
 {% extends "base.html" %}
 
+{% block title %}
+Entrar na sala | Multiplayer
+{% endblock %}
+
 {% block content %}
 
-<div class="max-w-md mx-auto px-4 py-12">
+<div
+    class="
+        max-w-md
+        mx-auto
+        px-4
+        py-8
+        md:py-12
+    "
+>
 
+    <!-- CABEÇALHO -->
     <div class="text-center">
 
-        <div class="text-6xl">
+        <div
+            class="
+                w-24
+                h-24
+                mx-auto
+                rounded-full
+                bg-indigo-50
+                flex
+                items-center
+                justify-center
+                text-6xl
+            "
+        >
             🚪
         </div>
 
-        <h1 class="text-4xl font-black mt-4">
-            Entrar
+        <h1
+            class="
+                text-4xl
+                font-black
+                mt-5
+                text-slate-900
+            "
+        >
+            Entrar na sala
         </h1>
+
+        <p
+            class="
+                text-slate-500
+                mt-2
+            "
+        >
+            Digite o código da partida e escolha seu apelido.
+        </p>
 
     </div>
 
 
+    <!-- FORMULÁRIO -->
     <form
         method="POST"
+
         class="
-        bg-white
-        border
-        rounded-3xl
-        p-6
-        mt-8
-        space-y-5
+            bg-white
+            border
+            border-slate-200
+            rounded-3xl
+            p-6
+            md:p-7
+            mt-8
+            space-y-6
+            shadow-sm
         "
     >
 
+
+        <!-- CÓDIGO DA SALA -->
         <div>
 
-            <label class="font-black">
+            <label
+                for="codigo"
+                class="
+                    block
+                    font-black
+                    text-slate-800
+                "
+            >
                 Código da sala
             </label>
 
+
             <input
+                id="codigo"
                 name="codigo"
+                type="text"
+
                 inputmode="numeric"
+                pattern="[0-9]{6}"
                 maxlength="6"
+
                 required
+
+                autocomplete="off"
+
                 placeholder="123456"
+
                 class="
-                w-full
-                border-2
-                rounded-2xl
-                p-4
-                mt-2
-                text-center
-                text-3xl
-                tracking-widest
-                font-black
+                    w-full
+                    border-2
+                    border-slate-200
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-100
+                    outline-none
+                    rounded-2xl
+                    p-4
+                    mt-2
+                    text-center
+                    text-3xl
+                    tracking-[0.25em]
+                    font-black
+                    transition
                 "
             >
+
+
+            <p
+                class="
+                    text-xs
+                    text-slate-400
+                    mt-2
+                "
+            >
+                Digite os 6 números enviados pelo anfitrião.
+            </p>
 
         </div>
 
 
+
+        <!-- APELIDO -->
         <div>
 
-            <label class="font-black">
+            <label
+                for="apelido"
+                class="
+                    block
+                    font-black
+                    text-slate-800
+                "
+            >
                 Seu apelido
             </label>
 
+
             <input
+                id="apelido"
                 name="apelido"
+                type="text"
+
                 maxlength="20"
-                placeholder="{{ current_user.nome }}"
+
+                value="{{ current_user.nome }}"
+
+                placeholder="Digite seu apelido"
+
                 class="
-                w-full
-                border
-                rounded-2xl
-                p-4
-                mt-2
+                    w-full
+                    border
+                    border-slate-200
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-100
+                    outline-none
+                    rounded-2xl
+                    p-4
+                    mt-2
+                    font-bold
+                    transition
                 "
             >
+
+
+            <p
+                class="
+                    text-xs
+                    text-slate-400
+                    mt-2
+                "
+            >
+                Você pode alterar o nome antes de entrar.
+            </p>
 
         </div>
 
 
+
+        <!-- BOTÃO -->
         <button
+            type="submit"
+
             class="
-            w-full
-            bg-indigo-600
-            text-white
-            font-black
-            rounded-2xl
-            p-4
+                w-full
+                bg-indigo-600
+                hover:bg-indigo-700
+                active:scale-[0.99]
+                text-white
+                font-black
+                rounded-2xl
+                p-4
+                text-lg
+                shadow-lg
+                transition
+                duration-200
             "
         >
-            Entrar na partida
+            🎮 Entrar na partida
         </button>
 
     </form>
 
+
+
+    <!-- VOLTAR -->
+    <a
+        href="{{ url_for('multiplayer.inicio') }}"
+
+        class="
+            flex
+            items-center
+            justify-center
+            gap-2
+            mt-6
+            text-indigo-600
+            font-bold
+            hover:text-indigo-700
+        "
+    >
+        ← Voltar
+    </a>
+
 </div>
+
+
+<script>
+
+const campoCodigo =
+    document.getElementById(
+        "codigo"
+    );
+
+
+/*
+Permite somente números no
+campo do código da sala.
+*/
+
+campoCodigo.addEventListener(
+    "input",
+    () => {
+
+        campoCodigo.value =
+            campoCodigo.value
+                .replace(/\D/g, "")
+                .slice(0, 6);
+
+    }
+);
+
+</script>
 
 {% endblock %}

@@ -364,31 +364,23 @@
                     >
 
                         <div
-                            class="
-                                h-full
-                                rounded-full
-                                transition-all
-                                duration-500
+    class="
+        h-full
+        rounded-full
+        transition-all
+        duration-500
 
-                                {% if progresso and progresso.concluido %}
-                                    bg-green-500
-                                {% else %}
-                                    bg-indigo-500
-                                {% endif %}
+        {% if progresso and progresso.concluido %}
+            w-full
+            bg-green-500
+        {% else %}
+            w-0
+            bg-indigo-500
+        {% endif %}
 
-                                group-hover:bg-white
-                            "
-
-                            style="
-                                width:
-                                {% if progresso and progresso.concluido %}
-                                    100%
-                                {% else %}
-                                    0%
-                                {% endif %}
-                            "
-                        ></div>
-
+        group-hover:bg-white
+    "
+></div>
                     </div>
 
                 </a>

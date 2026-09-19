@@ -4,82 +4,201 @@
 Jogar com amigos
 {% endblock %}
 
-
 {% block content %}
 
-<div class="max-w-4xl mx-auto px-4 py-12">
+<div class="max-w-4xl mx-auto px-4 py-10 md:py-14">
 
+    <!-- Cabeçalho -->
     <div class="text-center">
 
-        <div class="text-7xl">
+        <div class="text-7xl md:text-8xl">
             🎮
         </div>
 
-        <h1 class="text-4xl md:text-5xl font-black mt-5">
+        <h1 class="
+            text-4xl
+            md:text-5xl
+            font-black
+            mt-5
+            text-slate-900
+        ">
             Jogar com amigos
         </h1>
 
-        <p class="text-slate-500 mt-3">
-            Crie uma sala ou entre em uma partida.
+        <p class="
+            text-slate-500
+            mt-3
+            text-base
+            md:text-lg
+        ">
+            Crie uma sala ou entre em uma partida com seus amigos.
         </p>
 
     </div>
 
 
-    <div class="grid md:grid-cols-2 gap-5 mt-10">
+    <!-- Opções -->
+    <div class="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        gap-6
+        mt-10
+    ">
 
+        <!-- Criar sala -->
         <a
             href="{{ url_for('multiplayer.criar') }}"
             class="
-            bg-indigo-600
-            text-white
-            rounded-3xl
-            p-8
-            text-center
+                group
+                bg-indigo-600
+                text-white
+                rounded-3xl
+                p-8
+                md:p-10
+                text-center
+                shadow-lg
+                transition
+                duration-200
+                hover:bg-indigo-700
+                hover:shadow-xl
+                hover:-translate-y-1
+                focus:outline-none
+                focus:ring-4
+                focus:ring-indigo-300
             "
         >
 
-            <div class="text-5xl">
+            <div class="
+                text-5xl
+                md:text-6xl
+                transition
+                duration-200
+                group-hover:scale-110
+            ">
                 👑
             </div>
 
-            <h2 class="text-2xl font-black mt-4">
+            <h2 class="
+                text-2xl
+                font-black
+                mt-5
+            ">
                 Criar sala
             </h2>
 
-            <p class="mt-2 opacity-80">
-                Você será o anfitrião.
+            <p class="
+                mt-2
+                text-indigo-100
+            ">
+                Crie uma nova partida e seja o anfitrião.
             </p>
+
+            <div class="
+                mt-6
+                inline-flex
+                items-center
+                justify-center
+                font-bold
+                bg-white/15
+                rounded-xl
+                px-5
+                py-3
+                transition
+                group-hover:bg-white/20
+            ">
+                Criar partida
+                <span class="ml-2">
+                    →
+                </span>
+            </div>
 
         </a>
 
 
+        <!-- Entrar em sala -->
         <a
             href="{{ url_for('multiplayer.entrar') }}"
             class="
-            bg-white
-            border-2
-            border-indigo-200
-            rounded-3xl
-            p-8
-            text-center
+                group
+                bg-white
+                border-2
+                border-indigo-200
+                rounded-3xl
+                p-8
+                md:p-10
+                text-center
+                shadow-sm
+                transition
+                duration-200
+                hover:border-indigo-400
+                hover:shadow-xl
+                hover:-translate-y-1
+                focus:outline-none
+                focus:ring-4
+                focus:ring-indigo-200
             "
         >
 
-            <div class="text-5xl">
+            <div class="
+                text-5xl
+                md:text-6xl
+                transition
+                duration-200
+                group-hover:scale-110
+            ">
                 🚪
             </div>
 
-            <h2 class="text-2xl font-black mt-4">
+            <h2 class="
+                text-2xl
+                font-black
+                mt-5
+                text-slate-900
+            ">
                 Entrar na sala
             </h2>
 
-            <p class="text-slate-500 mt-2">
-                Use o código dos seus amigos.
+            <p class="
+                text-slate-500
+                mt-2
+            ">
+                Use o código da sala para participar da partida.
             </p>
+
+            <div class="
+                mt-6
+                inline-flex
+                items-center
+                justify-center
+                font-bold
+                text-indigo-600
+                bg-indigo-50
+                rounded-xl
+                px-5
+                py-3
+                transition
+                group-hover:bg-indigo-100
+            ">
+                Entrar na partida
+                <span class="ml-2">
+                    →
+                </span>
+            </div>
 
         </a>
 
+    </div>
+
+
+    <!-- Informação inferior -->
+    <div class="
+        mt-10
+        text-center
+        text-sm
+        text-slate-400
+    ">
+        Convide seus amigos e descubra quem consegue a maior pontuação.
     </div>
 
 </div>
