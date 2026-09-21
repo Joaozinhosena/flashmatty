@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         botaoResponder.disabled = false;
 
         botaoResponder.textContent =
-            "Conferir 🚀";
+            "Conferir ";
     }
 
 
@@ -3185,19 +3185,23 @@ document.addEventListener("DOMContentLoaded", () => {
             // ====================================================
 
             if (dados.correto) {
+                somAcerto();
 
                 mostrarMensagem(
                     dados.mensagem ||
-                    "Muito bem! 🎉",
+                    "Muito bem! ",
                     "sucesso"
+                    
+
                 );
 
             } else {
+                somErro();
 
                 mostrarMensagem(
                     dados.mensagem ||
                     "Resposta incorreta.",
-                    "erro"
+                    "Não desista"
                 );
             }
 
@@ -3235,6 +3239,19 @@ document.addEventListener("DOMContentLoaded", () => {
             // ====================================================
 
             if (dados.terminou) {
+
+
+                if(dados.passou) {
+
+
+                    somConcluido()
+
+                }
+
+                else{
+                    somTentarNovamente()
+                
+                }
 
                 atualizarProgresso(
                     dados.quantidade,
@@ -3316,7 +3333,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     false;
 
                 botaoResponder.textContent =
-                    "Conferir 🚀";
+                    "Conferir ";
             }
         }
     }
@@ -3471,7 +3488,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     text-yellow-800
                                 "
                             >
-                                🏆 Assunto completamente concluído!
+                                 Assunto completamente concluído!
                             </div>
                         `
                         : ""

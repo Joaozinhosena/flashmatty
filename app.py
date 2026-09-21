@@ -1796,7 +1796,7 @@ def responder():
 
 
             mensagem = (
-                "Muito bem! 🎉"
+                "Muito bem! "
             )
 
 
