@@ -2,6 +2,9 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        "use strict";
+
+
         // ====================================================
         // ELEMENTO PRINCIPAL
         // ====================================================
@@ -11,79 +14,49 @@ document.addEventListener(
                 "multiplayerGame"
             );
 
+
         if (!jogo) {
+
+            console.warn(
+                "[MULTIPLAYER] #multiplayerGame não encontrado."
+            );
+
             return;
         }
 
 
         // ====================================================
-        // DADOS DA PARTIDA
+        // HELPERS
         // ====================================================
 
-        const codigo =
-            jogo.dataset.codigo || "";
+        function pegarElemento(id) {
 
-        const jogadorId =
-            jogo.dataset.jogador || "";
-
-        const host =
-            jogo.dataset.host === "true";
-
-
-        // ====================================================
-        // ELEMENTOS
-        // ====================================================
-
-        const area =
-            document.getElementById(
-                "areaPergunta"
+            return document.getElementById(
+                id
             );
+        }
 
-        const rodada =
-            document.getElementById(
-                "rodada"
+
+        function converterBoolean(valor) {
+
+            const convertido =
+                String(
+                    valor ?? ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            return [
+                "true",
+                "1",
+                "sim",
+                "yes"
+            ].includes(
+                convertido
             );
+        }
 
-        const total =
-            document.getElementById(
-                "total"
-            );
-
-        const cronometro =
-            document.getElementById(
-                "cronometro"
-            );
-
-        const barra =
-            document.getElementById(
-                "tempoBarra"
-            );
-
-
-        // ====================================================
-        // SOCKET.IO
-        // ====================================================
-
-        const socket = io();
-
-
-        // ====================================================
-        // ESTADO LOCAL
-        // ====================================================
-
-        let timer = null;
-
-        let respondeu = false;
-
-        let rodadaEncerrada = false;
-
-        let redirecionando =
-            false;
-
-
-        // ====================================================
-        // SEGURANÇA
-        // ====================================================
 
         function escaparHtml(valor) {
 
@@ -92,15 +65,722 @@ document.addEventListener(
                     "div"
                 );
 
+
             elemento.textContent =
                 valor ?? "";
+
 
             return elemento.innerHTML;
         }
 
 
+        function numeroSeguro(
+            valor,
+            padrao = 0
+        ) {
+
+            const numero =
+                Number(
+                    valor
+                );
+
+
+            return Number.isFinite(
+                numero
+            )
+                ?
+                numero
+                :
+                padrao;
+        }
+
+
         // ====================================================
-        // CONECTOU
+        // DADOS DA PARTIDA
+        // ====================================================
+
+        const codigo =
+            String(
+                jogo.dataset.codigo ||
+                ""
+            )
+            .trim();
+
+
+        const jogadorId =
+            String(
+                jogo.dataset.jogador ||
+                ""
+            )
+            .trim();
+
+
+        const host =
+            converterBoolean(
+                jogo.dataset.host
+            );
+
+
+        // ====================================================
+        // DEBUG INICIAL
+        // ====================================================
+
+        console.log(
+            "========================================"
+        );
+
+        console.log(
+            "🎮 FLASHMATTY MULTIPLAYER"
+        );
+
+        console.log(
+            "Código:",
+            codigo
+        );
+
+        console.log(
+            "Jogador:",
+            jogadorId
+        );
+
+        console.log(
+            "Host:",
+            host
+        );
+
+        console.log(
+            "data-host:",
+            jogo.dataset.host
+        );
+
+        console.log(
+            "========================================"
+        );
+
+
+        // ====================================================
+        // VERIFICAÇÃO DE DADOS
+        // ====================================================
+
+        if (!codigo) {
+
+            console.error(
+                "[MULTIPLAYER] Código da sala ausente."
+            );
+
+            return;
+        }
+
+
+        if (!jogadorId) {
+
+            console.error(
+                "[MULTIPLAYER] ID do jogador ausente."
+            );
+
+            return;
+        }
+
+
+        // ====================================================
+        // ELEMENTOS DA PÁGINA
+        // ====================================================
+
+        const area =
+            pegarElemento(
+                "areaPergunta"
+            );
+
+
+        const rodada =
+            pegarElemento(
+                "rodada"
+            );
+
+
+        const total =
+            pegarElemento(
+                "total"
+            );
+
+
+        const cronometro =
+            pegarElemento(
+                "cronometro"
+            );
+
+
+        const barra =
+            pegarElemento(
+                "tempoBarra"
+            );
+
+
+        if (!area) {
+
+            console.error(
+                "[MULTIPLAYER] #areaPergunta não encontrado."
+            );
+
+            return;
+        }
+
+
+        // ====================================================
+        // SOCKET.IO DISPONÍVEL?
+        // ====================================================
+
+        if (
+            typeof window.io !==
+            "function"
+        ) {
+
+            console.error(
+                "[MULTIPLAYER] Socket.IO não foi carregado."
+            );
+
+
+            area.innerHTML = `
+
+                <div
+                    class="
+                        text-center
+                        bg-red-50
+                        border
+                        border-red-200
+                        rounded-3xl
+                        p-8
+                    "
+                >
+
+                    <div class="text-5xl">
+                        ⚠️
+                    </div>
+
+                    <h2
+                        class="
+                            text-2xl
+                            font-black
+                            text-red-700
+                            mt-4
+                        "
+                    >
+                        Falha no multiplayer
+                    </h2>
+
+                    <p
+                        class="
+                            text-red-600
+                            mt-2
+                        "
+                    >
+                        O Socket.IO não foi carregado.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            return;
+        }
+
+
+        // ====================================================
+        // SOCKET.IO
+        // ====================================================
+
+        const socket =
+            window.io(
+                {
+                    transports: [
+                        "websocket",
+                        "polling"
+                    ],
+
+                    reconnection:
+                        true,
+
+                    reconnectionAttempts:
+                        Infinity,
+
+                    reconnectionDelay:
+                        800,
+
+                    reconnectionDelayMax:
+                        4000,
+
+                    timeout:
+                        10000
+                }
+            );
+
+
+        // ====================================================
+        // ESTADO LOCAL
+        // ====================================================
+
+        let timer =
+            null;
+
+
+        let respondeu =
+            false;
+
+
+        let rodadaEncerrada =
+            false;
+
+
+        let redirecionando =
+            false;
+
+
+        let questaoAtiva =
+            false;
+
+
+        let solicitandoQuestao =
+            false;
+
+
+        let primeiraQuestaoSolicitada =
+            false;
+
+
+        let tempoEsgotadoEnviado =
+            false;
+
+
+        let ultimaRodada =
+            null;
+
+
+        // ====================================================
+        // SONS
+        // ====================================================
+
+        function tocarSom(nome) {
+
+            try {
+
+                const funcao =
+                    window[
+                        nome
+                    ];
+
+
+                if (
+                    typeof funcao ===
+                    "function"
+                ) {
+
+                    funcao();
+                }
+
+            } catch (erro) {
+
+                console.warn(
+                    `[SOM] Falha em ${nome}:`,
+                    erro
+                );
+            }
+        }
+
+
+        // ====================================================
+        // STATUS DE CONEXÃO
+        // ====================================================
+
+        function obterStatusConexao() {
+
+            let status =
+                document.getElementById(
+                    "statusMultiplayer"
+                );
+
+
+            if (status) {
+
+                return status;
+            }
+
+
+            status =
+                document.createElement(
+                    "div"
+                );
+
+
+            status.id =
+                "statusMultiplayer";
+
+
+            status.className = `
+                fixed
+                bottom-4
+                right-4
+                z-50
+                rounded-full
+                px-4
+                py-2
+                text-xs
+                font-black
+                shadow-lg
+                transition
+                duration-300
+            `;
+
+
+            document.body.appendChild(
+                status
+            );
+
+
+            return status;
+        }
+
+
+        function mostrarStatus(
+            mensagem,
+            tipo = "normal"
+        ) {
+
+            const status =
+                obterStatusConexao();
+
+
+            status.textContent =
+                mensagem;
+
+
+            status.className = `
+                fixed
+                bottom-4
+                right-4
+                z-50
+                rounded-full
+                px-4
+                py-2
+                text-xs
+                font-black
+                shadow-lg
+                transition
+                duration-300
+            `;
+
+
+            if (
+                tipo ===
+                "online"
+            ) {
+
+                status.classList.add(
+                    "bg-green-600",
+                    "text-white"
+                );
+
+            }
+
+            else if (
+                tipo ===
+                "erro"
+            ) {
+
+                status.classList.add(
+                    "bg-red-600",
+                    "text-white"
+                );
+
+            }
+
+            else {
+
+                status.classList.add(
+                    "bg-slate-800",
+                    "text-white"
+                );
+            }
+
+
+            if (
+                tipo ===
+                "online"
+            ) {
+
+                setTimeout(
+                    () => {
+
+                        if (
+                            status.textContent ===
+                            mensagem
+                        ) {
+
+                            status.style.opacity =
+                                "0";
+
+                        }
+
+                    },
+                    1800
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        status.style.display =
+                            "none";
+
+                    },
+                    2200
+                );
+
+            } else {
+
+                status.style.display =
+                    "block";
+
+                status.style.opacity =
+                    "1";
+            }
+        }
+
+
+        // ====================================================
+        // ALTERAR TEXTO COM SEGURANÇA
+        // ====================================================
+
+        function definirTexto(
+            elemento,
+            valor
+        ) {
+
+            if (!elemento) {
+                return;
+            }
+
+
+            elemento.textContent =
+                valor;
+        }
+
+
+        // ====================================================
+        // BARRA DO TEMPO
+        // ====================================================
+
+        function definirBarra(
+            porcentagem
+        ) {
+
+            if (!barra) {
+                return;
+            }
+
+
+            const valor =
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        numeroSeguro(
+                            porcentagem
+                        )
+                    )
+                );
+
+
+            barra.style.width =
+                `${valor}%`;
+        }
+
+
+        // ====================================================
+        // DESABILITAR ALTERNATIVAS
+        // ====================================================
+
+        function desabilitarAlternativas() {
+
+            const container =
+                document.getElementById(
+                    "alternativas"
+                );
+
+
+            if (!container) {
+                return;
+            }
+
+
+            container
+                .querySelectorAll(
+                    "button"
+                )
+                .forEach(
+                    botao => {
+
+                        botao.disabled =
+                            true;
+
+                    }
+                );
+        }
+
+
+        // ====================================================
+        // PARAR CRONÔMETRO
+        // ====================================================
+
+        function pararTimer() {
+
+            if (
+                timer !==
+                null
+            ) {
+
+                clearInterval(
+                    timer
+                );
+
+
+                timer =
+                    null;
+            }
+        }
+
+
+        // ====================================================
+        // ENTRAR NA SALA SOCKET
+        // ====================================================
+
+        function entrarNaSalaSocket() {
+
+            if (
+                !socket.connected
+            ) {
+
+                return;
+            }
+
+
+            console.log(
+                "[MULTIPLAYER] Entrando na sala:",
+                codigo,
+                jogadorId
+            );
+
+
+            socket.emit(
+                "entrar_socket",
+                {
+                    codigo:
+                        codigo,
+
+                    jogador_id:
+                        jogadorId
+                }
+            );
+        }
+
+
+        // ====================================================
+        // SOLICITAR PRÓXIMA QUESTÃO
+        // ====================================================
+
+        function solicitarProximaQuestao() {
+
+            if (!host) {
+
+                console.warn(
+                    "[MULTIPLAYER] Apenas o host pode solicitar questão."
+                );
+
+                return;
+            }
+
+
+            if (
+                !socket.connected
+            ) {
+
+                console.warn(
+                    "[MULTIPLAYER] Socket desconectado."
+                );
+
+                mostrarStatus(
+                    "Reconectando...",
+                    "erro"
+                );
+
+                return;
+            }
+
+
+            if (
+                solicitandoQuestao
+            ) {
+
+                console.log(
+                    "[MULTIPLAYER] Já existe uma solicitação de questão."
+                );
+
+                return;
+            }
+
+
+            solicitandoQuestao =
+                true;
+
+
+            console.log(
+                "[MULTIPLAYER] Solicitando próxima questão."
+            );
+
+
+            socket.emit(
+                "proxima_questao",
+                {
+                    codigo:
+                        codigo,
+
+                    jogador_id:
+                        jogadorId
+                }
+            );
+
+
+            /*
+            Se o servidor não responder,
+            permitimos nova tentativa.
+            */
+
+            setTimeout(
+                () => {
+
+                    if (
+                        solicitandoQuestao
+                        &&
+                        !questaoAtiva
+                    ) {
+
+                        console.warn(
+                            "[MULTIPLAYER] Servidor não retornou questão."
+                        );
+
+
+                        solicitandoQuestao =
+                            false;
+                    }
+
+                },
+                6000
+            );
+        }
+
+
+        // ====================================================
+        // SOCKET CONECTADO
         // ====================================================
 
         socket.on(
@@ -108,30 +788,38 @@ document.addEventListener(
             () => {
 
                 console.log(
-                    "Conectado ao multiplayer:",
+                    "[MULTIPLAYER] Socket conectado:",
                     socket.id
                 );
 
 
-                // Entra novamente na room Socket.IO.
-                socket.emit(
-                    "entrar_socket",
-                    {
-                        codigo: codigo,
-                        jogador_id: jogadorId
-                    }
+                mostrarStatus(
+                    "● Conectado",
+                    "online"
                 );
 
 
-                /*
-                Somente o host solicita a primeira
-                questão.
+                entrarNaSalaSocket();
 
-                O servidor impede duplicação caso
-                já exista uma questão ativa.
+
+                /*
+                O host solicita a primeira pergunta.
+
+                Pequeno atraso garante que o evento
+                entrar_socket chegue antes.
                 */
 
-                if (host) {
+                if (
+                    host
+                    &&
+                    !questaoAtiva
+                    &&
+                    !primeiraQuestaoSolicitada
+                ) {
+
+                    primeiraQuestaoSolicitada =
+                        true;
+
 
                     setTimeout(
                         () => {
@@ -139,27 +827,46 @@ document.addEventListener(
                             if (
                                 socket.connected
                                 &&
+                                !questaoAtiva
+                                &&
                                 !rodadaEncerrada
                             ) {
 
-                                socket.emit(
-                                    "proxima_questao",
-                                    {
-                                        codigo:
-                                            codigo,
-
-                                        jogador_id:
-                                            jogadorId
-                                    }
+                                console.log(
+                                    "[MULTIPLAYER] Host solicitando primeira questão."
                                 );
 
+
+                                solicitarProximaQuestao();
                             }
 
                         },
-                        1500
+                        1000
                     );
-
                 }
+
+            }
+        );
+
+
+        // ====================================================
+        // DESCONECTADO
+        // ====================================================
+
+        socket.on(
+            "disconnect",
+            motivo => {
+
+                console.warn(
+                    "[MULTIPLAYER] Socket desconectado:",
+                    motivo
+                );
+
+
+                mostrarStatus(
+                    "● Reconectando...",
+                    "erro"
+                );
 
             }
         );
@@ -174,12 +881,60 @@ document.addEventListener(
             erro => {
 
                 console.error(
-                    "Erro Socket.IO:",
+                    "[MULTIPLAYER] Erro Socket.IO:",
                     erro
+                );
+
+
+                mostrarStatus(
+                    "Falha de conexão",
+                    "erro"
                 );
 
             }
         );
+
+
+        // ====================================================
+        // RECONEXÃO
+        // ====================================================
+
+        if (
+            socket.io
+        ) {
+
+            socket.io.on(
+                "reconnect_attempt",
+                tentativa => {
+
+                    console.log(
+                        "[MULTIPLAYER] Tentando reconectar:",
+                        tentativa
+                    );
+
+
+                    mostrarStatus(
+                        "Reconectando...",
+                        "erro"
+                    );
+
+                }
+            );
+
+
+            socket.io.on(
+                "reconnect",
+                tentativa => {
+
+                    console.log(
+                        "[MULTIPLAYER] Reconectado após",
+                        tentativa,
+                        "tentativas."
+                    );
+
+                }
+            );
+        }
 
 
         // ====================================================
@@ -190,72 +945,119 @@ document.addEventListener(
             "nova_questao",
             dados => {
 
+                console.log(
+                    "[MULTIPLAYER] Nova questão:",
+                    dados
+                );
+
+
                 if (!dados) {
+
                     return;
                 }
+
+
+                pararTimer();
+
+
+                solicitandoQuestao =
+                    false;
+
+
+                questaoAtiva =
+                    true;
 
 
                 respondeu =
                     false;
 
+
                 rodadaEncerrada =
                     false;
 
 
-                rodada.textContent =
-                    dados.rodada ?? "-";
+                tempoEsgotadoEnviado =
+                    false;
 
-                total.textContent =
-                    dados.total ?? "-";
+
+                ultimaRodada =
+                    dados.rodada ??
+                    ultimaRodada;
+
+
+                definirTexto(
+                    rodada,
+                    dados.rodada ??
+                    "-"
+                );
+
+
+                definirTexto(
+                    total,
+                    dados.total ??
+                    "-"
+                );
 
 
                 // ============================================
-                // DADOS DO MODO ESPECIAL
+                // DADOS DO MODO
                 // ============================================
 
                 const modo =
                     dados.modo ||
                     "classico";
 
+
                 const modoNome =
                     dados.modo_nome ||
                     "Clássico";
+
 
                 const modoIcone =
                     dados.modo_icone ||
                     "🎮";
 
+
                 const efeito =
-                    dados.efeito || "";
+                    dados.efeito ||
+                    "";
+
 
                 const multiplicador =
-                    Number(
-                        dados.multiplicador ||
+                    numeroSeguro(
+                        dados.multiplicador,
                         1
                     );
 
 
-                let avisoModo = "";
+                let avisoModo =
+                    "";
 
 
-                // Não precisa ocupar muito espaço
-                // no modo clássico.
                 if (
-                    modo !== "classico"
+                    modo !==
+                    "classico"
                     ||
                     efeito
+                    ||
+                    multiplicador > 1
                 ) {
 
                     avisoModo = `
+
                         <div
                             class="
                                 max-w-xl
                                 mx-auto
                                 mb-7
+
                                 bg-indigo-50
+
                                 border
                                 border-indigo-100
+
                                 rounded-2xl
+
                                 p-4
                                 text-center
                             "
@@ -272,51 +1074,58 @@ document.addEventListener(
                                 ${escaparHtml(modoNome)}
                             </div>
 
+
                             ${
                                 efeito
-                                ?
-                                `
-                                <p
-                                    class="
-                                        text-sm
-                                        text-indigo-600
-                                        mt-1
-                                    "
-                                >
-                                    ${escaparHtml(efeito)}
-                                </p>
-                                `
-                                :
-                                ""
+                                    ?
+                                    `
+                                    <p
+                                        class="
+                                            text-sm
+                                            text-indigo-600
+                                            mt-1
+                                        "
+                                    >
+                                        ${escaparHtml(efeito)}
+                                    </p>
+                                    `
+                                    :
+                                    ""
                             }
+
 
                             ${
                                 multiplicador > 1
-                                ?
-                                `
-                                <div
-                                    class="
-                                        inline-flex
-                                        mt-2
-                                        px-3
-                                        py-1
-                                        rounded-full
-                                        bg-indigo-600
-                                        text-white
-                                        text-xs
-                                        font-black
-                                    "
-                                >
-                                    ${multiplicador}x PONTOS
-                                </div>
-                                `
-                                :
-                                ""
+                                    ?
+                                    `
+                                    <div
+                                        class="
+                                            inline-flex
+
+                                            mt-3
+
+                                            px-3
+                                            py-1
+
+                                            rounded-full
+
+                                            bg-indigo-600
+                                            text-white
+
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        ⚡ ${multiplicador}x PONTOS
+                                    </div>
+                                    `
+                                    :
+                                    ""
                             }
 
                         </div>
-                    `;
 
+                    `;
                 }
 
 
@@ -328,33 +1137,49 @@ document.addEventListener(
 
                     ${avisoModo}
 
-                    <h1
-                        class="
-                            text-2xl
-                            md:text-4xl
-                            font-black
-                            text-center
-                            text-slate-900
-                            leading-tight
-                            px-2
-                        "
-                    >
-                        ${escaparHtml(
-                            dados.pergunta
-                        )}
-                    </h1>
-
-
                     <div
-                        id="alternativas"
                         class="
-                            grid
-                            grid-cols-1
-                            sm:grid-cols-2
-                            gap-4
-                            mt-10
+                            max-w-3xl
+                            mx-auto
                         "
                     >
+
+                        <h1
+                            class="
+                                text-2xl
+                                md:text-4xl
+
+                                font-black
+                                text-center
+                                text-slate-900
+
+                                leading-tight
+
+                                px-2
+                            "
+                        >
+                            ${escaparHtml(
+                                dados.pergunta ||
+                                "Questão"
+                            )}
+                        </h1>
+
+
+                        <div
+                            id="alternativas"
+
+                            class="
+                                grid
+                                grid-cols-1
+                                sm:grid-cols-2
+
+                                gap-4
+
+                                mt-10
+                            "
+                        >
+                        </div>
+
                     </div>
 
                 `;
@@ -366,13 +1191,58 @@ document.addEventListener(
                     );
 
 
-                if (
-                    !container
-                    ||
-                    !Array.isArray(
+                const alternativas =
+                    Array.isArray(
                         dados.alternativas
                     )
+                        ?
+                        dados.alternativas
+                        :
+                        [];
+
+
+                if (
+                    !container
                 ) {
+
+                    console.error(
+                        "[MULTIPLAYER] Container de alternativas ausente."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    alternativas.length ===
+                    0
+                ) {
+
+                    container.innerHTML = `
+
+                        <div
+                            class="
+                                sm:col-span-2
+                                text-center
+                                bg-red-50
+                                text-red-600
+                                rounded-2xl
+                                p-5
+                                font-bold
+                            "
+                        >
+                            Nenhuma alternativa foi recebida.
+                        </div>
+
+                    `;
+
+
+                    console.error(
+                        "[MULTIPLAYER] Questão sem alternativas:",
+                        dados
+                    );
+
+
                     return;
                 }
 
@@ -385,11 +1255,13 @@ document.addEventListener(
                     "▲",
                     "◆",
                     "●",
-                    "■"
+                    "■",
+                    "★",
+                    "⬢"
                 ];
 
 
-                dados.alternativas.forEach(
+                alternativas.forEach(
                     (
                         alternativa,
                         indice
@@ -405,30 +1277,56 @@ document.addEventListener(
                             "button";
 
 
+                        botao.dataset.resposta =
+                            String(
+                                alternativa
+                            );
+
+
                         botao.className = `
                             min-h-28
+
                             border-2
                             border-slate-200
+
                             rounded-3xl
+
                             p-5
+
                             text-xl
                             md:text-2xl
+
                             font-black
+
                             bg-white
                             text-slate-900
+
                             shadow-sm
+
                             transition
                             duration-200
+
                             hover:border-indigo-500
                             hover:bg-indigo-50
                             hover:-translate-y-1
+
+                            active:scale-[0.98]
+
                             disabled:cursor-not-allowed
                             disabled:opacity-70
                         `;
 
 
+                        const simbolo =
+                            simbolos[
+                                indice
+                            ]
+                            ||
+                            "●";
+
+
                         botao.textContent =
-                            `${simbolos[indice] || "●"} ${alternativa}`;
+                            `${simbolo} ${alternativa}`;
 
 
                         botao.addEventListener(
@@ -439,37 +1337,57 @@ document.addEventListener(
                                     respondeu
                                     ||
                                     rodadaEncerrada
+                                    ||
+                                    !questaoAtiva
                                 ) {
+
                                     return;
                                 }
+
+
+                                tocarSom(
+                                    "somSelecao"
+                                );
 
 
                                 respondeu =
                                     true;
 
 
-                                // Desativa todas.
                                 const botoes =
                                     container
-                                    .querySelectorAll(
-                                        "button"
-                                    );
+                                        .querySelectorAll(
+                                            "button"
+                                        );
 
 
                                 botoes.forEach(
-                                    b => {
+                                    outroBotao => {
 
-                                        b.disabled =
+                                        outroBotao.disabled =
                                             true;
 
                                     }
                                 );
 
 
-                                // Marca a selecionada.
+                                botao.classList.remove(
+                                    "border-slate-200",
+                                    "bg-white"
+                                );
+
+
                                 botao.classList.add(
                                     "border-indigo-600",
-                                    "bg-indigo-50"
+                                    "bg-indigo-100",
+                                    "ring-4",
+                                    "ring-indigo-100"
+                                );
+
+
+                                console.log(
+                                    "[MULTIPLAYER] Resposta enviada:",
+                                    alternativa
                                 );
 
 
@@ -496,7 +1414,6 @@ document.addEventListener(
                         container.appendChild(
                             botao
                         );
-
                     }
                 );
 
@@ -506,8 +1423,9 @@ document.addEventListener(
                 // ============================================
 
                 iniciarTimer(
-                    Number(
-                        dados.tempo || 20
+                    numeroSeguro(
+                        dados.tempo,
+                        20
                     )
                 );
 
@@ -523,18 +1441,26 @@ document.addEventListener(
             "resposta_recebida",
             dados => {
 
+                console.log(
+                    "[MULTIPLAYER] Resposta recebida:",
+                    dados
+                );
+
+
                 if (!dados) {
+
                     return;
                 }
 
 
-                // Evita mensagens duplicadas.
                 const anterior =
                     document.getElementById(
                         "feedbackResposta"
                     );
 
+
                 if (anterior) {
+
                     anterior.remove();
                 }
 
@@ -553,36 +1479,53 @@ document.addEventListener(
                 // ACERTO
                 // ============================================
 
-                if (dados.correto) {
+                if (
+                    dados.correto
+                ) {
+
+                    tocarSom(
+                        "somAcerto"
+                    );
+
 
                     feedback.className = `
+                        max-w-xl
+                        mx-auto
+
                         mt-6
+
                         text-center
+
                         bg-green-100
+
                         border
                         border-green-200
+
                         text-green-700
+
                         rounded-2xl
+
                         p-4
+
                         font-black
                     `;
 
 
                     const pontos =
-                        Number(
-                            dados.pontos || 0
+                        numeroSeguro(
+                            dados.pontos
                         );
 
 
                     const totalPontos =
-                        Number(
-                            dados.total_pontos || 0
+                        numeroSeguro(
+                            dados.total_pontos
                         );
 
 
                     const sequencia =
-                        Number(
-                            dados.sequencia || 0
+                        numeroSeguro(
+                            dados.sequencia
                         );
 
 
@@ -594,62 +1537,65 @@ document.addEventListener(
                                 md:text-2xl
                             "
                         >
-                            ✓ Correto!
+                            ✅ Correto!
                         </div>
+
 
                         <div
                             class="
                                 text-2xl
                                 md:text-3xl
+
                                 mt-2
                             "
                         >
                             +${pontos} pontos
                         </div>
 
+
                         ${
                             sequencia > 1
-                            ?
-                            `
-                            <div
-                                class="
-                                    mt-2
-                                    text-sm
-                                    text-orange-600
-                                "
-                            >
-                                🔥 ${sequencia}
-                                acertos seguidos
-                            </div>
-                            `
-                            :
-                            ""
+                                ?
+                                `
+                                <div
+                                    class="
+                                        mt-2
+                                        text-sm
+                                        text-orange-600
+                                    "
+                                >
+                                    🔥 ${sequencia}
+                                    acertos seguidos
+                                </div>
+                                `
+                                :
+                                ""
                         }
+
 
                         ${
                             totalPontos > 0
-                            ?
-                            `
-                            <div
-                                class="
-                                    mt-2
-                                    text-xs
-                                    text-green-600
-                                "
-                            >
-                                Total:
-                                ${totalPontos}
-                                pontos
-                            </div>
-                            `
-                            :
-                            ""
+                                ?
+                                `
+                                <div
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        text-green-600
+                                    "
+                                >
+                                    Total:
+                                    ${totalPontos}
+                                    pontos
+                                </div>
+                                `
+                                :
+                                ""
                         }
 
                     `;
 
                 }
-
 
                 // ============================================
                 // ERRO
@@ -657,33 +1603,50 @@ document.addEventListener(
 
                 else {
 
+                    tocarSom(
+                        "somErro"
+                    );
+
+
                     feedback.className = `
+                        max-w-xl
+                        mx-auto
+
                         mt-6
+
                         text-center
+
                         bg-red-100
+
                         border
                         border-red-200
+
                         text-red-600
+
                         rounded-2xl
+
                         p-4
+
                         font-black
                     `;
 
 
                     const pontos =
-                        Number(
-                            dados.pontos || 0
+                        numeroSeguro(
+                            dados.pontos
                         );
 
 
-                    let penalidade = "";
+                    let penalidade =
+                        "";
 
 
-                    // Dobro ou Nada pode retornar
-                    // pontuação negativa.
-                    if (pontos < 0) {
+                    if (
+                        pontos < 0
+                    ) {
 
                         penalidade = `
+
                             <div
                                 class="
                                     mt-2
@@ -692,19 +1655,24 @@ document.addEventListener(
                             >
                                 ${pontos} pontos
                             </div>
-                        `;
 
+                        `;
                     }
 
 
                     feedback.innerHTML = `
-                        <div class="text-xl">
-                            ✕ Resposta incorreta
+
+                        <div
+                            class="
+                                text-xl
+                            "
+                        >
+                            ❌ Resposta incorreta
                         </div>
 
                         ${penalidade}
-                    `;
 
+                    `;
                 }
 
 
@@ -724,7 +1692,14 @@ document.addEventListener(
             "rodada_finalizada",
             dados => {
 
+                console.log(
+                    "[MULTIPLAYER] Rodada finalizada:",
+                    dados
+                );
+
+
                 if (!dados) {
+
                     return;
                 }
 
@@ -737,25 +1712,39 @@ document.addEventListener(
                     true;
 
 
+                questaoAtiva =
+                    false;
+
+
+                solicitandoQuestao =
+                    false;
+
+
                 pararTimer();
 
 
-                cronometro.textContent =
-                    "⏱️ 0";
+                definirTexto(
+                    cronometro,
+                    "⏱️ 0"
+                );
 
 
-                barra.style.width =
-                    "0%";
+                definirBarra(
+                    0
+                );
+
+
+                desabilitarAlternativas();
 
 
                 const ranking =
                     Array.isArray(
                         dados.ranking
                     )
-                    ?
-                    dados.ranking
-                    :
-                    [];
+                        ?
+                        dados.ranking
+                        :
+                        [];
 
 
                 let rankingHtml =
@@ -770,16 +1759,18 @@ document.addEventListener(
                     .forEach(
                         jogador => {
 
+                            const posicao =
+                                numeroSeguro(
+                                    jogador.posicao
+                                );
+
+
                             let medalha =
-                                `${jogador.posicao}º`;
+                                `${posicao}º`;
 
 
                             if (
-                                Number(
-                                    jogador.posicao
-                                )
-                                ===
-                                1
+                                posicao === 1
                             ) {
 
                                 medalha =
@@ -788,11 +1779,7 @@ document.addEventListener(
                             }
 
                             else if (
-                                Number(
-                                    jogador.posicao
-                                )
-                                ===
-                                2
+                                posicao === 2
                             ) {
 
                                 medalha =
@@ -801,17 +1788,23 @@ document.addEventListener(
                             }
 
                             else if (
-                                Number(
-                                    jogador.posicao
-                                )
-                                ===
-                                3
+                                posicao === 3
                             ) {
 
                                 medalha =
                                     "🥉";
-
                             }
+
+
+                            const jogadorAtual =
+                                String(
+                                    jogador.id ??
+                                    ""
+                                )
+                                ===
+                                String(
+                                    jogadorId
+                                );
 
 
                             rankingHtml += `
@@ -821,11 +1814,21 @@ document.addEventListener(
                                         flex
                                         items-center
                                         justify-between
+
                                         gap-4
-                                        bg-slate-100
+
+                                        ${
+                                            jogadorAtual
+                                                ?
+                                                "bg-indigo-50 border-indigo-300"
+                                                :
+                                                "bg-slate-100 border-slate-200"
+                                        }
+
                                         border
-                                        border-slate-200
+
                                         rounded-2xl
+
                                         p-4
                                     "
                                 >
@@ -859,6 +1862,14 @@ document.addEventListener(
                                                 jogador.nome ||
                                                 "Jogador"
                                             )}
+
+                                            ${
+                                                jogadorAtual
+                                                    ?
+                                                    " (você)"
+                                                    :
+                                                    ""
+                                            }
                                         </span>
 
                                     </div>
@@ -870,25 +1881,38 @@ document.addEventListener(
                                             shrink-0
                                         "
                                     >
-                                        ${
-                                            Number(
-                                                jogador.pontos
-                                            )
-                                            ||
-                                            0
-                                        }
+                                        ${numeroSeguro(
+                                            jogador.pontos
+                                        )}
                                     </strong>
 
                                 </div>
 
                             `;
-
                         }
                     );
 
 
+                if (!rankingHtml) {
+
+                    rankingHtml = `
+
+                        <div
+                            class="
+                                text-center
+                                text-slate-500
+                                p-4
+                            "
+                        >
+                            Ranking indisponível.
+                        </div>
+
+                    `;
+                }
+
+
                 // ============================================
-                // MOTIVO DO FIM
+                // MOTIVO
                 // ============================================
 
                 let mensagemFim =
@@ -896,10 +1920,12 @@ document.addEventListener(
 
 
                 if (
-                    dados.motivo === "tempo"
+                    dados.motivo ===
+                    "tempo"
                 ) {
 
                     mensagemFim = `
+
                         <p
                             class="
                                 text-orange-500
@@ -909,8 +1935,8 @@ document.addEventListener(
                         >
                             ⏱️ Tempo esgotado
                         </p>
-                    `;
 
+                    `;
                 }
 
 
@@ -920,57 +1946,69 @@ document.addEventListener(
 
                 area.innerHTML = `
 
-                    <div class="text-center">
-
-                        <div class="text-5xl">
-                            🏆
-                        </div>
-
-                        <h2
-                            class="
-                                text-3xl
-                                font-black
-                                text-slate-900
-                                mt-3
-                            "
-                        >
-                            Ranking
-                        </h2>
-
-
-                        ${mensagemFim}
-
-
-                        <p
-                            class="
-                                text-slate-500
-                                mt-3
-                            "
-                        >
-                            Resposta correta:
-
-                            <strong
-                                class="
-                                    text-green-600
-                                "
-                            >
-                                ${escaparHtml(
-                                    dados.correta
-                                )}
-                            </strong>
-
-                        </p>
-
-                    </div>
-
-
                     <div
                         class="
-                            space-y-2
-                            mt-7
+                            max-w-2xl
+                            mx-auto
                         "
                     >
-                        ${rankingHtml}
+
+                        <div class="text-center">
+
+                            <div class="text-5xl">
+                                🏆
+                            </div>
+
+
+                            <h2
+                                class="
+                                    text-3xl
+                                    font-black
+                                    text-slate-900
+
+                                    mt-3
+                                "
+                            >
+                                Ranking
+                            </h2>
+
+
+                            ${mensagemFim}
+
+
+                            <p
+                                class="
+                                    text-slate-500
+                                    mt-3
+                                "
+                            >
+                                Resposta correta:
+
+                                <strong
+                                    class="
+                                        text-green-600
+                                    "
+                                >
+                                    ${escaparHtml(
+                                        dados.correta ??
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                space-y-2
+                                mt-7
+                            "
+                        >
+                            ${rankingHtml}
+                        </div>
+
                     </div>
 
                 `;
@@ -980,7 +2018,9 @@ document.addEventListener(
                 // HOST
                 // ============================================
 
-                if (host) {
+                if (
+                    host
+                ) {
 
                     const proximo =
                         document.createElement(
@@ -993,18 +2033,34 @@ document.addEventListener(
 
 
                     proximo.className = `
+                        block
+
                         w-full
+                        max-w-2xl
+                        mx-auto
+
                         bg-indigo-600
                         hover:bg-indigo-700
+
                         active:scale-[0.99]
+
                         text-white
+
                         rounded-2xl
+
                         p-4
+
                         text-lg
                         font-black
+
                         mt-7
+
                         shadow-lg
+
                         transition
+
+                        disabled:opacity-60
+                        disabled:cursor-not-allowed
                     `;
 
 
@@ -1019,6 +2075,19 @@ document.addEventListener(
                     proximo.addEventListener(
                         "click",
                         () => {
+
+                            if (
+                                proximo.disabled
+                            ) {
+
+                                return;
+                            }
+
+
+                            tocarSom(
+                                "somClique"
+                            );
+
 
                             proximo.disabled =
                                 true;
@@ -1035,19 +2104,14 @@ document.addEventListener(
 
 
                             proximo.textContent =
-                                "Carregando...";
+                                "⏳ Carregando...";
 
 
-                            socket.emit(
-                                "proxima_questao",
-                                {
-                                    codigo:
-                                        codigo,
+                            rodadaEncerrada =
+                                false;
 
-                                    jogador_id:
-                                        jogadorId
-                                }
-                            );
+
+                            solicitarProximaQuestao();
 
                         }
                     );
@@ -1058,7 +2122,6 @@ document.addEventListener(
                     );
 
                 }
-
 
                 // ============================================
                 // OUTROS JOGADORES
@@ -1074,8 +2137,10 @@ document.addEventListener(
 
                     espera.className = `
                         text-center
+
                         text-slate-500
                         font-bold
+
                         mt-7
                     `;
 
@@ -1083,7 +2148,7 @@ document.addEventListener(
                     espera.textContent =
                         dados.terminou
                             ?
-                            "Preparando o pódio..."
+                            "🏆 Preparando o pódio..."
                             :
                             "⏳ Aguardando o anfitrião...";
 
@@ -1099,9 +2164,8 @@ document.addEventListener(
 
                         setTimeout(
                             irResultado,
-                            1500
+                            1800
                         );
-
                     }
 
                 }
@@ -1116,16 +2180,33 @@ document.addEventListener(
 
         socket.on(
             "partida_finalizada",
-            () => {
+            dados => {
 
-                /*
-                Pequeno atraso para o jogador enxergar
-                a finalização antes do pódio.
-                */
+                console.log(
+                    "[MULTIPLAYER] Partida finalizada:",
+                    dados
+                );
+
+
+                questaoAtiva =
+                    false;
+
+
+                rodadaEncerrada =
+                    true;
+
+
+                pararTimer();
+
+
+                tocarSom(
+                    "somConcluido"
+                );
+
 
                 setTimeout(
                     irResultado,
-                    900
+                    1000
                 );
 
             }
@@ -1146,12 +2227,78 @@ document.addEventListener(
 
 
                 console.error(
-                    mensagem
+                    "[MULTIPLAYER] erro_sala:",
+                    mensagem,
+                    dados
                 );
 
 
-                alert(
-                    mensagem
+                solicitandoQuestao =
+                    false;
+
+
+                mostrarStatus(
+                    mensagem,
+                    "erro"
+                );
+
+
+                /*
+                Não usamos apenas alert.
+                A mensagem também aparece na tela.
+                */
+
+                const erroAnterior =
+                    document.getElementById(
+                        "erroMultiplayer"
+                    );
+
+
+                if (
+                    erroAnterior
+                ) {
+
+                    erroAnterior.remove();
+                }
+
+
+                const aviso =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                aviso.id =
+                    "erroMultiplayer";
+
+
+                aviso.className = `
+                    max-w-xl
+                    mx-auto
+
+                    bg-red-100
+
+                    border
+                    border-red-200
+
+                    text-red-700
+
+                    rounded-2xl
+
+                    p-4
+                    mt-5
+
+                    text-center
+                    font-bold
+                `;
+
+
+                aviso.textContent =
+                    mensagem;
+
+
+                area.appendChild(
+                    aviso
                 );
 
             }
@@ -1164,7 +2311,10 @@ document.addEventListener(
 
         function irResultado() {
 
-            if (redirecionando) {
+            if (
+                redirecionando
+            ) {
+
                 return;
             }
 
@@ -1176,65 +2326,17 @@ document.addEventListener(
             pararTimer();
 
 
+            console.log(
+                "[MULTIPLAYER] Indo para resultado."
+            );
+
+
             window.location.href =
                 `/multiplayer/resultado/${
                     encodeURIComponent(
                         codigo
                     )
                 }`;
-
-        }
-
-
-        // ====================================================
-        // DESABILITAR ALTERNATIVAS
-        // ====================================================
-
-        function desabilitarAlternativas() {
-
-            const container =
-                document.getElementById(
-                    "alternativas"
-                );
-
-
-            if (!container) {
-                return;
-            }
-
-
-            container
-                .querySelectorAll(
-                    "button"
-                )
-                .forEach(
-                    botao => {
-
-                        botao.disabled =
-                            true;
-
-                    }
-                );
-
-        }
-
-
-        // ====================================================
-        // PARAR TIMER
-        // ====================================================
-
-        function pararTimer() {
-
-            if (timer) {
-
-                clearInterval(
-                    timer
-                );
-
-                timer =
-                    null;
-
-            }
 
         }
 
@@ -1251,23 +2353,27 @@ document.addEventListener(
 
 
             segundos =
-                Number(
-                    segundos
+                numeroSeguro(
+                    segundos,
+                    20
                 );
 
 
             if (
-                !Number.isFinite(
-                    segundos
-                )
-                ||
                 segundos <= 0
             ) {
 
                 segundos =
                     20;
-
             }
+
+
+            tempoEsgotadoEnviado =
+                false;
+
+
+            const duracao =
+                segundos * 1000;
 
 
             const inicio =
@@ -1275,21 +2381,29 @@ document.addEventListener(
 
 
             const fim =
-                inicio
-                +
-                (
-                    segundos
-                    *
-                    1000
+                inicio + duracao;
+
+
+            definirTexto(
+                cronometro,
+                `⏱️ ${segundos}`
+            );
+
+
+            definirBarra(
+                100
+            );
+
+
+            if (
+                cronometro
+            ) {
+
+                cronometro.classList.remove(
+                    "text-red-600",
+                    "text-orange-500"
                 );
-
-
-            cronometro.textContent =
-                `⏱️ ${segundos}`;
-
-
-            barra.style.width =
-                "100%";
+            }
 
 
             function atualizar() {
@@ -1298,7 +2412,7 @@ document.addEventListener(
                     Date.now();
 
 
-                const milissegundosRestantes =
+                const restanteMs =
                     Math.max(
                         0,
                         fim - agora
@@ -1307,70 +2421,75 @@ document.addEventListener(
 
                 const restante =
                     Math.ceil(
-                        milissegundosRestantes
-                        /
+                        restanteMs /
                         1000
                     );
 
 
                 const porcentagem =
-                    Math.max(
-                        0,
-                        Math.min(
-                            100,
-                            (
-                                milissegundosRestantes
-                                /
-                                (
-                                    segundos
-                                    *
-                                    1000
-                                )
-                            )
-                            *
-                            100
-                        )
-                    );
+                    (
+                        restanteMs /
+                        duracao
+                    )
+                    *
+                    100;
 
 
-                cronometro.textContent =
-                    `⏱️ ${restante}`;
+                definirTexto(
+                    cronometro,
+                    `⏱️ ${restante}`
+                );
 
 
-                barra.style.width =
-                    `${porcentagem}%`;
+                definirBarra(
+                    porcentagem
+                );
 
 
-                // --------------------------------------------
-                // AVISOS VISUAIS
-                // --------------------------------------------
+                // ============================================
+                // CORES DO TEMPO
+                // ============================================
 
                 if (
-                    porcentagem <= 25
+                    cronometro
                 ) {
 
-                    cronometro.classList.add(
-                        "text-red-600"
-                    );
-
-                }
-
-                else {
-
                     cronometro.classList.remove(
-                        "text-red-600"
+                        "text-red-600",
+                        "text-orange-500"
                     );
+
+
+                    if (
+                        porcentagem <=
+                        25
+                    ) {
+
+                        cronometro.classList.add(
+                            "text-red-600"
+                        );
+
+                    }
+
+                    else if (
+                        porcentagem <=
+                        50
+                    ) {
+
+                        cronometro.classList.add(
+                            "text-orange-500"
+                        );
+                    }
 
                 }
 
 
-                // --------------------------------------------
-                // ACABOU
-                // --------------------------------------------
+                // ============================================
+                // TEMPO ESGOTADO
+                // ============================================
 
                 if (
-                    milissegundosRestantes
-                    <=
+                    restanteMs <=
                     0
                 ) {
 
@@ -1381,19 +2500,36 @@ document.addEventListener(
                         true;
 
 
+                    respondeu =
+                        true;
+
+
                     desabilitarAlternativas();
 
 
                     /*
-                    O servidor possui seu próprio
-                    temporizador.
+                    O servidor também pode possuir timer.
 
-                    O evento abaixo serve como
-                    confirmação adicional quando
-                    este navegador é o host.
+                    Esta flag garante que este navegador
+                    nunca envie tempo_esgotado duas vezes.
                     */
 
-                    if (host) {
+                    if (
+                        host
+                        &&
+                        !tempoEsgotadoEnviado
+                        &&
+                        socket.connected
+                    ) {
+
+                        tempoEsgotadoEnviado =
+                            true;
+
+
+                        console.log(
+                            "[MULTIPLAYER] Host informou tempo esgotado."
+                        );
+
 
                         socket.emit(
                             "tempo_esgotado",
@@ -1402,10 +2538,12 @@ document.addEventListener(
                                     codigo,
 
                                 jogador_id:
-                                    jogadorId
+                                    jogadorId,
+
+                                rodada:
+                                    ultimaRodada
                             }
                         );
-
                     }
 
                 }
@@ -1421,8 +2559,21 @@ document.addEventListener(
                     atualizar,
                     100
                 );
-
         }
+
+
+        // ====================================================
+        // SAÍDA DA PÁGINA
+        // ====================================================
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                pararTimer();
+
+            }
+        );
 
     }
 );

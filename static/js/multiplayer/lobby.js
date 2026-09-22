@@ -2,6 +2,9 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        "use strict";
+
+
         // ====================================================
         // ELEMENTO PRINCIPAL
         // ====================================================
@@ -13,7 +16,59 @@ document.addEventListener(
 
 
         if (!lobby) {
+
+            console.warn(
+                "[LOBBY] Elemento #lobby não encontrado."
+            );
+
             return;
+        }
+
+
+        // ====================================================
+        // HELPERS
+        // ====================================================
+
+        function booleano(valor) {
+
+            return [
+                "true",
+                "1",
+                "sim",
+                "yes"
+            ].includes(
+                String(
+                    valor ?? ""
+                )
+                    .trim()
+                    .toLowerCase()
+            );
+        }
+
+
+        function tocarSom(nome) {
+
+            try {
+
+                const funcao =
+                    window[nome];
+
+
+                if (
+                    typeof funcao ===
+                    "function"
+                ) {
+
+                    funcao();
+                }
+
+            } catch (erro) {
+
+                console.warn(
+                    `[LOBBY] Erro ao tocar ${nome}:`,
+                    erro
+                );
+            }
         }
 
 
@@ -22,19 +77,35 @@ document.addEventListener(
         // ====================================================
 
         const codigo =
-            lobby.dataset.codigo || "";
+            String(
+                lobby.dataset.codigo ||
+                ""
+            )
+                .trim();
 
 
         const jogadorId =
-            lobby.dataset.jogador || "";
+            String(
+                lobby.dataset.jogador ||
+                ""
+            )
+                .trim();
 
 
-        const host =
-            lobby.dataset.host === "true";
+        /*
+        Usamos let porque podemos corrigir
+        a informação quando o servidor enviar
+        jogadores_atualizados.
+        */
+
+        let ehHost =
+            booleano(
+                lobby.dataset.host
+            );
 
 
         // ====================================================
-        // ELEMENTOS DA TELA
+        // ELEMENTOS
         // ====================================================
 
         const lista =
@@ -62,14 +133,461 @@ document.addEventListener(
 
 
         // ====================================================
+        // DEBUG INICIAL
+        // ====================================================
+
+        console.log(
+            "====================================="
+        );
+
+        console.log(
+            "🎮 FLASHMATTY - LOBBY"
+        );
+
+        console.log(
+            "Sala:",
+            codigo
+        );
+
+        console.log(
+            "Jogador:",
+            jogadorId
+        );
+
+        console.log(
+            "Host informado pelo HTML:",
+            ehHost
+        );
+
+        console.log(
+            "====================================="
+        );
+
+
+        // ====================================================
+        // VALIDAÇÃO
+        // ====================================================
+
+        if (!codigo) {
+
+            console.error(
+                "[LOBBY] Código da sala não informado."
+            );
+
+            return;
+        }
+
+
+        if (!jogadorId) {
+
+            console.error(
+                "[LOBBY] ID do jogador não informado."
+            );
+
+            return;
+        }
+
+
+        if (
+            typeof window.io !==
+            "function"
+        ) {
+
+            console.error(
+                "[LOBBY] Socket.IO não foi carregado."
+            );
+
+
+            mostrarAviso(
+                "Não foi possível conectar ao multiplayer.",
+                "erro"
+            );
+
+            return;
+        }
+
+
+        // ====================================================
         // SOCKET.IO
         // ====================================================
 
-        const socket = io();
+        const socket =
+            window.io(
+                {
+                    transports: [
+                        "websocket",
+                        "polling"
+                    ],
+
+                    reconnection:
+                        true,
+
+                    reconnectionAttempts:
+                        Infinity,
+
+                    reconnectionDelay:
+                        800,
+
+                    reconnectionDelayMax:
+                        4000,
+
+                    timeout:
+                        10000
+                }
+            );
 
 
         // ====================================================
-        // CONECTOU
+        // ESTADO
+        // ====================================================
+
+        let redirecionando =
+            false;
+
+
+        let timeoutInicio =
+            null;
+
+
+        let quantidadeOnline =
+            0;
+
+
+        // ====================================================
+        // STATUS DE CONEXÃO
+        // ====================================================
+
+        function obterStatus() {
+
+            let elemento =
+                document.getElementById(
+                    "statusLobbySocket"
+                );
+
+
+            if (elemento) {
+
+                return elemento;
+            }
+
+
+            elemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            elemento.id =
+                "statusLobbySocket";
+
+
+            elemento.className = `
+                fixed
+                right-4
+                bottom-4
+                z-50
+
+                rounded-full
+
+                px-4
+                py-2
+
+                text-xs
+                font-black
+
+                shadow-lg
+
+                transition
+                duration-300
+            `;
+
+
+            document.body.appendChild(
+                elemento
+            );
+
+
+            return elemento;
+        }
+
+
+        function mostrarStatus(
+            mensagem,
+            tipo = "normal"
+        ) {
+
+            const elemento =
+                obterStatus();
+
+
+            elemento.style.display =
+                "block";
+
+
+            elemento.style.opacity =
+                "1";
+
+
+            elemento.textContent =
+                mensagem;
+
+
+            elemento.className = `
+                fixed
+                right-4
+                bottom-4
+                z-50
+
+                rounded-full
+
+                px-4
+                py-2
+
+                text-xs
+                font-black
+
+                shadow-lg
+
+                transition
+                duration-300
+            `;
+
+
+            if (
+                tipo ===
+                "online"
+            ) {
+
+                elemento.classList.add(
+                    "bg-green-600",
+                    "text-white"
+                );
+
+            }
+
+            else if (
+                tipo ===
+                "erro"
+            ) {
+
+                elemento.classList.add(
+                    "bg-red-600",
+                    "text-white"
+                );
+
+            }
+
+            else {
+
+                elemento.classList.add(
+                    "bg-slate-800",
+                    "text-white"
+                );
+            }
+
+
+            if (
+                tipo ===
+                "online"
+            ) {
+
+                setTimeout(
+                    () => {
+
+                        elemento.style.opacity =
+                            "0";
+
+                    },
+                    1700
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        elemento.style.display =
+                            "none";
+
+                    },
+                    2100
+                );
+            }
+        }
+
+
+        // ====================================================
+        // AVISO NA TELA
+        // ====================================================
+
+        function mostrarAviso(
+            mensagem,
+            tipo = "erro"
+        ) {
+
+            const anterior =
+                document.getElementById(
+                    "avisoLobby"
+                );
+
+
+            if (anterior) {
+
+                anterior.remove();
+            }
+
+
+            const aviso =
+                document.createElement(
+                    "div"
+                );
+
+
+            aviso.id =
+                "avisoLobby";
+
+
+            aviso.className = `
+                max-w-xl
+                mx-auto
+
+                mt-5
+
+                rounded-2xl
+
+                p-4
+
+                text-center
+                font-bold
+            `;
+
+
+            if (
+                tipo ===
+                "sucesso"
+            ) {
+
+                aviso.classList.add(
+                    "bg-green-100",
+                    "border",
+                    "border-green-200",
+                    "text-green-700"
+                );
+
+            } else {
+
+                aviso.classList.add(
+                    "bg-red-100",
+                    "border",
+                    "border-red-200",
+                    "text-red-700"
+                );
+            }
+
+
+            aviso.textContent =
+                mensagem;
+
+
+            lobby.appendChild(
+                aviso
+            );
+        }
+
+
+        // ====================================================
+        // ESTADO DO BOTÃO
+        // ====================================================
+
+        function definirBotaoInicio(
+            estado
+        ) {
+
+            if (!iniciar) {
+
+                return;
+            }
+
+
+            if (
+                estado ===
+                "iniciando"
+            ) {
+
+                iniciar.dataset.iniciando =
+                    "true";
+
+
+                iniciar.disabled =
+                    true;
+
+
+                iniciar.textContent =
+                    "⏳ Iniciando partida...";
+
+
+                return;
+            }
+
+
+            iniciar.dataset.iniciando =
+                "false";
+
+
+            if (!ehHost) {
+
+                iniciar.disabled =
+                    true;
+
+
+                return;
+            }
+
+
+            iniciar.disabled =
+                false;
+
+
+            iniciar.textContent =
+                "▶ Iniciar partida";
+        }
+
+
+        // ====================================================
+        // ENTRAR NA ROOM
+        // ====================================================
+
+        function entrarNaSalaSocket() {
+
+            if (
+                !socket.connected
+            ) {
+
+                return;
+            }
+
+
+            console.log(
+                "[LOBBY] Entrando na room:",
+                codigo,
+                jogadorId
+            );
+
+
+            socket.emit(
+                "entrar_socket",
+                {
+                    codigo:
+                        codigo,
+
+                    jogador_id:
+                        jogadorId
+                }
+            );
+        }
+
+
+        // ====================================================
+        // CONEXÃO
         // ====================================================
 
         socket.on(
@@ -77,18 +595,18 @@ document.addEventListener(
             () => {
 
                 console.log(
-                    "Socket conectado:",
+                    "[LOBBY] Socket conectado:",
                     socket.id
                 );
 
 
-                socket.emit(
-                    "entrar_socket",
-                    {
-                        codigo: codigo,
-                        jogador_id: jogadorId
-                    }
+                mostrarStatus(
+                    "● Conectado",
+                    "online"
                 );
+
+
+                entrarNaSalaSocket();
 
             }
         );
@@ -102,10 +620,30 @@ document.addEventListener(
             "disconnect",
             motivo => {
 
-                console.log(
-                    "Socket desconectado:",
+                console.warn(
+                    "[LOBBY] Socket desconectado:",
                     motivo
                 );
+
+
+                mostrarStatus(
+                    "● Reconectando...",
+                    "erro"
+                );
+
+
+                if (
+                    iniciar
+                    &&
+                    iniciar.dataset.iniciando
+                    ===
+                    "true"
+                ) {
+
+                    definirBotaoInicio(
+                        "normal"
+                    );
+                }
 
             }
         );
@@ -120,12 +658,54 @@ document.addEventListener(
             erro => {
 
                 console.error(
-                    "Erro ao conectar Socket.IO:",
+                    "[LOBBY] Erro Socket.IO:",
                     erro
+                );
+
+
+                mostrarStatus(
+                    "Falha na conexão",
+                    "erro"
                 );
 
             }
         );
+
+
+        // ====================================================
+        // RECONEXÃO
+        // ====================================================
+
+        if (
+            socket.io
+        ) {
+
+            socket.io.on(
+                "reconnect_attempt",
+                tentativa => {
+
+                    console.log(
+                        "[LOBBY] Tentativa de reconexão:",
+                        tentativa
+                    );
+
+                }
+            );
+
+
+            socket.io.on(
+                "reconnect",
+                tentativa => {
+
+                    console.log(
+                        "[LOBBY] Reconectado após",
+                        tentativa,
+                        "tentativas."
+                    );
+
+                }
+            );
+        }
 
 
         // ====================================================
@@ -136,12 +716,25 @@ document.addEventListener(
             "jogadores_atualizados",
             dados => {
 
+                console.log(
+                    "[LOBBY] Jogadores atualizados:",
+                    dados
+                );
+
+
                 if (
-                    !dados ||
+                    !dados
+                    ||
                     !Array.isArray(
                         dados.jogadores
                     )
                 ) {
+
+                    console.warn(
+                        "[LOBBY] Lista inválida:",
+                        dados
+                    );
+
                     return;
                 }
 
@@ -150,58 +743,115 @@ document.addEventListener(
                     dados.jogadores;
 
 
-                // --------------------------------------------
-                // LIMPA LISTA
-                // --------------------------------------------
+                // ============================================
+                // IDENTIFICA O JOGADOR ATUAL
+                // ============================================
 
-                if (lista) {
-                    lista.innerHTML = "";
+                const eu =
+                    jogadores.find(
+                        jogador =>
+
+                            String(
+                                jogador.id
+                            )
+                            ===
+                            String(
+                                jogadorId
+                            )
+                    );
+
+
+                /*
+                Se o HTML informou host incorretamente,
+                usamos a informação vinda do servidor.
+                */
+
+                if (eu) {
+
+                    const hostServidor =
+                        Boolean(
+                            eu.host
+                        );
+
+
+                    if (
+                        hostServidor !==
+                        ehHost
+                    ) {
+
+                        console.warn(
+                            "[LOBBY] Host corrigido pelo servidor:",
+                            hostServidor
+                        );
+
+
+                        ehHost =
+                            hostServidor;
+                    }
                 }
 
 
-                // --------------------------------------------
-                // QUANTIDADE
-                // --------------------------------------------
+                // ============================================
+                // QUANTIDADE ONLINE
+                // ============================================
 
-                const online =
+                const jogadoresOnline =
                     jogadores.filter(
                         jogador =>
-                            jogador.online
+                            Boolean(
+                                jogador.online
+                            )
                     );
+
+
+                quantidadeOnline =
+                    jogadoresOnline.length;
 
 
                 if (quantidade) {
 
                     quantidade.textContent =
-                        online.length;
-
+                        quantidadeOnline;
                 }
 
 
-                // --------------------------------------------
-                // MENSAGEM DE LISTA VAZIA
-                // --------------------------------------------
+                // ============================================
+                // LISTA VAZIA
+                // ============================================
 
                 if (
                     mensagemListaVazia
                 ) {
 
                     mensagemListaVazia.style.display =
-                        jogadores.length > 0
-                            ? "none"
-                            : "block";
-
+                        jogadores.length
+                            ?
+                            "none"
+                            :
+                            "block";
                 }
 
 
-                // --------------------------------------------
-                // MONTA JOGADORES
-                // --------------------------------------------
+                // ============================================
+                // LIMPA LISTA
+                // ============================================
+
+                if (lista) {
+
+                    lista.innerHTML =
+                        "";
+                }
+
+
+                // ============================================
+                // MONTA OS JOGADORES
+                // ============================================
 
                 jogadores.forEach(
                     jogador => {
 
                         if (!lista) {
+
                             return;
                         }
 
@@ -212,17 +862,40 @@ document.addEventListener(
                             );
 
 
+                        const jogadorAtual =
+                            String(
+                                jogador.id
+                            )
+                            ===
+                            String(
+                                jogadorId
+                            );
+
+
                         elemento.className = `
                             relative
-                            bg-slate-100
+
+                            ${
+                                jogadorAtual
+                                    ?
+                                    "bg-indigo-50 border-indigo-300"
+                                    :
+                                    "bg-slate-100 border-slate-200"
+                            }
+
                             border
-                            border-slate-200
+
                             rounded-2xl
+
                             p-4
+
                             text-center
+
                             transition
                             duration-200
+
                             hover:shadow-md
+                            hover:-translate-y-0.5
                         `;
 
 
@@ -242,8 +915,10 @@ document.addEventListener(
 
                         status.textContent =
                             jogador.online
-                                ? "🟢"
-                                : "⚫";
+                                ?
+                                "🟢"
+                                :
+                                "⚫";
 
 
                         elemento.appendChild(
@@ -263,17 +938,14 @@ document.addEventListener(
 
                         nome.className = `
                             mt-2
+
                             font-black
+
                             text-slate-900
+
                             truncate
                         `;
 
-
-                        /*
-                        Usamos textContent em vez de
-                        innerHTML para impedir que um
-                        apelido seja interpretado como HTML.
-                        */
 
                         nome.textContent =
                             jogador.nome ||
@@ -289,7 +961,9 @@ document.addEventListener(
                         // HOST
                         // ====================================
 
-                        if (jogador.host) {
+                        if (
+                            jogador.host
+                        ) {
 
                             const etiquetaHost =
                                 document.createElement(
@@ -299,14 +973,20 @@ document.addEventListener(
 
                             etiquetaHost.className = `
                                 inline-flex
+
                                 items-center
                                 justify-center
+
                                 mt-2
+
                                 px-3
                                 py-1
+
                                 rounded-full
+
                                 bg-amber-100
                                 text-amber-700
+
                                 text-xs
                                 font-black
                             `;
@@ -319,7 +999,6 @@ document.addEventListener(
                             elemento.appendChild(
                                 etiquetaHost
                             );
-
                         }
 
 
@@ -327,7 +1006,9 @@ document.addEventListener(
                         // OFFLINE
                         // ====================================
 
-                        if (!jogador.online) {
+                        if (
+                            !jogador.online
+                        ) {
 
                             const offline =
                                 document.createElement(
@@ -337,8 +1018,10 @@ document.addEventListener(
 
                             offline.className = `
                                 mt-2
+
                                 text-xs
                                 text-slate-400
+
                                 font-bold
                             `;
 
@@ -350,7 +1033,6 @@ document.addEventListener(
                             elemento.appendChild(
                                 offline
                             );
-
                         }
 
 
@@ -359,9 +1041,7 @@ document.addEventListener(
                         // ====================================
 
                         if (
-                            String(jogador.id)
-                            ===
-                            String(jogadorId)
+                            jogadorAtual
                         ) {
 
                             const voce =
@@ -372,13 +1052,18 @@ document.addEventListener(
 
                             voce.className = `
                                 absolute
+
                                 top-2
                                 right-2
-                                bg-indigo-100
-                                text-indigo-700
+
+                                bg-indigo-600
+                                text-white
+
                                 rounded-full
+
                                 px-2
                                 py-1
+
                                 text-[10px]
                                 font-black
                             `;
@@ -391,30 +1076,61 @@ document.addEventListener(
                             elemento.appendChild(
                                 voce
                             );
-
                         }
 
 
                         lista.appendChild(
                             elemento
                         );
-
                     }
                 );
 
 
-                // --------------------------------------------
+                // ============================================
                 // BOTÃO DO HOST
-                // --------------------------------------------
+                // ============================================
 
                 if (
-                    host &&
-                    iniciar &&
-                    !iniciar.dataset.iniciando
+                    iniciar
                 ) {
 
-                    iniciar.disabled = false;
+                    /*
+                    Importante:
+                    verificamos !== "true".
 
+                    "false" é uma string e seria
+                    considerada verdadeira em:
+                    !iniciar.dataset.iniciando
+                    */
+
+                    const estaIniciando =
+                        iniciar.dataset.iniciando
+                        ===
+                        "true";
+
+
+                    if (
+                        ehHost
+                        &&
+                        !estaIniciando
+                    ) {
+
+                        iniciar.disabled =
+                            false;
+
+
+                        iniciar.textContent =
+                            "▶ Iniciar partida";
+
+                    }
+
+                    else if (
+                        !ehHost
+                    ) {
+
+                        iniciar.disabled =
+                            true;
+                    }
                 }
 
             }
@@ -422,47 +1138,161 @@ document.addEventListener(
 
 
         // ====================================================
-        // INICIAR PARTIDA
+        // BOTÃO DE INICIAR
         // ====================================================
 
         if (
-            host &&
             iniciar
         ) {
+
+            iniciar.dataset.iniciando =
+                "false";
+
 
             iniciar.addEventListener(
                 "click",
                 () => {
 
-                    // Impede clique duplo.
+                    // ========================================
+                    // NÃO É HOST
+                    // ========================================
+
+                    if (
+                        !ehHost
+                    ) {
+
+                        console.warn(
+                            "[LOBBY] Jogador tentou iniciar sem ser host."
+                        );
+
+
+                        mostrarAviso(
+                            "Somente o anfitrião pode iniciar a partida."
+                        );
+
+
+                        return;
+                    }
+
+
+                    // ========================================
+                    // SOCKET DESCONECTADO
+                    // ========================================
+
+                    if (
+                        !socket.connected
+                    ) {
+
+                        mostrarAviso(
+                            "A conexão com o servidor foi perdida. Aguarde a reconexão."
+                        );
+
+
+                        return;
+                    }
+
+
+                    // ========================================
+                    // CLIQUE DUPLO
+                    // ========================================
+
                     if (
                         iniciar.dataset.iniciando
                         ===
                         "true"
                     ) {
+
                         return;
                     }
 
 
-                    iniciar.dataset.iniciando =
-                        "true";
+                    tocarSom(
+                        "somClique"
+                    );
 
 
-                    iniciar.disabled =
-                        true;
+                    definirBotaoInicio(
+                        "iniciando"
+                    );
 
 
-                    iniciar.textContent =
-                        "⏳ Iniciando partida...";
+                    console.log(
+                        "[LOBBY] Solicitando início da partida:",
+                        {
+                            codigo:
+                                codigo,
+
+                            jogador_id:
+                                jogadorId,
+
+                            jogadores_online:
+                                quantidadeOnline
+                        }
+                    );
 
 
                     socket.emit(
                         "iniciar_partida",
                         {
-                            codigo: codigo,
-                            jogador_id: jogadorId
+                            codigo:
+                                codigo,
+
+                            jogador_id:
+                                jogadorId
                         }
                     );
+
+
+                    /*
+                    Se o backend não responder com
+                    partida_iniciada ou erro_sala,
+                    o botão não fica travado para sempre.
+                    */
+
+                    clearTimeout(
+                        timeoutInicio
+                    );
+
+
+                    timeoutInicio =
+                        setTimeout(
+                            () => {
+
+                                if (
+                                    redirecionando
+                                ) {
+
+                                    return;
+                                }
+
+
+                                if (
+                                    iniciar.dataset.iniciando
+                                    !==
+                                    "true"
+                                ) {
+
+                                    return;
+                                }
+
+
+                                console.warn(
+                                    "[LOBBY] O servidor não respondeu ao iniciar_partida."
+                                );
+
+
+                                definirBotaoInicio(
+                                    "normal"
+                                );
+
+
+                                mostrarAviso(
+                                    "O servidor não respondeu ao pedido de início. Tente novamente."
+                                );
+
+                            },
+                            8000
+                        );
 
                 }
             );
@@ -478,15 +1308,60 @@ document.addEventListener(
             "partida_iniciada",
             dados => {
 
+                console.log(
+                    "[LOBBY] Partida iniciada:",
+                    dados
+                );
+
+
+                if (
+                    redirecionando
+                ) {
+
+                    return;
+                }
+
+
+                redirecionando =
+                    true;
+
+
+                clearTimeout(
+                    timeoutInicio
+                );
+
+
+                tocarSom(
+                    "somConcluido"
+                );
+
+
                 const codigoPartida =
-                    dados?.codigo ||
-                    codigo;
+                    String(
+                        dados?.codigo ||
+                        codigo
+                    );
 
 
-                window.location.href =
-                    `/multiplayer/jogo/${encodeURIComponent(
-                        codigoPartida
-                    )}`;
+                mostrarStatus(
+                    "Partida iniciada! 🎮",
+                    "online"
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        window.location.href =
+                            `/multiplayer/jogo/${
+                                encodeURIComponent(
+                                    codigoPartida
+                                )
+                            }`;
+
+                    },
+                    250
+                );
 
             }
         );
@@ -505,30 +1380,52 @@ document.addEventListener(
                     "Ocorreu um erro na sala.";
 
 
-                alert(
+                console.error(
+                    "[LOBBY] erro_sala:",
+                    mensagem,
+                    dados
+                );
+
+
+                clearTimeout(
+                    timeoutInicio
+                );
+
+
+                tocarSom(
+                    "somErro"
+                );
+
+
+                mostrarAviso(
                     mensagem
                 );
 
 
-                // Se o host tentou iniciar
-                // e ocorreu erro, libera novamente.
                 if (
-                    host &&
                     iniciar
                 ) {
 
-                    iniciar.dataset.iniciando =
-                        "false";
-
-
-                    iniciar.disabled =
-                        false;
-
-
-                    iniciar.textContent =
-                        "▶ Iniciar partida";
-
+                    definirBotaoInicio(
+                        "normal"
+                    );
                 }
+
+            }
+        );
+
+
+        // ====================================================
+        // SAÍDA DA PÁGINA
+        // ====================================================
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                clearTimeout(
+                    timeoutInicio
+                );
 
             }
         );
