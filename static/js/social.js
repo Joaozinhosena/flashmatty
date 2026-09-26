@@ -744,131 +744,211 @@
             // BOTÕES DE DESAFIAR
             // =================================================
 
-            document
-                .querySelectorAll(
-                    "[data-desafiar-usuario]"
-                )
-                .forEach(
-                    botao => {
+            document.addEventListener(
+    "click",
+    event => {
 
-                        botao.addEventListener(
-                            "click",
-                            () => {
-
-                                if (
-                                    !socket.connected
-                                ) {
-
-                                    criarToast(
-                                        "Não foi possível enviar o desafio: conexão indisponível."
-                                    );
-
-                                    return;
-
-                                }
+        const botao =
+            event.target.closest(
+                "[data-desafiar-usuario]"
+            );
 
 
-                                const usuarioId =
-                                    Number(
-                                        botao.dataset.desafiarUsuario
-                                    );
+        if (
+            !botao
+        ) {
+
+            return;
+
+        }
 
 
-                                if (
-                                    !Number.isFinite(
-                                        usuarioId
-                                    )
-                                ) {
+        // Impede comportamento padrão caso seja
+        // <a> ou esteja dentro de formulário.
 
-                                    return;
-
-                                }
+        event.preventDefault();
 
 
-                                if (
-                                    botao.dataset.enviando
-                                    ===
-                                    "true"
-                                ) {
-
-                                    return;
-
-                                }
+        const usuarioId =
+            Number(
+                botao.dataset.desafiarUsuario
+            );
 
 
-                                if (
-                                    typeof window.somClique
-                                    ===
-                                    "function"
-                                ) {
-
-                                    window.somClique();
-
-                                }
-
-
-                                const textoOriginal =
-                                    botao.textContent;
+        console.log(
+            "🎮 Botão desafiar clicado.",
+            {
+                usuarioId,
+                conectado:
+                    socket.connected
+            }
+        );
 
 
-                                botao.dataset.enviando =
-                                    "true";
+        if (
+            !Number.isFinite(
+                usuarioId
+            )
+        ) {
+
+            console.error(
+                "ID do usuário inválido:",
+                botao.dataset.desafiarUsuario
+            );
 
 
-                                botao.disabled =
-                                    true;
+            criarToast(
+                "Não foi possível identificar o usuário."
+            );
+
+            return;
+
+        }
 
 
-                                botao.textContent =
-                                    "⏳ Enviando...";
+        // ====================================================
+        // SOCKET CONECTADO?
+        // ====================================================
+
+        if (
+            !socket.connected
+        ) {
+
+            console.error(
+                "Socket social desconectado."
+            );
 
 
-                                socket.emit(
+            criarToast(
+                "Não foi possível enviar o desafio. O servidor está desconectado."
+            );
 
-                                    "social_desafiar",
+            return;
 
-                                    {
-
-                                        usuario_id:
-                                            usuarioId
-
-                                    }
-
-                                );
+        }
 
 
-                                setTimeout(
-                                    () => {
+        // ====================================================
+        // EVITAR CLIQUE DUPLO
+        // ====================================================
 
-                                        if (
-                                            !botao.isConnected
-                                        ) {
+        if (
+            botao.dataset.enviando
+            ===
+            "true"
+        ) {
 
-                                            return;
+            return;
 
-                                        }
-
-
-                                        botao.dataset.enviando =
-                                            "false";
-
-
-                                        botao.disabled =
-                                            false;
+        }
 
 
-                                        botao.textContent =
-                                            textoOriginal;
+        botao.dataset.enviando =
+            "true";
 
-                                    },
-                                    2000
-                                );
 
-                            }
-                        );
+        // ====================================================
+        // SOM
+        // ====================================================
 
-                    }
-                );
+        if (
+            typeof window.somClique
+            ===
+            "function"
+        ) {
+
+            window.somClique();
+
+        }
+
+
+        // ====================================================
+        // ALTERAR BOTÃO
+        // ====================================================
+
+        const textoOriginal =
+            botao.textContent;
+
+
+        if (
+            "disabled"
+            in botao
+        ) {
+
+            botao.disabled =
+                true;
+
+        }
+
+
+        botao.textContent =
+            "⏳ Enviando...";
+
+
+        // ====================================================
+        // ENVIAR DESAFIO
+        // ====================================================
+
+        console.log(
+            "📤 Enviando social_desafiar:",
+            usuarioId
+        );
+
+
+        socket.emit(
+
+            "social_desafiar",
+
+            {
+
+                usuario_id:
+                    usuarioId
+
+            }
+
+        );
+
+
+        // ====================================================
+        // RESTAURAR BOTÃO
+        // ====================================================
+
+        setTimeout(
+            () => {
+
+                if (
+                    !botao.isConnected
+                ) {
+
+                    return;
+
+                }
+
+
+                botao.dataset.enviando =
+                    "false";
+
+
+                if (
+                    "disabled"
+                    in botao
+                ) {
+
+                    botao.disabled =
+                        false;
+
+                }
+
+
+                botao.textContent =
+                    textoOriginal;
+
+            },
+            2500
+        );
+
+    }
+);
 
 
             // =================================================
