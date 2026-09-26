@@ -1043,49 +1043,39 @@
 ></script>
 
 
+
+
+
+
+
 <!-- ========================================================== -->
-<!-- SOCKET.IO + SOCIAL -->
+<!-- SOCKET.IO + SOCIAL + NOTIFICAÇÕES -->
 <!-- ========================================================== -->
 
 {% if current_user.is_authenticated %}
 
+<!-- Socket.IO -->
 <script
     src="https://cdn.socket.io/4.7.5/socket.io.min.js"
 ></script>
 
 
+<!-- Sistema social -->
 <script
     src="{{ url_for(
         'static',
         filename='js/social.js'
-    ) }}?v=2"
+    ) }}?v=7"
 ></script>
 
 
-
-
-
+<!-- Notificações -->
 <script
     src="{{ url_for(
         'static',
         filename='js/notificacoes.js'
-    ) }}?v=1"
+    ) }}?v=5"
 ></script>
-
-
-
-<script
-    src="{{ url_for(
-        'static',
-        filename='js/social.js'
-    ) }}?v=6"
-></script>
-
-
-
-
-
-
 
 
 
