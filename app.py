@@ -51,6 +51,15 @@ from social.routes import social_bp
 
 from multiplayer import socketio
 from multiplayer.routes import multiplayer_bp
+
+
+
+
+
+
+
+
+
 # ============================================================
 # APP
 # ============================================================
@@ -120,24 +129,16 @@ socketio.init_app(
 app.register_blueprint(
     multiplayer_bp
 )
-
-
+from notificacoes.routes import notificacoes_bp
+app.register_blueprint(
+    notificacoes_bp
+)
 
 app.register_blueprint(
     social_bp
 )
 
-# ============================================================
-# NOTIFICAÇÕES
-# ============================================================
 
-from notificacoes.routes import notificacoes_bp
-
-app.register_blueprint(
-    notificacoes_bp
-)
-
-# IMPORTANTE:
 # eventos somente depois de configurar SocketIO
 import multiplayer.socket_events
 
