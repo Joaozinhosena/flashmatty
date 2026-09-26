@@ -1,0 +1,2080 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Configurações - FlashMatty
+{% endblock %}
+
+
+{% block head %}
+
+<style>
+
+    /* ========================================================
+       PÁGINA DE CONFIGURAÇÕES
+       ======================================================== */
+
+    .config-page {
+        background-color: var(--fm-bg);
+        color: var(--fm-text);
+        min-height: 100vh;
+    }
+
+
+    .config-section {
+        scroll-margin-top: 100px;
+    }
+
+
+    .config-card {
+        background-color: var(--fm-card) !important;
+        border-color: var(--fm-border) !important;
+
+        transition:
+            transform .18s ease,
+            border-color .18s ease,
+            background-color .18s ease;
+    }
+
+
+    .config-card:hover {
+        transform: translateY(-2px);
+    }
+
+
+    .config-muted {
+        color: var(--fm-muted) !important;
+    }
+
+
+    .config-primary {
+        color: var(--fm-primary) !important;
+    }
+
+
+    .config-divider {
+        border-color: var(--fm-border) !important;
+    }
+
+
+    /* ========================================================
+       MENU RÁPIDO
+       ======================================================== */
+
+    .config-menu-item {
+        background-color: var(--fm-card);
+        border: 1px solid var(--fm-border);
+        color: var(--fm-text);
+
+        transition:
+            transform .18s ease,
+            border-color .18s ease,
+            background-color .18s ease;
+    }
+
+
+    .config-menu-item:hover {
+        border-color: var(--fm-primary);
+        transform: translateY(-2px);
+    }
+
+
+    /* ========================================================
+       BOTÃO PRINCIPAL
+       ======================================================== */
+
+    .config-primary-button {
+        background-color: var(--fm-primary) !important;
+        color: #ffffff !important;
+    }
+
+
+    .config-primary-button:hover {
+        filter: brightness(.9);
+    }
+
+
+    /* ========================================================
+       INPUTS
+       ======================================================== */
+
+    .config-input {
+        background-color: var(--fm-bg) !important;
+        border-color: var(--fm-border) !important;
+        color: var(--fm-text) !important;
+    }
+
+
+    .config-input:focus {
+        border-color: var(--fm-primary) !important;
+        outline: none;
+    }
+
+
+    /* ========================================================
+       SWITCH
+       ======================================================== */
+
+    .switch {
+        position: relative;
+        display: inline-block;
+
+        width: 52px;
+        height: 28px;
+
+        flex-shrink: 0;
+    }
+
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+
+    .switch-slider {
+        position: absolute;
+
+        inset: 0;
+
+        cursor: pointer;
+
+        background-color: #475569;
+
+        border-radius: 999px;
+
+        transition: .2s;
+    }
+
+
+    .switch-slider::before {
+        content: "";
+
+        position: absolute;
+
+        width: 20px;
+        height: 20px;
+
+        left: 4px;
+        top: 4px;
+
+        background-color: #ffffff;
+
+        border-radius: 50%;
+
+        transition: .2s;
+    }
+
+
+    .switch input:checked + .switch-slider {
+        background-color: var(--fm-primary);
+    }
+
+
+    .switch input:checked + .switch-slider::before {
+        transform: translateX(24px);
+    }
+
+
+    .switch input:focus-visible + .switch-slider {
+        outline:
+            3px solid
+            color-mix(
+                in srgb,
+                var(--fm-primary) 35%,
+                transparent
+            );
+    }
+
+
+    /* ========================================================
+       CHECKBOX DE NOTIFICAÇÕES
+       ======================================================== */
+
+    .notification-checkbox {
+        width: 20px;
+        height: 20px;
+
+        accent-color: var(--fm-primary);
+
+        cursor: pointer;
+    }
+
+
+    /* ========================================================
+       BOTÃO DESABILITADO
+       ======================================================== */
+
+    button:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+
+    /* ========================================================
+       MODAL
+       ======================================================== */
+
+    .config-modal-card {
+        background-color: var(--fm-card);
+        border-color: var(--fm-border);
+        color: var(--fm-text);
+    }
+
+
+    /* ========================================================
+       RESPONSIVO
+       ======================================================== */
+
+    @media (max-width: 640px) {
+
+        .notification-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .notification-buttons button {
+            width: 100%;
+            margin-left: 0 !important;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div
+    class="
+        config-page
+        px-4
+        py-10
+    "
+>
+
+    <div class="max-w-5xl mx-auto">
+
+
+        <!-- ================================================== -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================== -->
+
+        <header>
+
+            <p
+                class="
+                    config-primary
+                    uppercase
+                    tracking-wider
+                    font-black
+                    text-sm
+                "
+            >
+                FlashMatty
+            </p>
+
+
+            <h1
+                class="
+                    text-4xl
+                    font-black
+                    mt-2
+                "
+            >
+                Configurações ⚙️
+            </h1>
+
+
+            <p
+                class="
+                    config-muted
+                    mt-2
+                "
+            >
+                Personalize sua experiência no FlashMatty.
+            </p>
+
+        </header>
+
+
+
+        <!-- ================================================== -->
+        <!-- MENU RÁPIDO -->
+        <!-- ================================================== -->
+
+        <nav
+            aria-label="Seções das configurações"
+
+            class="
+                grid
+                grid-cols-2
+                sm:grid-cols-3
+                lg:grid-cols-5
+                gap-3
+                mt-8
+            "
+        >
+
+            <a
+                href="#aparencia"
+
+                class="
+                    config-menu-item
+                    rounded-2xl
+                    p-4
+                    font-black
+                "
+            >
+                🎨 Aparência
+            </a>
+
+
+            <a
+                href="#audio"
+
+                class="
+                    config-menu-item
+                    rounded-2xl
+                    p-4
+                    font-black
+                "
+            >
+                🔊 Áudio
+            </a>
+
+
+            <a
+                href="#notificacoes"
+
+                class="
+                    config-menu-item
+                    rounded-2xl
+                    p-4
+                    font-black
+                "
+            >
+                🔔 Notificações
+            </a>
+
+
+            <a
+                href="#acessibilidade"
+
+                class="
+                    config-menu-item
+                    rounded-2xl
+                    p-4
+                    font-black
+                "
+            >
+                ♿ Acessibilidade
+            </a>
+
+
+            <a
+                href="#sobre"
+
+                class="
+                    config-menu-item
+                    rounded-2xl
+                    p-4
+                    font-black
+                "
+            >
+                ℹ️ Sobre
+            </a>
+
+        </nav>
+
+
+
+        <!-- ================================================== -->
+        <!-- APARÊNCIA -->
+        <!-- ================================================== -->
+
+        <section
+            id="aparencia"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                🎨 Aparência
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    p-6
+                    mt-4
+                "
+            >
+
+                <label
+                    for="temaAplicativo"
+                    class="font-black"
+                >
+                    Tema do FlashMatty
+                </label>
+
+
+                <p
+                    class="
+                        config-muted
+                        text-sm
+                        mt-1
+                    "
+                >
+                    Escolha um tema pronto ou crie o seu próprio.
+                </p>
+
+
+                <select
+                    id="temaAplicativo"
+
+                    class="
+                        config-input
+                        w-full
+                        mt-4
+                        border
+                        rounded-xl
+                        px-4
+                        py-3
+                    "
+                >
+
+                    <option value="dark">
+                        🌙 Escuro
+                    </option>
+
+                    <option value="light">
+                        ☀️ Claro
+                    </option>
+
+                    <option value="custom">
+                        🎨 Personalizado
+                    </option>
+
+                </select>
+
+
+
+                <!-- ========================================== -->
+                <!-- TEMA PERSONALIZADO -->
+                <!-- ========================================== -->
+
+                <div
+                    id="painelTemaPersonalizado"
+
+                    class="
+                        hidden
+                        mt-7
+                        border-t
+                        config-divider
+                        pt-6
+                    "
+                >
+
+                    <h3 class="text-xl font-black">
+                        🎨 Criar meu tema
+                    </h3>
+
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                        "
+                    >
+                        Escolha as cores da interface.
+                    </p>
+
+
+
+                    <div
+                        class="
+                            grid
+                            sm:grid-cols-2
+                            gap-4
+                            mt-6
+                        "
+                    >
+
+
+                        <!-- COR PRINCIPAL -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Cor principal
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Botões, links e destaques
+                            </span>
+
+
+                            <input
+                                id="corPrimaria"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+
+
+                        <!-- FUNDO -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Fundo
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Cor principal das páginas
+                            </span>
+
+
+                            <input
+                                id="corFundo"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+
+
+                        <!-- CARD -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Cards
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Caixas, painéis e menus
+                            </span>
+
+
+                            <input
+                                id="corCard"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+
+
+                        <!-- TEXTO -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Texto
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Cor principal das letras
+                            </span>
+
+
+                            <input
+                                id="corTexto"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+
+
+                        <!-- TEXTO SECUNDÁRIO -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Texto secundário
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Descrições e informações secundárias
+                            </span>
+
+
+                            <input
+                                id="corSecundaria"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+
+
+                        <!-- BORDA -->
+
+                        <label
+                            class="
+                                config-card
+                                border
+                                rounded-2xl
+                                p-4
+                            "
+                        >
+
+                            <span class="font-black block">
+                                Bordas
+                            </span>
+
+                            <span
+                                class="
+                                    config-muted
+                                    text-xs
+                                    block
+                                    mt-1
+                                "
+                            >
+                                Contorno dos componentes
+                            </span>
+
+
+                            <input
+                                id="corBorda"
+                                type="color"
+
+                                class="
+                                    w-full
+                                    h-12
+                                    mt-3
+                                    rounded-xl
+                                    cursor-pointer
+                                "
+                            >
+
+                        </label>
+
+                    </div>
+
+
+
+                    <!-- ====================================== -->
+                    <!-- PREVIEW -->
+                    <!-- ====================================== -->
+
+                    <div class="mt-7">
+
+                        <p class="font-black mb-3">
+                            Pré-visualização
+                        </p>
+
+
+                        <div
+                            id="previewTema"
+
+                            class="
+                                rounded-3xl
+                                p-5
+                                border
+                            "
+                        >
+
+                            <div
+                                id="previewCard"
+
+                                class="
+                                    rounded-2xl
+                                    p-5
+                                    border
+                                "
+                            >
+
+                                <h4
+                                    id="previewTitulo"
+
+                                    class="
+                                        text-xl
+                                        font-black
+                                    "
+                                >
+                                    Meu FlashMatty
+                                </h4>
+
+
+                                <p
+                                    id="previewTexto"
+                                    class="mt-2"
+                                >
+                                    Assim ficará o seu tema personalizado.
+                                </p>
+
+
+                                <button
+                                    id="previewBotao"
+                                    type="button"
+
+                                    class="
+                                        mt-4
+                                        rounded-xl
+                                        px-5
+                                        py-3
+                                        text-white
+                                        font-black
+                                    "
+                                >
+                                    Botão de exemplo
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ====================================== -->
+                    <!-- AÇÕES DO TEMA -->
+                    <!-- ====================================== -->
+
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            gap-3
+                            mt-6
+                        "
+                    >
+
+                        <button
+                            id="salvarTemaPersonalizado"
+                            type="button"
+
+                            class="
+                                config-primary-button
+                                flex-1
+                                rounded-xl
+                                py-3
+                                px-5
+                                font-black
+                            "
+                        >
+                            ✓ Usar este tema
+                        </button>
+
+
+                        <button
+                            id="restaurarTemaPersonalizado"
+                            type="button"
+
+                            class="
+                                config-card
+                                border
+                                rounded-xl
+                                px-5
+                                py-3
+                                font-black
+                            "
+                        >
+                            ↺ Restaurar cores
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================== -->
+        <!-- ÁUDIO -->
+        <!-- ================================================== -->
+
+        <section
+            id="audio"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                🔊 Áudio
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    p-6
+                    mt-4
+                "
+            >
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
+                    "
+                >
+
+                    <div>
+
+                        <p class="font-black">
+                            Efeitos sonoros
+                        </p>
+
+                        <p
+                            class="
+                                config-muted
+                                text-sm
+                                mt-1
+                            "
+                        >
+                            Sons de clique, respostas, moedas e recompensas.
+                        </p>
+
+                    </div>
+
+
+                    <label
+                        class="switch"
+                        aria-label="Ativar efeitos sonoros"
+                    >
+
+                        <input
+                            id="sonsAtivados"
+                            type="checkbox"
+                            checked
+                        >
+
+                        <span class="switch-slider"></span>
+
+                    </label>
+
+                </div>
+
+
+
+                <!-- VOLUME -->
+
+                <div class="mt-7">
+
+                    <div
+                        class="
+                            flex
+                            justify-between
+                            gap-3
+                        "
+                    >
+
+                        <label
+                            for="volumeAplicativo"
+                            class="font-black"
+                        >
+                            Volume
+                        </label>
+
+
+                        <span
+                            id="volumeValor"
+
+                            class="
+                                config-primary
+                                font-black
+                            "
+                        >
+                            70%
+                        </span>
+
+                    </div>
+
+
+                    <input
+                        id="volumeAplicativo"
+
+                        type="range"
+
+                        min="0"
+                        max="100"
+                        value="70"
+
+                        class="
+                            w-full
+                            mt-4
+                        "
+
+                        style="
+                            accent-color:
+                                var(--fm-primary);
+                        "
+                    >
+
+
+                    <div
+                        class="
+                            flex
+                            justify-between
+                            text-xs
+                            config-muted
+                            mt-1
+                        "
+                    >
+                        <span>0%</span>
+                        <span>100%</span>
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="testarSom"
+                    type="button"
+
+                    class="
+                        config-primary-button
+                        mt-6
+                        rounded-xl
+                        px-5
+                        py-3
+                        font-black
+                    "
+                >
+                    🔊 Testar som
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================== -->
+        <!-- NOTIFICAÇÕES -->
+        <!-- ================================================== -->
+
+        <section
+            id="notificacoes"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                🔔 Notificações
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    p-6
+                    mt-4
+                "
+            >
+
+                <div>
+
+                    <h3 class="font-black text-lg">
+                        Notificações neste dispositivo
+                    </h3>
+
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                        "
+                    >
+                        Receba avisos do FlashMatty mesmo
+                        quando a página não estiver aberta.
+                    </p>
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div
+                    class="
+                        mt-5
+                        rounded-2xl
+                        border
+                        config-divider
+                        p-4
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            gap-3
+                        "
+                    >
+
+                        <span
+                            class="
+                                text-2xl
+                                leading-none
+                            "
+                        >
+                            📡
+                        </span>
+
+
+                        <div>
+
+                            <p class="font-black">
+                                Estado
+                            </p>
+
+
+                            <p
+                                id="notificacaoStatus"
+
+                                role="status"
+
+                                aria-live="polite"
+
+                                class="
+                                    config-muted
+                                    text-sm
+                                    font-bold
+                                    mt-1
+                                "
+                            >
+                                Inicializando sistema de notificações...
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BOTÕES -->
+
+                <div
+                    class="
+                        notification-buttons
+                        flex
+                        flex-wrap
+                        gap-3
+                        mt-5
+                    "
+                >
+
+                    <button
+                        id="ativarNotificacoes"
+
+                        type="button"
+
+                        data-ativo="false"
+
+                        class="
+                            config-primary-button
+                            rounded-xl
+                            px-5
+                            py-3
+                            font-black
+                        "
+                    >
+                        🔕 Ativar notificações
+                    </button>
+
+
+                    <button
+                        id="testarNotificacao"
+
+                        type="button"
+
+                        disabled
+
+                        class="
+                            config-card
+                            border
+                            rounded-xl
+                            px-5
+                            py-3
+                            font-black
+                        "
+                    >
+                        🧪 Enviar teste
+                    </button>
+
+                </div>
+
+
+
+                <noscript>
+
+                    <p
+                        class="
+                            text-red-400
+                            font-bold
+                            mt-4
+                        "
+                    >
+                        JavaScript precisa estar ativado para
+                        utilizar notificações.
+                    </p>
+
+                </noscript>
+
+
+
+                <!-- ========================================== -->
+                <!-- PREFERÊNCIAS -->
+                <!-- ========================================== -->
+
+                <div
+                    class="
+                        border-t
+                        config-divider
+                        mt-7
+                        pt-6
+                    "
+                >
+
+                    <h3 class="font-black">
+                        O que deseja receber?
+                    </h3>
+
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                            mb-5
+                        "
+                    >
+                        Estas preferências ficam vinculadas
+                        à sua conta.
+                    </p>
+
+
+
+                    <div class="space-y-5">
+
+
+                        <label
+                            class="
+                                flex
+                                justify-between
+                                items-center
+                                gap-4
+                            "
+                        >
+
+                            <span>
+
+                                <strong class="block">
+                                    👥 Solicitações de amizade
+                                </strong>
+
+                                <span
+                                    class="
+                                        config-muted
+                                        text-sm
+                                    "
+                                >
+                                    Novos pedidos e amizades aceitas.
+                                </span>
+
+                            </span>
+
+
+                            <input
+                                id="prefNotificacaoAmizades"
+
+                                type="checkbox"
+
+                                checked
+
+                                class="notification-checkbox"
+                            >
+
+                        </label>
+
+
+
+                        <label
+                            class="
+                                flex
+                                justify-between
+                                items-center
+                                gap-4
+                            "
+                        >
+
+                            <span>
+
+                                <strong class="block">
+                                    🎮 Desafios multiplayer
+                                </strong>
+
+                                <span
+                                    class="
+                                        config-muted
+                                        text-sm
+                                    "
+                                >
+                                    Convites enviados pelos seus amigos.
+                                </span>
+
+                            </span>
+
+
+                            <input
+                                id="prefNotificacaoDesafios"
+
+                                type="checkbox"
+
+                                checked
+
+                                class="notification-checkbox"
+                            >
+
+                        </label>
+
+
+
+                        <label
+                            class="
+                                flex
+                                justify-between
+                                items-center
+                                gap-4
+                            "
+                        >
+
+                            <span>
+
+                                <strong class="block">
+                                    🏆 Conquistas
+                                </strong>
+
+                                <span
+                                    class="
+                                        config-muted
+                                        text-sm
+                                    "
+                                >
+                                    Avisos quando desbloquear conquistas.
+                                </span>
+
+                            </span>
+
+
+                            <input
+                                id="prefNotificacaoConquistas"
+
+                                type="checkbox"
+
+                                checked
+
+                                class="notification-checkbox"
+                            >
+
+                        </label>
+
+
+
+                        <label
+                            class="
+                                flex
+                                justify-between
+                                items-center
+                                gap-4
+                            "
+                        >
+
+                            <span>
+
+                                <strong class="block">
+                                    🪙 Recompensas
+                                </strong>
+
+                                <span
+                                    class="
+                                        config-muted
+                                        text-sm
+                                    "
+                                >
+                                    Moedas, bônus e outras recompensas.
+                                </span>
+
+                            </span>
+
+
+                            <input
+                                id="prefNotificacaoRecompensas"
+
+                                type="checkbox"
+
+                                checked
+
+                                class="notification-checkbox"
+                            >
+
+                        </label>
+
+
+
+                        <label
+                            class="
+                                flex
+                                justify-between
+                                items-center
+                                gap-4
+                            "
+                        >
+
+                            <span>
+
+                                <strong class="block">
+                                    📚 Lembretes de estudo
+                                </strong>
+
+                                <span
+                                    class="
+                                        config-muted
+                                        text-sm
+                                    "
+                                >
+                                    Lembretes para continuar sua jornada.
+                                </span>
+
+                            </span>
+
+
+                            <input
+                                id="prefNotificacaoLembretes"
+
+                                type="checkbox"
+
+                                checked
+
+                                class="notification-checkbox"
+                            >
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- INFORMAÇÃO -->
+
+                <div
+                    class="
+                        mt-7
+                        rounded-2xl
+                        border
+                        config-divider
+                        p-4
+                    "
+                >
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                        "
+                    >
+                        💡 Cada computador, celular ou navegador
+                        precisa ativar as notificações individualmente.
+                        A mesma conta pode possuir vários dispositivos.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================== -->
+        <!-- ACESSIBILIDADE -->
+        <!-- ================================================== -->
+
+        <section
+            id="acessibilidade"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                ♿ Acessibilidade
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    mt-4
+                    overflow-hidden
+                "
+            >
+
+
+                <!-- REDUZIR ANIMAÇÕES -->
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
+                        p-6
+                        border-b
+                        config-divider
+                    "
+                >
+
+                    <div>
+
+                        <p class="font-black">
+                            Reduzir animações
+                        </p>
+
+                        <p
+                            class="
+                                config-muted
+                                text-sm
+                                mt-1
+                            "
+                        >
+                            Diminui movimentos e transições da interface.
+                        </p>
+
+                    </div>
+
+
+                    <label
+                        class="switch"
+                        aria-label="Reduzir animações"
+                    >
+
+                        <input
+                            id="reduzirAnimacoes"
+                            type="checkbox"
+                        >
+
+                        <span class="switch-slider"></span>
+
+                    </label>
+
+                </div>
+
+
+
+                <!-- TEXTO GRANDE -->
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
+                        p-6
+                    "
+                >
+
+                    <div>
+
+                        <p class="font-black">
+                            Texto maior
+                        </p>
+
+                        <p
+                            class="
+                                config-muted
+                                text-sm
+                                mt-1
+                            "
+                        >
+                            Aumenta ligeiramente o tamanho
+                            dos textos da interface.
+                        </p>
+
+                    </div>
+
+
+                    <label
+                        class="switch"
+                        aria-label="Ativar texto maior"
+                    >
+
+                        <input
+                            id="textoGrande"
+                            type="checkbox"
+                        >
+
+                        <span class="switch-slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================== -->
+        <!-- CONTA -->
+        <!-- ================================================== -->
+
+        {% if current_user.is_authenticated %}
+
+        <section
+            id="conta"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                👤 Conta
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    p-6
+                    mt-4
+                "
+            >
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
+                        gap-4
+                    "
+                >
+
+                    <div>
+
+                        <p class="font-black">
+                            {{ current_user.nome }}
+                        </p>
+
+                        <p
+                            class="
+                                config-muted
+                                text-sm
+                            "
+                        >
+                            @{{ current_user.username }}
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            gap-3
+                        "
+                    >
+
+                        <a
+                            href="{{ url_for('social.editar_perfil') }}"
+
+                            class="
+                                config-primary-button
+                                rounded-xl
+                                px-4
+                                py-3
+                                font-black
+                            "
+                        >
+                            Editar perfil
+                        </a>
+
+
+                        <a
+                            href="{{ url_for('logout') }}"
+
+                            class="
+                                config-card
+                                border
+                                rounded-xl
+                                px-4
+                                py-3
+                                font-black
+                            "
+                        >
+                            Sair
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+
+        <!-- ================================================== -->
+        <!-- SOBRE -->
+        <!-- ================================================== -->
+
+        <section
+            id="sobre"
+            class="config-section mt-10"
+        >
+
+            <h2 class="text-2xl font-black">
+                ℹ️ Sobre o FlashMatty
+            </h2>
+
+
+            <div
+                class="
+                    config-card
+                    border
+                    rounded-3xl
+                    mt-4
+                    overflow-hidden
+                "
+            >
+
+
+                <!-- CRÉDITOS -->
+
+                <button
+                    type="button"
+
+                    data-abrir-info="creditos"
+
+                    class="
+                        w-full
+                        text-left
+                        p-6
+                        border-b
+                        config-divider
+                    "
+                >
+
+                    <p class="font-black">
+                        🏆 Créditos
+                    </p>
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                        "
+                    >
+                        Desenvolvimento e informações do projeto.
+                    </p>
+
+                </button>
+
+
+
+                <!-- PRIVACIDADE -->
+
+                <button
+                    type="button"
+
+                    data-abrir-info="privacidade"
+
+                    class="
+                        w-full
+                        text-left
+                        p-6
+                        border-b
+                        config-divider
+                    "
+                >
+
+                    <p class="font-black">
+                        🔐 Política de Privacidade
+                    </p>
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                        "
+                    >
+                        Saiba como os dados do aplicativo
+                        são utilizados.
+                    </p>
+
+                </button>
+
+
+
+                <!-- TERMOS -->
+
+                <button
+                    type="button"
+
+                    data-abrir-info="termos"
+
+                    class="
+                        w-full
+                        text-left
+                        p-6
+                        border-b
+                        config-divider
+                    "
+                >
+
+                    <p class="font-black">
+                        📄 Termos de Uso
+                    </p>
+
+                    <p
+                        class="
+                            config-muted
+                            text-sm
+                            mt-1
+                        "
+                    >
+                        Condições de utilização do FlashMatty.
+                    </p>
+
+                </button>
+
+
+
+                <!-- VERSÃO -->
+
+                <div class="p-6">
+
+                    <div
+                        class="
+                            flex
+                            justify-between
+                            gap-4
+                        "
+                    >
+
+                        <span class="config-muted">
+                            Versão
+                        </span>
+
+                        <strong>
+                            1.0.0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================== -->
+        <!-- AVISO DE CONFIGURAÇÃO SALVA -->
+        <!-- ================================================== -->
+
+        <div
+            id="configSalva"
+
+            role="status"
+
+            aria-live="polite"
+
+            class="
+                hidden
+
+                fixed
+                bottom-6
+                left-1/2
+                -translate-x-1/2
+
+                z-50
+
+                rounded-xl
+                bg-green-600
+                text-white
+
+                px-6
+                py-3
+
+                font-black
+                shadow-2xl
+            "
+        >
+            ✓ Configuração salva
+        </div>
+
+
+
+        <!-- ================================================== -->
+        <!-- MODAL -->
+        <!-- ================================================== -->
+
+        <div
+            id="modalInfo"
+
+            class="
+                hidden
+
+                fixed
+                inset-0
+
+                z-[100]
+
+                bg-black/70
+                backdrop-blur-sm
+
+                p-4
+
+                overflow-y-auto
+            "
+        >
+
+            <div
+                class="
+                    config-modal-card
+
+                    max-w-2xl
+                    mx-auto
+                    my-10
+
+                    border
+
+                    rounded-3xl
+
+                    p-6
+                    md:p-8
+                "
+            >
+
+                <div
+                    class="
+                        flex
+                        justify-between
+                        items-start
+                        gap-4
+                    "
+                >
+
+                    <h2
+                        id="modalTitulo"
+
+                        class="
+                            text-2xl
+                            font-black
+                        "
+                    ></h2>
+
+
+                    <button
+                        id="fecharModalInfo"
+
+                        type="button"
+
+                        class="
+                            config-card
+                            border
+                            rounded-xl
+                            px-4
+                            py-2
+                            font-black
+                        "
+                    >
+                        ✕
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="modalConteudo"
+
+                    class="
+                        config-muted
+                        mt-6
+                        leading-relaxed
+                        space-y-4
+                    "
+                ></div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/configuracoes.js'
+    ) }}?v=5"
+></script>
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/notificacoes.js'
+    ) }}?v=5"
+></script>
+
+{% endblock %}

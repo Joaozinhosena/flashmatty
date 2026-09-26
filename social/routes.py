@@ -3,6 +3,22 @@ import secrets
 from datetime import datetime
 from io import BytesIO
 
+
+from notificacoes.push import (
+    enviar_push_usuario,
+)
+
+
+
+
+
+
+
+
+
+
+
+
 from flask import (
     Blueprint,
     abort,
@@ -199,7 +215,17 @@ def obter_relacao(
 def sao_amigos(
     usuario_a_id,
     usuario_b_id
+    
+
+
+
+
 ):
+
+
+    
+
+    
 
     relacao = obter_relacao(
         usuario_a_id,
@@ -528,7 +554,32 @@ def pode_ver_progresso(
         sao_amigos(
             current_user.id,
             alvo.id
+
+
         )
+
+        and
+
+
+
+        enviar_push_usuario(
+
+    alvo.id,
+
+    "🎮 Novo desafio!",
+
+    f"{current_user.nome} desafiou você para uma partida no FlashMatty.",
+
+    url=url_for(
+        "multiplayer.inicio"
+    ),
+
+    categoria="desafios",
+
+    tag="desafio-multiplayer"
+
+)
+
 
     )
 
@@ -1616,6 +1667,32 @@ def enviar_amizade(
         db.session.commit()
 
 
+        enviar_push_usuario(
+
+    alvo.id,
+
+    "👥 Nova solicitação de amizade",
+
+    f"{current_user.nome} quer ser seu amigo no FlashMatty.",
+
+    url=url_for(
+        "social.amigos"
+    ),
+
+    categoria="amizades",
+
+    tag="amizade"
+
+)
+
+
+
+
+
+
+
+
+
         flash(
             f"Solicitação enviada para {alvo.nome}. ✅"
         )
@@ -1639,7 +1716,6 @@ def enviar_amizade(
 # ============================================================
 # ACEITAR AMIZADE
 # ============================================================
-
 @social_bp.route(
     "/amizade/aceitar/<int:amizade_id>",
     methods=[
@@ -1677,6 +1753,19 @@ def aceitar_amizade(
         )
 
 
+    # ========================================================
+    # GUARDAR QUEM ENVIOU A SOLICITAÇÃO
+    # ========================================================
+
+    solicitante_id = (
+        relacao.solicitante_id
+    )
+
+
+    # ========================================================
+    # ACEITAR
+    # ========================================================
+
     relacao.status = (
         "aceita"
     )
@@ -1685,8 +1774,45 @@ def aceitar_amizade(
     db.session.commit()
 
 
+    # ========================================================
+    # NOTIFICAR QUEM ENVIOU
+    # ========================================================
+
+    try:
+
+        enviar_push_usuario(
+
+            solicitante_id,
+
+            " Solicitação aceita",
+
+            (
+                f"{current_user.nome} aceitou "
+                "sua solicitação de amizade."
+            ),
+
+            url=url_for(
+                "social.amigos"
+            ),
+
+            categoria=
+                "amizades",
+
+            tag=
+                "amizade-aceita"
+
+        )
+
+    except Exception as erro:
+
+        print(
+            "Erro ao enviar Push de amizade aceita:",
+            erro
+        )
+
+
     flash(
-        "Solicitação aceita. 🎉"
+        "Solicitação aceita. "
     )
 
 
@@ -1701,6 +1827,20 @@ def aceitar_amizade(
         )
 
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ============================================================
@@ -1806,31 +1946,4 @@ def remover_amigo(
     ):
 
         abort(
-            404
-        )
-
-
-    db.session.delete(
-        relacao
-    )
-
-
-    db.session.commit()
-
-
-    flash(
-        "Amigo removido."
-    )
-
-
-    return redirect(
-
-        request.referrer
-
-        or
-
-        url_for(
-            "social.amigos"
-        )
-
-    )
+            404)

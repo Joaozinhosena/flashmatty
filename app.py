@@ -1,3 +1,8 @@
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from flask import (
     Flask,
     render_template,
@@ -122,16 +127,67 @@ app.register_blueprint(
     social_bp
 )
 
+# ============================================================
+# NOTIFICAÇÕES
+# ============================================================
 
+from notificacoes.routes import notificacoes_bp
 
-
-
+app.register_blueprint(
+    notificacoes_bp
+)
 
 # IMPORTANTE:
 # eventos somente depois de configurar SocketIO
 import multiplayer.socket_events
 
 import social.socket_events
+
+
+
+
+
+
+
+# ============================================================
+# SERVICE WORKER
+# ============================================================
+
+@app.route(
+    "/service-worker.js"
+)
+def service_worker():
+
+    resposta = (
+        app.send_static_file(
+            "service-worker.js"
+        )
+    )
+
+    resposta.headers[
+        "Content-Type"
+    ] = (
+        "application/javascript; charset=utf-8"
+    )
+
+    resposta.headers[
+        "Cache-Control"
+    ] = (
+        "no-cache"
+    )
+
+    return resposta
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2355,6 +2411,24 @@ def biblioteca():
         historico=
             historico
     )
+
+
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+
+@app.route(
+    "/configuracoes"
+)
+@login_required
+def configuracoes():
+
+    return render_template(
+        "configuracoes.html"
+    )
+
+
 
 
 # ============================================================

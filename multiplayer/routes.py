@@ -927,3 +927,157 @@ def resultado(
         codigo=codigo
 
     )
+
+
+
+
+
+    # ========================================================
+    # SEGURANÇA
+    # SOMENTE OS DOIS JOGADORES DA SALA
+    # ========================================================
+
+    if (
+        jogador_id
+        not in
+        sala[
+            "jogadores"
+        ]
+    ):
+
+        flash(
+            "Você não participa deste desafio."
+        )
+
+        return redirect(
+            url_for(
+                "social.amigos"
+            )
+        )
+
+
+    # ========================================================
+    # PREPARAR SESSÃO MULTIPLAYER
+    # ========================================================
+
+    session[
+        "multiplayer_jogador"
+    ] = jogador_id
+
+
+    session[
+        "multiplayer_codigo"
+    ] = codigo
+
+
+    session.modified = True
+
+
+    # ========================================================
+    # ENTRAR NO LOBBY
+    # ========================================================
+
+    return redirect(
+        url_for(
+            "multiplayer.lobby",
+            codigo=codigo
+        )
+    )
+
+
+
+
+
+
+
+
+# ============================================================
+# ENTRAR EM SALA CRIADA POR DESAFIO
+# ============================================================
+
+@multiplayer_bp.route(
+    "/desafio/<codigo>"
+)
+@login_required
+def entrar_desafio(
+    codigo
+):
+
+    codigo = str(
+        codigo
+    ).strip()
+
+
+    sala = buscar_sala(
+        codigo
+    )
+
+
+    if not sala:
+
+        flash(
+            "A sala deste desafio não existe mais."
+        )
+
+        return redirect(
+            url_for(
+                "multiplayer.inicio"
+            )
+        )
+
+
+    jogador_id = str(
+        current_user.id
+    )
+
+
+    # ========================================================
+    # GARANTE QUE ESTE USUÁRIO PERTENCE À SALA
+    # ========================================================
+
+    if (
+        jogador_id
+        not in
+        sala[
+            "jogadores"
+        ]
+    ):
+
+        flash(
+            "Você não participa deste desafio."
+        )
+
+        return redirect(
+            url_for(
+                "multiplayer.inicio"
+            )
+        )
+
+
+    # ========================================================
+    # CONFIGURAR SESSÃO MULTIPLAYER
+    # ========================================================
+
+    session[
+        "multiplayer_jogador"
+    ] = jogador_id
+
+
+    session[
+        "multiplayer_codigo"
+    ] = codigo
+
+
+    session.modified = True
+
+
+    # ========================================================
+    # IR PARA O LOBBY
+    # ========================================================
+
+    return redirect(
+        url_for(
+            "multiplayer.lobby",
+            codigo=codigo
+        )
+    )
