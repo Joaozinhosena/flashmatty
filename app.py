@@ -34,14 +34,18 @@ from models import (
 from curriculum import CURRICULO
 from game import gerar_questao
 
+from datetime import datetime
+
+from social.models import PerfilUsuario
+from social.routes import social_bp
+
+
 # ============================================================
 # MULTIPLAYER
 # ============================================================
 
 from multiplayer import socketio
 from multiplayer.routes import multiplayer_bp
-
-
 # ============================================================
 # APP
 # ============================================================
@@ -112,9 +116,23 @@ app.register_blueprint(
     multiplayer_bp
 )
 
+
+
+app.register_blueprint(
+    social_bp
+)
+
+
+
+
+
+
 # IMPORTANTE:
 # eventos somente depois de configurar SocketIO
 import multiplayer.socket_events
+
+import social.socket_events
+
 
 
 # ============================================================
@@ -1049,23 +1067,28 @@ def login():
 # LOGOUT
 # ============================================================
 
-@app.route(
-    "/logout"
-)
+@app.route("/logout")
 @login_required
 def logout():
 
+    perfil = PerfilUsuario.obter(
+        current_user.id,
+        criar=True
+    )
+
+    perfil.ultimo_acesso = (
+        datetime.utcnow()
+    )
+
+    db.session.commit()
+
     logout_user()
-
-
     session.clear()
 
-
     return redirect(
-        url_for(
-            "login"
-        )
+        url_for("login")
     )
+
 
 
 # ============================================================

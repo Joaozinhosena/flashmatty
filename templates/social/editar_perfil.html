@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}
+Editar perfil - FlashMatty
+{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-900 text-white px-4 py-10">
+
+    <div class="max-w-2xl mx-auto">
+
+        <a
+            href="{{ url_for(
+                'social.perfil',
+                username=current_user.username
+            ) }}"
+            class="
+                font-black
+                text-indigo-400
+                hover:text-indigo-300
+                transition
+            "
+        >
+            ← Meu perfil
+        </a>
+
+
+        <section
+            class="
+                mt-6
+                bg-slate-800
+                border
+                border-slate-700
+                rounded-3xl
+                p-6
+                md:p-8
+            "
+        >
+
+            <h1 class="text-3xl font-black">
+                Editar perfil
+            </h1>
+
+            <p class="text-slate-400 mt-2">
+                Personalize como você aparece no FlashMatty.
+            </p>
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="mt-8 space-y-6"
+            >
+
+                <!-- CSRF -->
+
+                <input
+                    type="hidden"
+                    name="_csrf_token"
+                    value="{{ social_csrf_token() }}"
+                >
+
+
+                <!-- ================================================= -->
+                <!-- FOTO -->
+                <!-- ================================================= -->
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        sm:flex-row
+                        sm:items-center
+                        gap-5
+                    "
+                >
+
+                    <img
+                        src="{{ url_for(
+                            'social.foto_perfil',
+                            usuario_id=current_user.id
+                        ) }}"
+                        alt="Minha foto"
+                        class="
+                            w-24
+                            h-24
+                            rounded-full
+                            object-cover
+                            border-4
+                            border-indigo-500
+                            shrink-0
+                        "
+                    >
+
+
+                    <div class="flex-1">
+
+                        <label
+                            for="foto"
+                            class="block font-black mb-2"
+                        >
+                            Foto de perfil
+                        </label>
+
+                        <input
+                            id="foto"
+                            type="file"
+                            name="foto"
+                            accept="image/jpeg,image/png,image/webp"
+                            class="
+                                block
+                                w-full
+                                text-sm
+                                text-slate-300
+                            "
+                        >
+
+                        <p class="text-xs text-slate-500 mt-2">
+                            JPG, PNG ou WebP. Máximo de 3 MB.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REMOVER FOTO -->
+
+                <label
+                    class="
+                        flex
+                        items-center
+                        gap-3
+                        text-sm
+                        text-slate-300
+                        cursor-pointer
+                    "
+                >
+
+                    <input
+                        type="checkbox"
+                        name="remover_foto"
+                        value="1"
+                        class="
+                            w-4
+                            h-4
+                            accent-indigo-600
+                        "
+                    >
+
+                    Remover minha foto atual
+
+                </label>
+
+
+                <!-- ================================================= -->
+                <!-- NOME -->
+                <!-- ================================================= -->
+
+                <div>
+
+                    <label
+                        for="nome"
+                        class="block font-black mb-2"
+                    >
+                        Nome
+                    </label>
+
+                    <input
+                        id="nome"
+                        name="nome"
+                        type="text"
+                        maxlength="80"
+                        required
+                        value="{{ current_user.nome or '' }}"
+                        class="
+                            w-full
+                            rounded-xl
+                            bg-slate-900
+                            border
+                            border-slate-600
+                            px-4
+                            py-3
+                            outline-none
+                            focus:border-indigo-500
+                            focus:ring-4
+                            focus:ring-indigo-500/10
+                            transition
+                        "
+                    >
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- BIO -->
+                <!-- ================================================= -->
+
+                <div>
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            justify-between
+                            gap-3
+                        "
+                    >
+
+                        <label
+                            for="bio"
+                            class="block font-black"
+                        >
+                            Bio
+                        </label>
+
+                        <span
+                            id="contadorBio"
+                            class="text-xs text-slate-500"
+                        >
+                            0 / 160
+                        </span>
+
+                    </div>
+
+
+                    <textarea
+                        id="bio"
+                        name="bio"
+                        maxlength="160"
+                        rows="4"
+                        placeholder="Conte algo sobre você..."
+                        class="
+                            w-full
+                            mt-2
+                            rounded-xl
+                            bg-slate-900
+                            border
+                            border-slate-600
+                            px-4
+                            py-3
+                            outline-none
+                            resize-none
+                            focus:border-indigo-500
+                            focus:ring-4
+                            focus:ring-indigo-500/10
+                            transition
+                        "
+                    >{{ perfil_usuario.bio or '' }}</textarea>
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        Máximo de 160 caracteres.
+                    </p>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- PRIVACIDADE -->
+                <!-- ================================================= -->
+
+                <div>
+
+                    <label
+                        for="visibilidade_progresso"
+                        class="block font-black mb-2"
+                    >
+                        Quem pode ver meu progresso?
+                    </label>
+
+
+                    <select
+                        id="visibilidade_progresso"
+                        name="visibilidade_progresso"
+                        class="
+                            w-full
+                            rounded-xl
+                            bg-slate-900
+                            border
+                            border-slate-600
+                            px-4
+                            py-3
+                            outline-none
+                            focus:border-indigo-500
+                            focus:ring-4
+                            focus:ring-indigo-500/10
+                            transition
+                        "
+                    >
+
+                        <option
+                            value="todos"
+                            {% if perfil_usuario.visibilidade_progresso == "todos" %}
+                            selected
+                            {% endif %}
+                        >
+                            Todos os usuários
+                        </option>
+
+
+                        <option
+                            value="amigos"
+                            {% if perfil_usuario.visibilidade_progresso == "amigos" %}
+                            selected
+                            {% endif %}
+                        >
+                            Somente amigos
+                        </option>
+
+
+                        <option
+                            value="privado"
+                            {% if perfil_usuario.visibilidade_progresso == "privado" %}
+                            selected
+                            {% endif %}
+                        >
+                            Somente eu
+                        </option>
+
+                    </select>
+
+
+                    <div
+                        class="
+                            mt-3
+                            bg-slate-900/60
+                            border
+                            border-slate-700
+                            rounded-xl
+                            p-4
+                            text-sm
+                            text-slate-400
+                        "
+                    >
+
+                        <p>
+                            <strong class="text-white">
+                                Todos:
+                            </strong>
+                            qualquer usuário pode visualizar seu progresso.
+                        </p>
+
+                        <p class="mt-2">
+                            <strong class="text-white">
+                                Somente amigos:
+                            </strong>
+                            apenas usuários adicionados poderão visualizar.
+                        </p>
+
+                        <p class="mt-2">
+                            <strong class="text-white">
+                                Somente eu:
+                            </strong>
+                            seu progresso ficará privado.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- SALVAR -->
+                <!-- ================================================= -->
+
+                <div class="flex flex-col sm:flex-row gap-3">
+
+                    <button
+                        type="submit"
+                        class="
+                            flex-1
+                            rounded-xl
+                            bg-indigo-600
+                            hover:bg-indigo-700
+                            py-4
+                            px-6
+                            font-black
+                            transition
+                            active:scale-[0.98]
+                        "
+                    >
+                        💾 Salvar alterações
+                    </button>
+
+
+                    <a
+                        href="{{ url_for(
+                            'social.perfil',
+                            username=current_user.username
+                        ) }}"
+                        class="
+                            rounded-xl
+                            bg-slate-700
+                            hover:bg-slate-600
+                            py-4
+                            px-6
+                            font-black
+                            text-center
+                            transition
+                        "
+                    >
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const bio = document.getElementById(
+            "bio"
+        );
+
+        const contador = document.getElementById(
+            "contadorBio"
+        );
+
+
+        function atualizarContador() {
+
+            if (
+                !bio
+                ||
+                !contador
+            ) {
+                return;
+            }
+
+            contador.textContent =
+                `${bio.value.length} / 160`;
+
+        }
+
+
+        atualizarContador();
+
+
+        bio?.addEventListener(
+            "input",
+            atualizarContador
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

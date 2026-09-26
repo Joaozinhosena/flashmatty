@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+
+{% block title %}
+Buscar usuários - FlashMatty
+{% endblock %}
+
+
+{% block head %}
+
+<style>
+
+.status-social[data-online="1"] {
+    color: #4ade80;
+}
+
+.status-social[data-online="0"] {
+    color: #94a3b8;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div
+    class="
+        min-h-screen
+        bg-slate-900
+        text-white
+        px-4
+        py-10
+    "
+>
+
+    <div
+        class="
+            max-w-4xl
+            mx-auto
+        "
+    >
+
+        <!-- ================================================= -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                flex
+                flex-wrap
+                items-end
+                justify-between
+                gap-4
+            "
+        >
+
+            <div>
+
+                <p
+                    class="
+                        text-indigo-400
+                        font-black
+                        uppercase
+                        tracking-wider
+                        text-sm
+                    "
+                >
+                    Comunidade
+                </p>
+
+
+                <h1
+                    class="
+                        text-4xl
+                        font-black
+                        mt-2
+                    "
+                >
+                    Buscar usuários 🔎
+                </h1>
+
+
+                <p
+                    class="
+                        text-slate-400
+                        mt-2
+                    "
+                >
+                    Encontre outros jogadores pelo nome
+                    ou nome de usuário.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('social.amigos') }}"
+
+                class="
+                    rounded-xl
+                    bg-slate-800
+                    border
+                    border-slate-700
+
+                    hover:border-indigo-500
+
+                    px-5
+                    py-3
+
+                    font-black
+
+                    transition
+                "
+            >
+                👥 Meus amigos
+            </a>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- PESQUISA -->
+        <!-- ================================================= -->
+
+        <form
+            method="GET"
+
+            action="{{ url_for('social.buscar_usuarios') }}"
+
+            class="
+                mt-8
+
+                flex
+                flex-col
+                sm:flex-row
+
+                gap-3
+            "
+        >
+
+            <input
+                name="q"
+
+                value="{{ termo }}"
+
+                placeholder="Ex.: João ou joao123"
+
+                autocomplete="off"
+
+                class="
+                    flex-1
+                    min-w-0
+
+                    rounded-xl
+
+                    bg-slate-800
+
+                    border
+                    border-slate-600
+
+                    px-4
+                    py-4
+
+                    text-white
+
+                    outline-none
+
+                    transition
+
+                    focus:border-indigo-500
+                    focus:ring-4
+                    focus:ring-indigo-500/10
+                "
+            >
+
+
+            <button
+                type="submit"
+
+                class="
+                    rounded-xl
+
+                    bg-indigo-600
+                    hover:bg-indigo-700
+
+                    px-7
+                    py-4
+
+                    font-black
+
+                    transition
+
+                    active:scale-[0.98]
+                "
+            >
+                🔎 Buscar
+            </button>
+
+        </form>
+
+
+        <!-- ================================================= -->
+        <!-- RESULTADOS -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                space-y-4
+                mt-8
+            "
+        >
+
+            {% for usuario in usuarios %}
+
+                {% set relacao = relacoes.get(usuario.id) %}
+
+                <div
+                    class="
+                        bg-slate-800
+
+                        border
+                        border-slate-700
+
+                        rounded-2xl
+
+                        p-5
+
+                        flex
+                        flex-col
+
+                        sm:flex-row
+                        sm:items-center
+
+                        gap-4
+
+                        transition
+
+                        hover:border-indigo-500
+                    "
+                >
+
+                    <!-- FOTO -->
+
+                    <a
+                        href="{{ url_for(
+                            'social.perfil',
+                            username=usuario.username
+                        ) }}"
+                        class="shrink-0"
+                    >
+
+                        <img
+                            src="{{ url_for(
+                                'social.foto_perfil',
+                                usuario_id=usuario.id
+                            ) }}"
+
+                            alt="Foto de {{ usuario.nome }}"
+
+                            class="
+                                w-16
+                                h-16
+
+                                rounded-full
+
+                                object-cover
+
+                                border-2
+                                border-slate-600
+                            "
+                        >
+
+                    </a>
+
+
+                    <!-- USUÁRIO -->
+
+                    <div
+                        class="
+                            flex-1
+                            min-w-0
+                        "
+                    >
+
+                        <a
+                            href="{{ url_for(
+                                'social.perfil',
+                                username=usuario.username
+                            ) }}"
+
+                            class="
+                                block
+
+                                text-lg
+                                font-black
+
+                                hover:text-indigo-400
+
+                                truncate
+
+                                transition
+                            "
+                        >
+                            {{ usuario.nome }}
+                        </a>
+
+
+                        <p
+                            class="
+                                text-slate-400
+                            "
+                        >
+                            @{{ usuario.username }}
+                        </p>
+
+
+                        <!-- ONLINE -->
+
+                        <span
+                            class="
+                                status-social
+
+                                inline-block
+
+                                mt-1
+
+                                text-sm
+                                font-black
+                            "
+
+                            data-online-user="{{ usuario.id }}"
+
+                            data-online="{{
+                                1
+                                if social_esta_online(usuario.id)
+                                else
+                                0
+                            }}"
+                        >
+
+                            {% if social_esta_online(usuario.id) %}
+
+                                ● Online
+
+                            {% else %}
+
+                                ● Offline
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- AÇÕES -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="
+                            shrink-0
+
+                            flex
+                            flex-wrap
+                            gap-2
+                        "
+                    >
+
+                        <!-- SEM RELAÇÃO OU RECUSADA -->
+
+                        {% if
+                            not relacao
+                            or
+                            relacao.status == "recusada"
+                        %}
+
+                            <form
+                                method="POST"
+
+                                action="{{ url_for(
+                                    'social.enviar_amizade',
+                                    usuario_id=usuario.id
+                                ) }}"
+                            >
+
+                                <input
+                                    type="hidden"
+
+                                    name="_csrf_token"
+
+                                    value="{{ social_csrf_token() }}"
+                                >
+
+
+                                <button
+                                    type="submit"
+
+                                    class="
+                                        rounded-xl
+
+                                        bg-indigo-600
+                                        hover:bg-indigo-700
+
+                                        px-5
+                                        py-3
+
+                                        font-black
+
+                                        transition
+
+                                        active:scale-[0.98]
+                                    "
+                                >
+                                    + Amigo
+                                </button>
+
+                            </form>
+
+
+                        <!-- AMIGOS -->
+
+                        {% elif
+                            relacao.status == "aceita"
+                        %}
+
+                            <a
+                                href="{{ url_for(
+                                    'social.perfil',
+                                    username=usuario.username
+                                ) }}"
+
+                                class="
+                                    inline-flex
+                                    items-center
+
+                                    rounded-xl
+
+                                    bg-green-500/15
+
+                                    border
+                                    border-green-500/20
+
+                                    text-green-400
+
+                                    px-5
+                                    py-3
+
+                                    font-black
+                                "
+                            >
+                                ✓ Amigos
+                            </a>
+
+
+                        <!-- SOLICITAÇÃO PENDENTE -->
+
+                        {% elif
+                            relacao.status == "pendente"
+                        %}
+
+                            {% if
+                                relacao.destinatario_id
+                                ==
+                                current_user.id
+                            %}
+
+                                <!-- RECEBI A SOLICITAÇÃO -->
+
+                                <form
+                                    method="POST"
+
+                                    action="{{ url_for(
+                                        'social.aceitar_amizade',
+                                        amizade_id=relacao.id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+
+                                        name="_csrf_token"
+
+                                        value="{{ social_csrf_token() }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+
+                                        class="
+                                            rounded-xl
+
+                                            bg-green-600
+                                            hover:bg-green-700
+
+                                            px-4
+                                            py-3
+
+                                            font-black
+                                        "
+                                    >
+                                        ✓ Aceitar
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+
+                                    action="{{ url_for(
+                                        'social.recusar_amizade',
+                                        amizade_id=relacao.id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+
+                                        name="_csrf_token"
+
+                                        value="{{ social_csrf_token() }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+
+                                        class="
+                                            rounded-xl
+
+                                            bg-slate-700
+                                            hover:bg-slate-600
+
+                                            px-4
+                                            py-3
+
+                                            font-black
+                                        "
+                                    >
+                                        Recusar
+                                    </button>
+
+                                </form>
+
+
+                            {% else %}
+
+                                <!-- EU ENVIEI -->
+
+                                <span
+                                    class="
+                                        inline-flex
+                                        items-center
+
+                                        rounded-xl
+
+                                        bg-slate-700
+
+                                        text-slate-300
+
+                                        px-5
+                                        py-3
+
+                                        font-black
+                                    "
+                                >
+                                    ⏳ Pendente
+                                </span>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <!-- ================================================= -->
+                <!-- NENHUM RESULTADO -->
+                <!-- ================================================= -->
+
+                {% if termo %}
+
+                    <div
+                        class="
+                            bg-slate-800
+
+                            border
+                            border-slate-700
+
+                            rounded-3xl
+
+                            p-10
+
+                            text-center
+                        "
+                    >
+
+                        <div
+                            class="
+                                text-5xl
+                            "
+                        >
+                            🔍
+                        </div>
+
+
+                        <h2
+                            class="
+                                text-xl
+                                font-black
+                                mt-4
+                            "
+                        >
+                            Nenhum usuário encontrado
+                        </h2>
+
+
+                        <p
+                            class="
+                                text-slate-400
+                                mt-2
+                            "
+                        >
+                            Não encontramos usuários para
+
+                            <strong
+                                class="
+                                    text-white
+                                "
+                            >
+                                "{{ termo }}"
+                            </strong>.
+                        </p>
+
+                    </div>
+
+
+                {% else %}
+
+                    <!-- ================================================= -->
+                    <!-- ANTES DE PESQUISAR -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="
+                            bg-slate-800
+
+                            border
+                            border-slate-700
+
+                            rounded-3xl
+
+                            p-10
+
+                            text-center
+                        "
+                    >
+
+                        <div
+                            class="
+                                text-5xl
+                            "
+                        >
+                            👥
+                        </div>
+
+
+                        <h2
+                            class="
+                                text-xl
+                                font-black
+                                mt-4
+                            "
+                        >
+                            Encontre seus amigos
+                        </h2>
+
+
+                        <p
+                            class="
+                                text-slate-400
+                                mt-2
+                            "
+                        >
+                            Digite um nome ou usuário acima
+                            para começar a pesquisar.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

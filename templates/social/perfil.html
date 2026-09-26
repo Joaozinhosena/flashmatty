@@ -1,0 +1,917 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ usuario.nome }} - FlashMatty
+{% endblock %}
+
+
+{% block head %}
+
+<style>
+
+.status-online {
+    color: #4ade80;
+}
+
+.status-offline {
+    color: #94a3b8;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-900 text-white px-4 py-10">
+
+    <div class="max-w-5xl mx-auto">
+
+        <!-- ================================================= -->
+        <!-- PERFIL -->
+        <!-- ================================================= -->
+
+        <section
+            class="
+                bg-slate-800
+                border
+                border-slate-700
+                rounded-3xl
+                p-6
+                md:p-8
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    flex-col
+                    md:flex-row
+                    md:items-center
+                    gap-6
+                "
+            >
+
+                <!-- FOTO -->
+
+                <div class="shrink-0">
+
+                    <img
+                        src="{{ url_for(
+                            'social.foto_perfil',
+                            usuario_id=usuario.id
+                        ) }}"
+
+                        alt="Foto de {{ usuario.nome }}"
+
+                        class="
+                            w-32
+                            h-32
+                            rounded-full
+                            object-cover
+                            border-4
+                            border-indigo-500
+                        "
+                    >
+
+                </div>
+
+
+                <!-- DADOS -->
+
+                <div class="flex-1 min-w-0">
+
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            items-center
+                            gap-3
+                        "
+                    >
+
+                        <h1
+                            class="
+                                text-3xl
+                                md:text-4xl
+                                font-black
+                                truncate
+                            "
+                        >
+                            {{ usuario.nome }}
+                        </h1>
+
+
+                        {% if online %}
+
+                            <span
+                                class="
+                                    status-online
+                                    font-black
+                                    text-sm
+                                "
+                            >
+                                ● Online
+                            </span>
+
+                        {% else %}
+
+                            <span
+                                class="
+                                    status-offline
+                                    font-black
+                                    text-sm
+                                "
+                            >
+                                ● Offline
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-1
+                        "
+                    >
+                        @{{ usuario.username }}
+                    </p>
+
+
+                    <!-- BIO -->
+
+                    {% if perfil_usuario.bio %}
+
+                        <p
+                            class="
+                                text-slate-300
+                                mt-4
+                                leading-relaxed
+                            "
+                        >
+                            {{ perfil_usuario.bio }}
+                        </p>
+
+                    {% else %}
+
+                        <p
+                            class="
+                                text-slate-500
+                                mt-4
+                                italic
+                            "
+                        >
+                            Nenhuma bio adicionada.
+                        </p>
+
+                    {% endif %}
+
+
+                    <!-- INFORMAÇÕES -->
+
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            gap-x-6
+                            gap-y-2
+                            mt-4
+                            text-sm
+                        "
+                    >
+
+                        <span class="text-slate-400">
+
+                            👥
+
+                            <strong class="text-white">
+                                {{ quantidade_amigos }}
+                            </strong>
+
+                            amigo{% if quantidade_amigos != 1 %}s{% endif %}
+
+                        </span>
+
+
+                        {% if not online %}
+
+                            <span class="text-slate-500">
+
+                                Último acesso:
+
+                                {{ social_formatar_ultimo_acesso(
+                                    perfil_usuario.ultimo_acesso
+                                ) }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- AÇÕES -->
+                <!-- ================================================= -->
+
+                <div
+                    class="
+                        flex
+                        flex-wrap
+                        gap-3
+                        md:flex-col
+                        md:items-stretch
+                    "
+                >
+
+                    <!-- MEU PRÓPRIO PERFIL -->
+
+                    {% if usuario.id == current_user.id %}
+
+                        <a
+                            href="{{ url_for(
+                                'social.editar_perfil'
+                            ) }}"
+
+                            class="
+                                rounded-xl
+                                bg-indigo-600
+                                hover:bg-indigo-700
+                                px-5
+                                py-3
+                                text-center
+                                font-black
+                                transition
+                            "
+                        >
+                            ✏️ Editar perfil
+                        </a>
+
+
+                    <!-- OUTRO USUÁRIO -->
+
+                    {% else %}
+
+                        <!-- SEM AMIZADE -->
+
+                        {% if
+                            not relacao
+                            or
+                            relacao.status == "recusada"
+                        %}
+
+                            <form
+                                method="POST"
+
+                                action="{{ url_for(
+                                    'social.enviar_amizade',
+                                    usuario_id=usuario.id
+                                ) }}"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ social_csrf_token() }}"
+                                >
+
+
+                                <button
+                                    type="submit"
+
+                                    class="
+                                        w-full
+                                        rounded-xl
+                                        bg-indigo-600
+                                        hover:bg-indigo-700
+                                        px-5
+                                        py-3
+                                        font-black
+                                        transition
+                                    "
+                                >
+                                    ➕ Adicionar amigo
+                                </button>
+
+                            </form>
+
+
+                        <!-- AMIZADE ACEITA -->
+
+                        {% elif relacao.status == "aceita" %}
+
+                            <button
+                                type="button"
+
+                                data-desafiar-usuario="{{ usuario.id }}"
+
+                                class="
+                                    rounded-xl
+                                    bg-violet-600
+                                    hover:bg-violet-700
+                                    px-5
+                                    py-3
+                                    font-black
+                                    transition
+                                "
+                            >
+                                🎮 Desafiar
+                            </button>
+
+
+                            <form
+                                method="POST"
+
+                                action="{{ url_for(
+                                    'social.remover_amigo',
+                                    usuario_id=usuario.id
+                                ) }}"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ social_csrf_token() }}"
+                                >
+
+
+                                <button
+                                    type="submit"
+
+                                    class="
+                                        w-full
+                                        rounded-xl
+                                        bg-slate-700
+                                        hover:bg-red-600
+                                        px-5
+                                        py-3
+                                        font-black
+                                        transition
+                                    "
+                                >
+                                    Remover amigo
+                                </button>
+
+                            </form>
+
+
+                        <!-- SOLICITAÇÃO PENDENTE -->
+
+                        {% elif relacao.status == "pendente" %}
+
+                            {% if
+                                relacao.destinatario_id
+                                ==
+                                current_user.id
+                            %}
+
+                                <form
+                                    method="POST"
+
+                                    action="{{ url_for(
+                                        'social.aceitar_amizade',
+                                        amizade_id=relacao.id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ social_csrf_token() }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+
+                                        class="
+                                            w-full
+                                            rounded-xl
+                                            bg-green-600
+                                            hover:bg-green-700
+                                            px-5
+                                            py-3
+                                            font-black
+                                        "
+                                    >
+                                        ✓ Aceitar solicitação
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+
+                                    action="{{ url_for(
+                                        'social.recusar_amizade',
+                                        amizade_id=relacao.id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="_csrf_token"
+                                        value="{{ social_csrf_token() }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+
+                                        class="
+                                            w-full
+                                            rounded-xl
+                                            bg-slate-700
+                                            hover:bg-slate-600
+                                            px-5
+                                            py-3
+                                            font-black
+                                        "
+                                    >
+                                        Recusar
+                                    </button>
+
+                                </form>
+
+
+                            {% else %}
+
+                                <span
+                                    class="
+                                        rounded-xl
+                                        bg-slate-700
+                                        text-slate-300
+                                        px-5
+                                        py-3
+                                        font-black
+                                        text-center
+                                    "
+                                >
+                                    ⏳ Solicitação enviada
+                                </span>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- PROGRESSO -->
+        <!-- ================================================= -->
+
+        <section class="mt-8">
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    gap-4
+                "
+            >
+
+                <div>
+
+                    <p
+                        class="
+                            text-indigo-400
+                            uppercase
+                            tracking-wider
+                            font-black
+                            text-sm
+                        "
+                    >
+                        FlashMatty
+                    </p>
+
+
+                    <h2
+                        class="
+                            text-2xl
+                            font-black
+                            mt-1
+                        "
+                    >
+                        Progresso 📊
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            {% if mostrar_progresso and estatisticas %}
+
+                <div
+                    class="
+                        grid
+                        grid-cols-2
+                        lg:grid-cols-4
+                        gap-4
+                        mt-5
+                    "
+                >
+
+                    <!-- NÍVEL -->
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Nível
+                        </p>
+
+                        <p
+                            class="
+                                text-3xl
+                                font-black
+                                mt-2
+                            "
+                        >
+                            {{ estatisticas.nivel }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- XP -->
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            XP
+                        </p>
+
+                        <p
+                            class="
+                                text-3xl
+                                font-black
+                                mt-2
+                                text-indigo-400
+                            "
+                        >
+                            {{ estatisticas.xp }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- MOEDAS -->
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Moedas
+                        </p>
+
+                        <p
+                            class="
+                                text-3xl
+                                font-black
+                                mt-2
+                                text-yellow-400
+                            "
+                        >
+                            🪙 {{ estatisticas.moedas }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- PRECISÃO -->
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Precisão
+                        </p>
+
+                        <p
+                            class="
+                                text-3xl
+                                font-black
+                                mt-2
+                                text-green-400
+                            "
+                        >
+                            {{ estatisticas.precisao }}%
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- PROGRESSO GERAL -->
+                <!-- ================================================= -->
+
+                <div
+                    class="
+                        bg-slate-800
+                        border
+                        border-slate-700
+                        rounded-2xl
+                        p-6
+                        mt-4
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            justify-between
+                            items-center
+                            gap-4
+                        "
+                    >
+
+                        <div>
+
+                            <p class="font-black">
+                                Progresso geral
+                            </p>
+
+
+                            <p
+                                class="
+                                    text-sm
+                                    text-slate-400
+                                    mt-1
+                                "
+                            >
+
+                                {{ estatisticas.assuntos_concluidos }}
+
+                                de
+
+                                {{ estatisticas.total_assuntos }}
+
+                                assuntos concluídos
+
+                            </p>
+
+                        </div>
+
+
+                        <span
+                            class="
+                                text-xl
+                                font-black
+                                text-indigo-400
+                            "
+                        >
+                            {{ estatisticas.progresso_geral }}%
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            h-3
+                            bg-slate-700
+                            rounded-full
+                            overflow-hidden
+                            mt-4
+                        "
+                    >
+
+                        <div
+                            class="
+                                h-full
+                                bg-indigo-500
+                                rounded-full
+                            "
+
+                            style="
+                                width:
+                                {{ estatisticas.progresso_geral }}%;
+                            "
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- MAIS ESTATÍSTICAS -->
+                <!-- ================================================= -->
+
+                <div
+                    class="
+                        grid
+                        md:grid-cols-3
+                        gap-4
+                        mt-4
+                    "
+                >
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Acertos
+                        </p>
+
+                        <p
+                            class="
+                                text-2xl
+                                font-black
+                                text-green-400
+                                mt-2
+                            "
+                        >
+                            {{ estatisticas.acertos }}
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Erros
+                        </p>
+
+                        <p
+                            class="
+                                text-2xl
+                                font-black
+                                text-red-400
+                                mt-2
+                            "
+                        >
+                            {{ estatisticas.erros }}
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-2xl
+                            p-5
+                        "
+                    >
+
+                        <p class="text-slate-400 text-sm">
+                            Etapas concluídas
+                        </p>
+
+                        <p
+                            class="
+                                text-2xl
+                                font-black
+                                text-violet-400
+                                mt-2
+                            "
+                        >
+                            {{ estatisticas.etapas_concluidas }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <!-- PRIVADO -->
+
+                <div
+                    class="
+                        bg-slate-800
+                        border
+                        border-slate-700
+                        rounded-3xl
+                        p-10
+                        mt-5
+                        text-center
+                    "
+                >
+
+                    <div class="text-5xl">
+                        🔒
+                    </div>
+
+
+                    <h3
+                        class="
+                            text-xl
+                            font-black
+                            mt-4
+                        "
+                    >
+                        Progresso privado
+                    </h3>
+
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-2
+                        "
+                    >
+                        Este usuário escolheu não exibir
+                        seu progresso para você.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- VOLTAR -->
+        <!-- ================================================= -->
+
+        <div class="mt-8">
+
+            <a
+                href="{{ url_for('social.amigos') }}"
+
+                class="
+                    text-slate-400
+                    hover:text-white
+                    font-black
+                    transition
+                "
+            >
+                ← Voltar para amigos
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
