@@ -969,27 +969,21 @@ document.addEventListener(
             creditos: {
 
                 titulo:
-                    "🏆 Créditos",
+                    " Créditos",
 
                 conteudo:
                     `
                     <p>
-                        <strong>FlashMatty</strong> é uma
-                        plataforma educacional de matemática
-                        desenvolvida para tornar o aprendizado
-                        mais interativo.
+                       Desenvolvimento:
+                        <strong>Programador : Sena  </strong>.
+                         <strong>Designer : yure </strong>.
+
                     </p>
 
-                    <p>
-                        O projeto reúne exercícios,
-                        progressão, recompensas, perfis,
-                        amizades e partidas multiplayer.
-                    </p>
+                   
 
-                    <p>
-                        Desenvolvimento:
-                        <strong>FlashMatty</strong>.
-                    </p>
+                    
+                    
                     `
 
             },
@@ -998,7 +992,7 @@ document.addEventListener(
             privacidade: {
 
                 titulo:
-                    "🔐 Política de Privacidade",
+                    " Política de Privacidade",
 
                 conteudo:
                     `
@@ -1035,7 +1029,7 @@ document.addEventListener(
             termos: {
 
                 titulo:
-                    "📄 Termos de Uso",
+                    " Termos de Uso",
 
                 conteudo:
                     `
