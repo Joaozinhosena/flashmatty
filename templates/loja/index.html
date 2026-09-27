@@ -1,0 +1,818 @@
+{% extends "base.html" %}
+
+{% block title %}
+Loja - FlashMatty
+{% endblock %}
+
+
+{% block content %}
+
+<div
+    class="
+        min-h-screen
+        px-4
+        py-8
+        md:py-10
+        bg-slate-950
+        text-white
+    "
+>
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- ================================================= -->
+        <!-- CABEÇALHO -->
+        <!-- ================================================= -->
+
+        <section
+            class="
+                rounded-3xl
+                border
+                border-slate-800
+                bg-slate-900/80
+                shadow-2xl
+                p-6
+                md:p-8
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    flex-col
+                    lg:flex-row
+                    lg:items-center
+                    lg:justify-between
+                    gap-6
+                "
+            >
+
+                <div>
+
+                    <p
+                        class="
+                            text-indigo-400
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-xs
+                        "
+                    >
+                        FlashMatty Store
+                    </p>
+
+                    <h1
+                        class="
+                            text-3xl
+                            md:text-5xl
+                            font-black
+                            mt-2
+                        "
+                    >
+                         Loja de personalização
+                    </h1>
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-3
+                            max-w-3xl
+                        "
+                    >
+                        Use suas moedas para comprar títulos,
+                        fundos, molduras, badges, estilos de nome,
+                        cartões de perfil e efeitos cosméticos.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-3
+                    "
+                >
+
+                    <div
+                        class="
+                            rounded-2xl
+                            border
+                            border-yellow-400/20
+                            bg-yellow-400/10
+                            px-5
+                            py-4
+                        "
+                    >
+
+                        <p
+                            class="
+                                text-xs
+                                uppercase
+                                tracking-widest
+                                text-yellow-300
+                                font-black
+                            "
+                        >
+                            Seu saldo
+                        </p>
+
+                        <strong
+                            class="
+                                block
+                                text-2xl
+                                mt-1
+                                text-yellow-300
+                            "
+                        >
+                            🪙 {{ current_user.moedas or 0 }}
+                        </strong>
+
+                    </div>
+
+
+                    
+
+                    
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- FILTROS -->
+        <!-- ================================================= -->
+
+        <section
+            class="
+                mt-6
+                flex
+                flex-wrap
+                gap-2
+            "
+        >
+
+            <button
+                type="button"
+                data-store-filter="todos"
+                data-active="1"
+                class="
+                    rounded-xl
+                    border
+                    border-indigo-500
+                    bg-indigo-600
+                    px-4
+                    py-2
+                    font-black
+                    text-sm
+                    transition
+                "
+            >
+                Todos
+            </button>
+
+
+            {% for tipo in tipos %}
+
+            <button
+                type="button"
+                data-store-filter="{{ tipo }}"
+                data-active="0"
+                class="
+                    rounded-xl
+                    border
+                    border-slate-700
+                    bg-slate-900
+                    hover:bg-slate-800
+                    px-4
+                    py-2
+                    font-black
+                    text-sm
+                    transition
+                "
+            >
+                {{ tipos_label[tipo] }}
+            </button>
+
+            {% endfor %}
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- CATÁLOGO -->
+        <!-- ================================================= -->
+
+        {% for tipo in tipos %}
+
+        <section
+            class="mt-8"
+            data-store-section="{{ tipo }}"
+        >
+
+            <div
+                class="
+                    flex
+                    items-end
+                    justify-between
+                    gap-4
+                    mb-4
+                "
+            >
+
+                <div>
+
+                    <p
+                        class="
+                            text-indigo-400
+                            font-black
+                            text-xs
+                            uppercase
+                            tracking-widest
+                        "
+                    >
+                        Categoria
+                    </p>
+
+                    <h2
+                        class="
+                            text-2xl
+                            md:text-3xl
+                            font-black
+                        "
+                    >
+                        {{ tipos_label[tipo] }}
+                    </h2>
+
+                </div>
+
+                <span
+                    class="
+                        text-slate-500
+                        text-sm
+                        font-bold
+                    "
+                >
+                    {{ catalogo[tipo]|length }} itens
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    grid
+                    sm:grid-cols-2
+                    xl:grid-cols-3
+                    gap-4
+                "
+            >
+
+                {% for item in catalogo[tipo] %}
+
+                <article
+                    class="
+                        group
+                        rounded-3xl
+                        border
+                        border-slate-800
+                        bg-slate-900/80
+                        p-5
+                        shadow-xl
+                        transition
+                        duration-200
+                        hover:-translate-y-1
+                        hover:border-indigo-500/60
+                    "
+                >
+
+                    <!-- ===================================== -->
+                    <!-- PREVIEW -->
+                    <!-- ===================================== -->
+
+                    <div
+                        class="
+                            relative
+                            min-h-28
+                            overflow-hidden
+                            rounded-2xl
+                            flex
+                            items-center
+                            justify-center
+                            border
+                            border-white/5
+
+                            {% if item.id == 'fundo_ceu_noturno' %}
+                                bg-gradient-to-br
+                                from-slate-950
+                                via-blue-950
+                                to-indigo-950
+
+                            {% elif item.id == 'fundo_sunset' %}
+                                bg-gradient-to-br
+                                from-orange-950
+                                via-rose-900
+                                to-indigo-950
+
+                            {% elif item.id == 'fundo_neon' %}
+                                bg-gradient-to-br
+                                from-cyan-950
+                                via-violet-950
+                                to-fuchsia-950
+
+                            {% elif item.id == 'fundo_galaxia' %}
+                                bg-gradient-to-br
+                                from-slate-950
+                                via-indigo-950
+                                to-purple-950
+
+                            {% elif item.id == 'fundo_esmeralda' %}
+                                bg-gradient-to-br
+                                from-emerald-950
+                                via-teal-950
+                                to-slate-950
+
+                            {% elif item.id == 'card_vidro' %}
+                                bg-slate-800/60
+                                backdrop-blur-xl
+                                border-slate-600/30
+
+                            {% elif item.id == 'card_neon' %}
+                                bg-slate-950
+                                border-violet-500
+                                shadow-[0_0_28px_rgba(139,92,246,0.28)]
+
+                            {% elif item.id == 'card_ouro' %}
+                                bg-gradient-to-br
+                                from-amber-950
+                                to-slate-950
+                                border-yellow-400
+                                shadow-[0_0_28px_rgba(245,158,11,0.25)]
+
+                            {% elif item.id == 'card_galactico' %}
+                                bg-gradient-to-br
+                                from-indigo-950
+                                via-purple-950
+                                to-slate-950
+                                border-purple-400
+                                shadow-[0_0_32px_rgba(168,85,247,0.28)]
+
+                            {% else %}
+                                bg-gradient-to-br
+                                from-slate-900
+                                to-slate-800
+                            {% endif %}
+                        "
+                    >
+
+                        {% if item.tipo == "titulo" %}
+
+                            <span
+                                class="
+                                    rounded-full
+                                    border
+                                    border-white/10
+                                    bg-slate-950/70
+                                    px-4
+                                    py-2
+                                    font-black
+                                    text-sm
+                                "
+                            >
+                                {{ item.icone }}
+                                {{ item.valor.texto }}
+                            </span>
+
+
+                        {% elif item.tipo == "moldura" %}
+
+                            <div
+                                class="
+                                    w-20
+                                    h-20
+                                    rounded-full
+                                    bg-slate-950
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-3xl
+
+                                    {% if item.id == 'moldura_indigo' %}
+                                        ring-4
+                                        ring-indigo-400
+                                        shadow-[0_0_24px_rgba(99,102,241,0.55)]
+
+                                    {% elif item.id == 'moldura_fogo' %}
+                                        ring-4
+                                        ring-orange-400
+                                        shadow-[0_0_26px_rgba(239,68,68,0.65)]
+
+                                    {% elif item.id == 'moldura_gelo' %}
+                                        ring-4
+                                        ring-cyan-300
+                                        shadow-[0_0_26px_rgba(14,165,233,0.62)]
+
+                                    {% elif item.id == 'moldura_ouro' %}
+                                        ring-4
+                                        ring-yellow-400
+                                        shadow-[0_0_30px_rgba(245,158,11,0.72)]
+
+                                    {% elif item.id == 'moldura_arco_iris' %}
+                                        ring-4
+                                        ring-fuchsia-400
+                                        shadow-[0_0_28px_rgba(34,211,238,0.55)]
+                                    {% endif %}
+                                "
+                            >
+                                
+                            </div>
+
+
+                        {% elif item.tipo == "badge" %}
+
+                            <div
+                                class="
+                                    w-20
+                                    h-20
+                                    rounded-2xl
+                                    bg-slate-950/70
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-5xl
+                                    shadow-xl
+                                "
+                            >
+                                {{ item.valor.simbolo }}
+                            </div>
+
+
+                        {% elif item.tipo == "nome" %}
+
+                            <strong
+                                class="
+                                    text-2xl
+                                    font-black
+
+                                    {% if item.id == 'nome_ciano' %}
+                                        text-cyan-300
+                                        drop-shadow-[0_0_10px_rgba(34,211,238,0.45)]
+
+                                    {% elif item.id == 'nome_dourado' %}
+                                        text-yellow-300
+                                        drop-shadow-[0_0_10px_rgba(250,204,21,0.45)]
+
+                                    {% elif item.id == 'nome_gradiente' %}
+                                        bg-gradient-to-r
+                                        from-cyan-400
+                                        via-violet-400
+                                        to-pink-400
+                                        bg-clip-text
+                                        text-transparent
+
+                                    {% elif item.id == 'nome_esmeralda' %}
+                                        text-emerald-300
+                                        drop-shadow-[0_0_10px_rgba(16,185,129,0.42)]
+
+                                    {% elif item.id == 'nome_lendario' %}
+                                        bg-gradient-to-r
+                                        from-yellow-200
+                                        via-orange-400
+                                        to-fuchsia-400
+                                        bg-clip-text
+                                        text-transparent
+                                    {% endif %}
+                                "
+                            >
+                                {{ current_user.nome }}
+                            </strong>
+
+
+                        {% elif item.tipo == "efeito" %}
+
+                            <div
+                                class="
+                                    relative
+                                    flex
+                                    flex-col
+                                    items-center
+                                    justify-center
+                                "
+                            >
+
+                                {% if item.id == 'efeito_estrelas' %}
+
+                                <div
+                                    class="
+                                        absolute
+                                        -top-10
+                                        -left-10
+                                        w-24
+                                        h-24
+                                        rounded-full
+                                        bg-white/10
+                                        blur-xl
+                                        animate-pulse
+                                    "
+                                ></div>
+
+                                {% elif item.id == 'efeito_grade' %}
+
+                                <div
+                                    class="
+                                        absolute
+                                        inset-2
+                                        rounded-xl
+                                        border
+                                        border-cyan-400/30
+                                        animate-pulse
+                                    "
+                                ></div>
+
+                                {% elif item.id == 'efeito_aurora' %}
+
+                                <div
+                                    class="
+                                        absolute
+                                        -inset-4
+                                        rounded-full
+                                        bg-gradient-to-r
+                                        from-cyan-500/20
+                                        via-violet-500/25
+                                        to-pink-500/20
+                                        blur-2xl
+                                        animate-pulse
+                                    "
+                                ></div>
+
+                                {% elif item.id == 'efeito_scan' %}
+
+                                <div
+                                    class="
+                                        absolute
+                                        inset-x-4
+                                        top-1/2
+                                        h-px
+                                        bg-cyan-300
+                                        shadow-[0_0_18px_rgba(103,232,249,0.85)]
+                                        animate-pulse
+                                    "
+                                ></div>
+
+                                {% endif %}
+
+
+                                <div
+                                    class="
+                                        relative
+                                        text-5xl
+                                    "
+                                >
+                                    {{ item.icone }}
+                                </div>
+
+                                <p
+                                    class="
+                                        relative
+                                        text-xs
+                                        text-slate-400
+                                        mt-2
+                                    "
+                                >
+                                    Efeito animado
+                                </p>
+
+                            </div>
+
+
+                        {% else %}
+
+                            <div class="text-5xl">
+                                {{ item.icone }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ===================================== -->
+                    <!-- INFORMAÇÕES -->
+                    <!-- ===================================== -->
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                            gap-4
+                            mt-5
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    uppercase
+                                    tracking-widest
+                                    font-black
+                                    text-[11px]
+
+                                    {% if item.raridade == 'comum' %}
+                                        text-slate-300
+                                    {% elif item.raridade == 'raro' %}
+                                        text-cyan-300
+                                    {% elif item.raridade == 'epico' %}
+                                        text-purple-300
+                                    {% elif item.raridade == 'lendario' %}
+                                        text-yellow-300
+                                    {% elif item.raridade == 'mitico' %}
+                                        text-pink-300
+                                    {% endif %}
+                                "
+                            >
+                                {{ item.raridade }}
+                            </p>
+
+                            <h3
+                                class="
+                                    text-xl
+                                    font-black
+                                    mt-1
+                                "
+                            >
+                                {{ item.icone }}
+                                {{ item.nome }}
+                            </h3>
+
+                        </div>
+
+
+                        <strong
+                            class="
+                                shrink-0
+                                text-yellow-300
+                            "
+                        >
+                            🪙 {{ item.preco }}
+                        </strong>
+
+                    </div>
+
+
+                    <p
+                        class="
+                            text-slate-400
+                            mt-3
+                            text-sm
+                            min-h-11
+                        "
+                    >
+                        {{ item.descricao }}
+                    </p>
+
+
+                    <!-- ===================================== -->
+                    <!-- AÇÃO -->
+                    <!-- ===================================== -->
+
+                    <div class="mt-5">
+
+                        {% if item.id in comprados %}
+
+                            {% if equipados[item.tipo] == item.id %}
+
+                            <div
+                                class="
+                                    w-full
+                                    rounded-xl
+                                    bg-emerald-500/10
+                                    border
+                                    border-emerald-400/20
+                                    text-emerald-300
+                                    px-4
+                                    py-3
+                                    text-center
+                                    font-black
+                                "
+                            >
+                                ✓ Equipado
+                            </div>
+
+                            {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'loja.equipar',
+                                    item_id=item.id
+                                ) }}"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ loja_csrf_token() }}"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="voltar"
+                                    value="{{ url_for('loja.index') }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        w-full
+                                        rounded-xl
+                                        bg-violet-600
+                                        hover:bg-violet-500
+                                        px-4
+                                        py-3
+                                        font-black
+                                        transition
+                                    "
+                                >
+                                    Equipar
+                                </button>
+
+                            </form>
+
+                            {% endif %}
+
+                        {% else %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'loja.comprar',
+                                item_id=item.id
+                            ) }}"
+                            data-store-purchase
+                            data-item-name="{{ item.nome }}"
+                            data-item-price="{{ item.preco }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ loja_csrf_token() }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="
+                                    w-full
+                                    rounded-xl
+                                    bg-indigo-600
+                                    hover:bg-indigo-500
+                                    px-4
+                                    py-3
+                                    font-black
+                                    transition
+                                "
+                            >
+                                Comprar por 🪙 {{ item.preco }}
+                            </button>
+
+                        </form>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/loja.js'
+    ) }}?v=2"
+></script>
+
+{% endblock %}

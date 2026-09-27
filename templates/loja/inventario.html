@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}
+Inventário - FlashMatty
+{% endblock %}
+
+
+{% block content %}
+
+<div
+    class="
+        min-h-screen
+        bg-slate-950
+        text-white
+        px-4
+        py-8
+        md:py-10
+    "
+>
+
+    <div class="max-w-6xl mx-auto">
+
+        <div
+            class="
+                flex
+                flex-col
+                md:flex-row
+                md:items-center
+                md:justify-between
+                gap-5
+            "
+        >
+
+            <div>
+
+                <p
+                    class="
+                        text-indigo-400
+                        uppercase
+                        tracking-widest
+                        font-black
+                        text-xs
+                    "
+                >
+                    Personalização
+                </p>
+
+                <h1
+                    class="
+                        text-3xl
+                        md:text-5xl
+                        font-black
+                        mt-1
+                    "
+                >
+                     Seu inventário
+                </h1>
+
+                <p
+                    class="
+                        text-slate-400
+                        mt-3
+                    "
+                >
+                    Equipe e troque os cosméticos
+                    que você já comprou.
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    flex
+                    flex-wrap
+                    gap-3
+                "
+            >
+
+                <a
+                    href="{{ url_for('loja.index') }}"
+                    class="
+                        rounded-xl
+                        bg-indigo-600
+                        hover:bg-indigo-500
+                        px-5
+                        py-3
+                        font-black
+                        transition
+                    "
+                >
+                     Loja
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'social.perfil',
+                        username=current_user.username
+                    ) }}"
+                    class="
+                        rounded-xl
+                        bg-slate-800
+                        hover:bg-slate-700
+                        px-5
+                        py-3
+                        font-black
+                        transition
+                    "
+                >
+                     Ver perfil
+                </a>
+
+            </div>
+
+        </div>
+
+
+        {% if itens %}
+
+        <div
+            class="
+                grid
+                sm:grid-cols-2
+                lg:grid-cols-3
+                gap-4
+                mt-8
+            "
+        >
+
+            {% for item in itens %}
+
+            <article
+                class="
+                    rounded-3xl
+                    border
+                    border-slate-800
+                    bg-slate-900/80
+                    p-5
+                    shadow-xl
+                "
+            >
+
+                <div
+                    class="
+                        flex
+                        items-start
+                        justify-between
+                        gap-4
+                    "
+                >
+
+                    <div class="text-4xl">
+                        {{ item.icone }}
+                    </div>
+
+                    <span
+                        class="
+                            rounded-full
+                            border
+                            border-slate-700
+                            bg-slate-800
+                            px-3
+                            py-1
+                            text-xs
+                            font-black
+                            uppercase
+
+                            {% if item.raridade == 'raro' %}
+                                text-cyan-300
+                            {% elif item.raridade == 'epico' %}
+                                text-purple-300
+                            {% elif item.raridade == 'lendario' %}
+                                text-yellow-300
+                            {% elif item.raridade == 'mitico' %}
+                                text-pink-300
+                            {% else %}
+                                text-slate-300
+                            {% endif %}
+                        "
+                    >
+                        {{ item.raridade }}
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="
+                        text-xl
+                        font-black
+                        mt-4
+                    "
+                >
+                    {{ item.nome }}
+                </h2>
+
+                <p
+                    class="
+                        text-indigo-300
+                        text-xs
+                        font-black
+                        uppercase
+                        tracking-widest
+                        mt-1
+                    "
+                >
+                    {{ tipos_label[item.tipo] }}
+                </p>
+
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        mt-3
+                        min-h-11
+                    "
+                >
+                    {{ item.descricao }}
+                </p>
+
+
+                {% if equipados[item.tipo] == item.id %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'loja.desequipar',
+                        tipo=item.tipo
+                    ) }}"
+                    class="mt-5"
+                >
+
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ loja_csrf_token() }}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="voltar"
+                        value="{{ url_for('loja.inventario') }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="
+                            w-full
+                            rounded-xl
+                            bg-emerald-500/10
+                            hover:bg-red-500/10
+                            border
+                            border-emerald-400/20
+                            hover:border-red-400/20
+                            text-emerald-300
+                            hover:text-red-300
+                            px-4
+                            py-3
+                            font-black
+                            transition
+                        "
+                    >
+                        ✓ Equipado — desequipar
+                    </button>
+
+                </form>
+
+                {% else %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'loja.equipar',
+                        item_id=item.id
+                    ) }}"
+                    class="mt-5"
+                >
+
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ loja_csrf_token() }}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="voltar"
+                        value="{{ url_for('loja.inventario') }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="
+                            w-full
+                            rounded-xl
+                            bg-violet-600
+                            hover:bg-violet-500
+                            px-4
+                            py-3
+                            font-black
+                            transition
+                        "
+                    >
+                        Equipar
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <section
+            class="
+                rounded-3xl
+                border
+                border-slate-800
+                bg-slate-900/80
+                p-10
+                text-center
+                mt-8
+                shadow-xl
+            "
+        >
+
+            <div class="text-6xl">
+                
+            </div>
+
+            <h2
+                class="
+                    text-2xl
+                    font-black
+                    mt-4
+                "
+            >
+                Seu inventário está vazio
+            </h2>
+
+            <p
+                class="
+                    text-slate-400
+                    mt-2
+                "
+            >
+                Compre itens na loja usando
+                as moedas conquistadas no FlashMatty.
+            </p>
+
+            <a
+                href="{{ url_for('loja.index') }}"
+                class="
+                    inline-block
+                    rounded-xl
+                    bg-indigo-600
+                    hover:bg-indigo-500
+                    px-5
+                    py-3
+                    font-black
+                    mt-6
+                    transition
+                "
+            >
+                Ir para a loja
+            </a>
+
+        </section>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

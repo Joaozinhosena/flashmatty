@@ -659,28 +659,10 @@
             </a>
 
 
-            <a
-                href="{{ url_for('jornada') }}"
-                class="app-nav-link transition"
-            >
-                Jornada
-            </a>
+          
 
+          
 
-            <a
-                href="{{ url_for('biblioteca') }}"
-                class="app-nav-link transition"
-            >
-                Biblioteca
-            </a>
-
-
-            <a
-                href="{{ url_for('social.buscar_usuarios') }}"
-                class="app-nav-link transition"
-            >
-                Buscar
-            </a>
 
 
             <a
@@ -729,6 +711,30 @@
             </a>
 
 
+
+
+            <!-- LOJA -->
+
+            <a
+                href="{{ url_for('loja.index') }}"
+
+                class="
+                    app-nav-link
+                    transition
+                "
+
+                title="Loja"
+            >
+
+                
+
+                <span class="">
+                    Loja
+                </span>
+
+            </a>
+
+
             <!-- CONFIGURAÇÕES -->
 
             <a
@@ -742,9 +748,9 @@
                 title="Configurações"
             >
 
-                ⚙️
+                
 
-                <span class="hidden lg:inline">
+                <span class="">
                     Configurações
                 </span>
 
@@ -759,7 +765,7 @@
                     whitespace-nowrap
                 "
             >
-                ⭐ {{ current_user.xp or 0 }} XP
+                XP {{ current_user.xp or 0 }} 
             </span>
 
 
@@ -1043,39 +1049,49 @@
 ></script>
 
 
-
-
-
-
-
 <!-- ========================================================== -->
-<!-- SOCKET.IO + SOCIAL + NOTIFICAÇÕES -->
+<!-- SOCKET.IO + SOCIAL -->
 <!-- ========================================================== -->
 
 {% if current_user.is_authenticated %}
 
-<!-- Socket.IO -->
 <script
     src="https://cdn.socket.io/4.7.5/socket.io.min.js"
 ></script>
 
 
-<!-- Sistema social -->
 <script
     src="{{ url_for(
         'static',
         filename='js/social.js'
-    ) }}?v=7"
+    ) }}?v=2"
 ></script>
 
 
-<!-- Notificações -->
+
+
+
 <script
     src="{{ url_for(
         'static',
         filename='js/notificacoes.js'
-    ) }}?v=5"
+    ) }}?v=1"
 ></script>
+
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/social.js'
+    ) }}?v=6"
+></script>
+
+
+
+
+
+
 
 
 

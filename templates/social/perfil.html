@@ -5,41 +5,318 @@
 {% endblock %}
 
 
-{% block head %}
-
-<style>
-
-.status-online {
-    color: #4ade80;
-}
-
-.status-offline {
-    color: #94a3b8;
-}
-
-</style>
-
-{% endblock %}
-
-
 {% block content %}
 
-<div class="min-h-screen bg-slate-900 text-white px-4 py-10">
+{% set personalizacao =
+    loja_personalizacao(
+        usuario.id
+    )
+%}
 
-    <div class="max-w-5xl mx-auto">
+{% set titulo =
+    personalizacao.titulo
+%}
+
+{% set fundo =
+    personalizacao.fundo
+%}
+
+{% set moldura =
+    personalizacao.moldura
+%}
+
+{% set badge =
+    personalizacao.badge
+%}
+
+{% set nome_estilo =
+    personalizacao.nome
+%}
+
+{% set card =
+    personalizacao.card
+%}
+
+{% set efeito =
+    personalizacao.efeito
+%}
+
+
+<div
+    class="
+        relative
+        min-h-screen
+        overflow-hidden
+        text-white
+        px-4
+        py-10
+
+        {% if fundo and fundo.id == 'fundo_ceu_noturno' %}
+            bg-gradient-to-br
+            from-slate-950
+            via-blue-950
+            to-indigo-950
+
+        {% elif fundo and fundo.id == 'fundo_sunset' %}
+            bg-gradient-to-br
+            from-orange-950
+            via-rose-900
+            to-indigo-950
+
+        {% elif fundo and fundo.id == 'fundo_neon' %}
+            bg-gradient-to-br
+            from-cyan-950
+            via-violet-950
+            to-fuchsia-950
+
+        {% elif fundo and fundo.id == 'fundo_galaxia' %}
+            bg-gradient-to-br
+            from-slate-950
+            via-indigo-950
+            to-purple-950
+
+        {% elif fundo and fundo.id == 'fundo_esmeralda' %}
+            bg-gradient-to-br
+            from-emerald-950
+            via-teal-950
+            to-slate-950
+
+        {% else %}
+            bg-slate-950
+        {% endif %}
+    "
+>
+
+    <!-- ===================================================== -->
+    <!-- EFEITOS -->
+    <!-- ===================================================== -->
+
+    {% if efeito %}
+
+    <div
+        class="
+            absolute
+            inset-0
+            pointer-events-none
+            overflow-hidden
+        "
+        aria-hidden="true"
+    >
+
+        {% if efeito.id == 'efeito_estrelas' %}
+
+            <div
+                class="
+                    absolute
+                    top-12
+                    left-[10%]
+                    w-2
+                    h-2
+                    rounded-full
+                    bg-white/80
+                    animate-pulse
+                "
+            ></div>
+
+            <div
+                class="
+                    absolute
+                    top-36
+                    right-[16%]
+                    w-3
+                    h-3
+                    rounded-full
+                    bg-cyan-200/70
+                    animate-ping
+                "
+            ></div>
+
+            <div
+                class="
+                    absolute
+                    bottom-28
+                    left-[30%]
+                    w-2
+                    h-2
+                    rounded-full
+                    bg-violet-200/70
+                    animate-pulse
+                "
+            ></div>
+
+            <div
+                class="
+                    absolute
+                    bottom-16
+                    right-[25%]
+                    w-1.5
+                    h-1.5
+                    rounded-full
+                    bg-white/70
+                    animate-ping
+                "
+            ></div>
+
+
+        {% elif efeito.id == 'efeito_grade' %}
+
+            <div
+                class="
+                    absolute
+                    inset-x-8
+                    bottom-8
+                    h-48
+                    border
+                    border-cyan-400/20
+                    rounded-3xl
+                    bg-cyan-400/5
+                    backdrop-blur-sm
+                    animate-pulse
+                "
+            ></div>
+
+
+        {% elif efeito.id == 'efeito_aurora' %}
+
+            <div
+                class="
+                    absolute
+                    -top-24
+                    -left-24
+                    w-96
+                    h-96
+                    rounded-full
+                    bg-cyan-500/20
+                    blur-3xl
+                    animate-pulse
+                "
+            ></div>
+
+            <div
+                class="
+                    absolute
+                    top-20
+                    right-[-5rem]
+                    w-[28rem]
+                    h-[28rem]
+                    rounded-full
+                    bg-fuchsia-500/20
+                    blur-3xl
+                    animate-pulse
+                "
+            ></div>
+
+
+        {% elif efeito.id == 'efeito_scan' %}
+
+            <div
+                class="
+                    absolute
+                    inset-x-10
+                    top-1/3
+                    h-px
+                    bg-cyan-300
+                    shadow-[0_0_24px_rgba(103,232,249,0.85)]
+                    animate-pulse
+                "
+            ></div>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+
+    <div
+        class="
+            relative
+            z-10
+            max-w-5xl
+            mx-auto
+        "
+    >
 
         <!-- ================================================= -->
-        <!-- PERFIL -->
+        <!-- TOPO -->
+        <!-- ================================================= -->
+
+        <div
+            class="
+                flex
+                flex-wrap
+                gap-3
+                items-center
+                justify-between
+            "
+        >
+
+            
+
+
+            {% if usuario.id == current_user.id %}
+
+            <div
+                class="
+                    flex
+                    flex-wrap
+                    gap-2
+                "
+            >
+
+              
+
+             
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CARD PRINCIPAL -->
         <!-- ================================================= -->
 
         <section
             class="
-                bg-slate-800
+                mt-6
                 border
-                border-slate-700
                 rounded-3xl
                 p-6
                 md:p-8
+                shadow-2xl
+
+                {% if card and card.id == 'card_vidro' %}
+                    bg-slate-900/60
+                    backdrop-blur-xl
+                    border-slate-600/30
+
+                {% elif card and card.id == 'card_neon' %}
+                    bg-slate-950/90
+                    border-violet-500
+                    shadow-[0_0_30px_rgba(139,92,246,0.28)]
+
+                {% elif card and card.id == 'card_ouro' %}
+                    bg-gradient-to-br
+                    from-amber-950/90
+                    to-slate-950/90
+                    border-yellow-400
+                    shadow-[0_0_30px_rgba(245,158,11,0.25)]
+
+                {% elif card and card.id == 'card_galactico' %}
+                    bg-gradient-to-br
+                    from-indigo-950/90
+                    via-purple-950/80
+                    to-slate-950/90
+                    border-purple-400
+                    shadow-[0_0_34px_rgba(168,85,247,0.30)]
+
+                {% else %}
+                    bg-slate-900/90
+                    border-slate-800
+                {% endif %}
             "
         >
 
@@ -53,34 +330,100 @@
                 "
             >
 
-                <!-- FOTO -->
+                <!-- ========================================= -->
+                <!-- AVATAR -->
+                <!-- ========================================= -->
 
-                <div class="shrink-0">
+                <div
+                    class="
+                        relative
+                        w-32
+                        h-32
+                        shrink-0
+                        rounded-full
+
+                        {% if moldura and moldura.id == 'moldura_indigo' %}
+                            ring-4
+                            ring-indigo-400
+                            shadow-[0_0_24px_rgba(99,102,241,0.55)]
+
+                        {% elif moldura and moldura.id == 'moldura_fogo' %}
+                            ring-4
+                            ring-orange-400
+                            shadow-[0_0_26px_rgba(239,68,68,0.65)]
+
+                        {% elif moldura and moldura.id == 'moldura_gelo' %}
+                            ring-4
+                            ring-cyan-300
+                            shadow-[0_0_26px_rgba(14,165,233,0.62)]
+
+                        {% elif moldura and moldura.id == 'moldura_ouro' %}
+                            ring-4
+                            ring-yellow-400
+                            shadow-[0_0_30px_rgba(245,158,11,0.72)]
+
+                        {% elif moldura and moldura.id == 'moldura_arco_iris' %}
+                            ring-4
+                            ring-fuchsia-400
+                            shadow-[0_0_30px_rgba(34,211,238,0.55)]
+
+                        {% else %}
+                            ring-4
+                            ring-indigo-500
+                        {% endif %}
+                    "
+                >
 
                     <img
                         src="{{ url_for(
                             'social.foto_perfil',
                             usuario_id=usuario.id
                         ) }}"
-
                         alt="Foto de {{ usuario.nome }}"
-
                         class="
-                            w-32
-                            h-32
+                            w-full
+                            h-full
                             rounded-full
                             object-cover
-                            border-4
-                            border-indigo-500
                         "
                     >
+
+
+                    {% if badge %}
+
+                    <span
+                        class="
+                            absolute
+                            -right-2
+                            bottom-1
+                            min-w-11
+                            h-11
+                            px-2
+                            rounded-full
+                            flex
+                            items-center
+                            justify-center
+                            bg-slate-950/95
+                            border-2
+                            border-white/20
+                            shadow-xl
+                            text-xl
+                        "
+                        title="{{ badge.nome }}"
+                    >
+                        {{ badge.valor.simbolo }}
+                    </span>
+
+                    {% endif %}
 
                 </div>
 
 
+                <!-- ========================================= -->
                 <!-- DADOS -->
+                <!-- ========================================= -->
 
-                <div class="flex-1 min-w-0">
+                <div class="flex-1">
 
                     <div
                         class="
@@ -96,38 +439,61 @@
                                 text-3xl
                                 md:text-4xl
                                 font-black
-                                truncate
+
+                                {% if nome_estilo and nome_estilo.id == 'nome_ciano' %}
+                                    text-cyan-300
+                                    drop-shadow-[0_0_10px_rgba(34,211,238,0.45)]
+
+                                {% elif nome_estilo and nome_estilo.id == 'nome_dourado' %}
+                                    text-yellow-300
+                                    drop-shadow-[0_0_10px_rgba(250,204,21,0.45)]
+
+                                {% elif nome_estilo and nome_estilo.id == 'nome_gradiente' %}
+                                    bg-gradient-to-r
+                                    from-cyan-400
+                                    via-violet-400
+                                    to-pink-400
+                                    bg-clip-text
+                                    text-transparent
+
+                                {% elif nome_estilo and nome_estilo.id == 'nome_esmeralda' %}
+                                    text-emerald-300
+                                    drop-shadow-[0_0_10px_rgba(16,185,129,0.42)]
+
+                                {% elif nome_estilo and nome_estilo.id == 'nome_lendario' %}
+                                    bg-gradient-to-r
+                                    from-yellow-200
+                                    via-orange-400
+                                    to-fuchsia-400
+                                    bg-clip-text
+                                    text-transparent
+                                {% endif %}
                             "
                         >
                             {{ usuario.nome }}
                         </h1>
 
 
-                        {% if online %}
+                        <span
+                            class="
+                                font-black
+                                text-sm
 
-                            <span
-                                class="
-                                    status-online
-                                    font-black
-                                    text-sm
-                                "
-                            >
+                                {% if online %}
+                                    text-emerald-400
+                                {% else %}
+                                    text-slate-400
+                                {% endif %}
+                            "
+                            data-online-user="{{ usuario.id }}"
+                            data-online="{{ 1 if online else 0 }}"
+                        >
+                            {% if online %}
                                 ● Online
-                            </span>
-
-                        {% else %}
-
-                            <span
-                                class="
-                                    status-offline
-                                    font-black
-                                    text-sm
-                                "
-                            >
+                            {% else %}
                                 ● Offline
-                            </span>
-
-                        {% endif %}
+                            {% endif %}
+                        </span>
 
                     </div>
 
@@ -142,72 +508,109 @@
                     </p>
 
 
-                    <!-- BIO -->
+                    {% if titulo %}
 
-                    {% if perfil_usuario.bio %}
+                    <div
+                        class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            mt-3
+                            rounded-full
+                            border
+                            border-white/10
+                            bg-slate-950/60
+                            px-4
+                            py-2
+                            text-sm
+                            font-black
+                        "
+                    >
+                        <span>
+                            {{ titulo.icone }}
+                        </span>
 
-                        <p
-                            class="
-                                text-slate-300
-                                mt-4
-                                leading-relaxed
-                            "
-                        >
-                            {{ perfil_usuario.bio }}
-                        </p>
-
-                    {% else %}
-
-                        <p
-                            class="
-                                text-slate-500
-                                mt-4
-                                italic
-                            "
-                        >
-                            Nenhuma bio adicionada.
-                        </p>
+                        <span>
+                            {{ titulo.valor.texto }}
+                        </span>
+                    </div>
 
                     {% endif %}
 
 
-                    <!-- INFORMAÇÕES -->
+                    {% if perfil_usuario.bio %}
+
+                    <p
+                        class="
+                            mt-4
+                            text-slate-200
+                            max-w-2xl
+                        "
+                    >
+                        {{ perfil_usuario.bio }}
+                    </p>
+
+                    {% endif %}
+
 
                     <div
                         class="
                             flex
                             flex-wrap
-                            gap-x-6
-                            gap-y-2
-                            mt-4
-                            text-sm
+                            gap-3
+                            mt-5
                         "
                     >
 
-                        <span class="text-slate-400">
-
+                        <span
+                            class="
+                                rounded-full
+                                bg-slate-950/45
+                                border
+                                border-white/10
+                                px-4
+                                py-2
+                                font-black
+                                text-sm
+                            "
+                        >
                             👥
+                            {{ quantidade_amigos }}
 
-                            <strong class="text-white">
-                                {{ quantidade_amigos }}
-                            </strong>
-
-                            amigo{% if quantidade_amigos != 1 %}s{% endif %}
-
+                            {% if quantidade_amigos == 1 %}
+                                amigo
+                            {% else %}
+                                amigos
+                            {% endif %}
                         </span>
 
 
-                        {% if not online %}
+                        {% if
+                            not online
+                            and
+                            perfil_usuario.ultimo_acesso
+                        %}
 
-                            <span class="text-slate-500">
-
-                                Último acesso:
-
-                                {{ social_formatar_ultimo_acesso(
+                        <span
+                            class="
+                                rounded-full
+                                bg-slate-950/45
+                                border
+                                border-white/10
+                                px-4
+                                py-2
+                                font-bold
+                                text-sm
+                                text-slate-300
+                            "
+                        >
+                            Visto
+                            {{
+                                social_formatar_ultimo_acesso(
                                     perfil_usuario.ultimo_acesso
-                                ) }}
-
-                            </span>
+                                )
+                            }}
+                        </span>
 
                         {% endif %}
 
@@ -216,152 +619,99 @@
                 </div>
 
 
-                <!-- ================================================= -->
+                <!-- ========================================= -->
                 <!-- AÇÕES -->
-                <!-- ================================================= -->
+                <!-- ========================================= -->
 
                 <div
                     class="
                         flex
                         flex-wrap
                         gap-3
-                        md:flex-col
-                        md:items-stretch
                     "
                 >
 
-                    <!-- MEU PRÓPRIO PERFIL -->
-
                     {% if usuario.id == current_user.id %}
 
-                        <a
-                            href="{{ url_for(
-                                'social.editar_perfil'
-                            ) }}"
-
-                            class="
-                                rounded-xl
-                                bg-indigo-600
-                                hover:bg-indigo-700
-                                px-5
-                                py-3
-                                text-center
-                                font-black
-                                transition
-                            "
-                        >
-                             Editar perfil
-                        </a>
+                    <a
+                        href="{{ url_for(
+                            'social.editar_perfil'
+                        ) }}"
+                        class="
+                            rounded-xl
+                            bg-indigo-600
+                            hover:bg-indigo-500
+                            px-5
+                            py-3
+                            font-black
+                            transition
+                        "
+                    >
+                        Editar perfil
+                    </a>
 
 
-                    <!-- OUTRO USUÁRIO -->
+                    
+                <a
+                    href="{{ url_for(
+                        'loja.inventario'
+                    ) }}"
+                    class="
+                        rounded-xl
+                        bg-violet-600
+                        hover:bg-violet-500
+                        px-4
+                        py-2
+                        font-black
+                        transition
+                    "
+                >
+                     Inventário
+                </a>
+
+
 
                     {% else %}
-
-                        <!-- SEM AMIZADE -->
 
                         {% if
                             not relacao
                             or
-                            relacao.status == "recusada"
+                            relacao.status
+                            ==
+                            "recusada"
                         %}
 
-                            <form
-                                method="POST"
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'social.enviar_amizade',
+                                usuario_id=usuario.id
+                            ) }}"
+                        >
 
-                                action="{{ url_for(
-                                    'social.enviar_amizade',
-                                    usuario_id=usuario.id
-                                ) }}"
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ social_csrf_token() }}"
                             >
 
-                                <input
-                                    type="hidden"
-                                    name="_csrf_token"
-                                    value="{{ social_csrf_token() }}"
-                                >
-
-
-                                <button
-                                    type="submit"
-
-                                    class="
-                                        w-full
-                                        rounded-xl
-                                        bg-indigo-600
-                                        hover:bg-indigo-700
-                                        px-5
-                                        py-3
-                                        font-black
-                                        transition
-                                    "
-                                >
-                                     Adicionar amigo
-                                </button>
-
-                            </form>
-
-
-                        <!-- AMIZADE ACEITA -->
-
-                        {% elif relacao.status == "aceita" %}
-
                             <button
-                                type="button"
-
-                                data-desafiar-usuario="{{ usuario.id }}"
-
+                                type="submit"
                                 class="
                                     rounded-xl
-                                    bg-violet-600
-                                    hover:bg-violet-700
+                                    bg-indigo-600
+                                    hover:bg-indigo-500
                                     px-5
                                     py-3
                                     font-black
                                     transition
                                 "
                             >
-                                 Desafiar
+                                + Adicionar amigo
                             </button>
 
+                        </form>
 
-                            <form
-                                method="POST"
-
-                                action="{{ url_for(
-                                    'social.remover_amigo',
-                                    usuario_id=usuario.id
-                                ) }}"
-                            >
-
-                                <input
-                                    type="hidden"
-                                    name="_csrf_token"
-                                    value="{{ social_csrf_token() }}"
-                                >
-
-
-                                <button
-                                    type="submit"
-
-                                    class="
-                                        w-full
-                                        rounded-xl
-                                        bg-slate-700
-                                        hover:bg-red-600
-                                        px-5
-                                        py-3
-                                        font-black
-                                        transition
-                                    "
-                                >
-                                    Remover amigo
-                                </button>
-
-                            </form>
-
-
-                        <!-- SOLICITAÇÃO PENDENTE -->
 
                         {% elif relacao.status == "pendente" %}
 
@@ -371,93 +721,137 @@
                                 current_user.id
                             %}
 
-                                <form
-                                    method="POST"
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'social.aceitar_amizade',
+                                    amizade_id=relacao.id
+                                ) }}"
+                            >
 
-                                    action="{{ url_for(
-                                        'social.aceitar_amizade',
-                                        amizade_id=relacao.id
-                                    ) }}"
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ social_csrf_token() }}"
                                 >
 
-                                    <input
-                                        type="hidden"
-                                        name="_csrf_token"
-                                        value="{{ social_csrf_token() }}"
-                                    >
+                                <button
+                                    type="submit"
+                                    class="
+                                        rounded-xl
+                                        bg-emerald-600
+                                        hover:bg-emerald-500
+                                        px-5
+                                        py-3
+                                        font-black
+                                        transition
+                                    "
+                                >
+                                    ✓ Aceitar
+                                </button>
+
+                            </form>
 
 
-                                    <button
-                                        type="submit"
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'social.recusar_amizade',
+                                    amizade_id=relacao.id
+                                ) }}"
+                            >
 
-                                        class="
-                                            w-full
-                                            rounded-xl
-                                            bg-green-600
-                                            hover:bg-green-700
-                                            px-5
-                                            py-3
-                                            font-black
-                                        "
-                                    >
-                                        ✓ Aceitar solicitação
-                                    </button>
-
-                                </form>
-
-
-                                <form
-                                    method="POST"
-
-                                    action="{{ url_for(
-                                        'social.recusar_amizade',
-                                        amizade_id=relacao.id
-                                    ) }}"
+                                <input
+                                    type="hidden"
+                                    name="_csrf_token"
+                                    value="{{ social_csrf_token() }}"
                                 >
 
-                                    <input
-                                        type="hidden"
-                                        name="_csrf_token"
-                                        value="{{ social_csrf_token() }}"
-                                    >
+                                <button
+                                    type="submit"
+                                    class="
+                                        rounded-xl
+                                        bg-slate-800
+                                        hover:bg-slate-700
+                                        px-5
+                                        py-3
+                                        font-black
+                                        transition
+                                    "
+                                >
+                                    Recusar
+                                </button>
 
-
-                                    <button
-                                        type="submit"
-
-                                        class="
-                                            w-full
-                                            rounded-xl
-                                            bg-slate-700
-                                            hover:bg-slate-600
-                                            px-5
-                                            py-3
-                                            font-black
-                                        "
-                                    >
-                                        Recusar
-                                    </button>
-
-                                </form>
+                            </form>
 
 
                             {% else %}
 
-                                <span
-                                    class="
-                                        rounded-xl
-                                        bg-slate-700
-                                        text-slate-300
-                                        px-5
-                                        py-3
-                                        font-black
-                                        text-center
-                                    "
-                                >
-                                     Solicitação enviada
-                                </span>
+                            <span
+                                class="
+                                    rounded-xl
+                                    bg-slate-800
+                                    px-5
+                                    py-3
+                                    font-black
+                                    text-slate-300
+                                "
+                            >
+                                Solicitação enviada
+                            </span>
 
                             {% endif %}
+
+
+                        {% elif relacao.status == "aceita" %}
+
+                        <button
+                            type="button"
+                            data-desafiar-usuario="{{ usuario.id }}"
+                            class="
+                                rounded-xl
+                                bg-violet-600
+                                hover:bg-violet-500
+                                px-5
+                                py-3
+                                font-black
+                                transition
+                            "
+                        >
+                            🎮 Desafiar
+                        </button>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'social.remover_amigo',
+                                usuario_id=usuario.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="_csrf_token"
+                                value="{{ social_csrf_token() }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="
+                                    rounded-xl
+                                    bg-slate-800
+                                    hover:bg-red-600
+                                    px-5
+                                    py-3
+                                    font-black
+                                    transition
+                                "
+                            >
+                                Remover amigo
+                            </button>
+
+                        </form>
 
                         {% endif %}
 
@@ -471,444 +865,314 @@
 
 
         <!-- ================================================= -->
-        <!-- PROGRESSO -->
+        <!-- ESTATÍSTICAS -->
         <!-- ================================================= -->
 
-        <section class="mt-8">
+        {% if mostrar_progresso %}
+
+        <section
+            class="
+                grid
+                grid-cols-2
+                lg:grid-cols-4
+                gap-4
+                mt-6
+            "
+        >
+
+            <div
+                class="
+                    bg-slate-900/80
+                    border
+                    border-slate-800
+                    rounded-2xl
+                    p-5
+                    shadow-lg
+                "
+            >
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Nível
+                </p>
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-indigo-300
+                    "
+                >
+                    {{ estatisticas.nivel }}
+                </strong>
+            </div>
+
+
+            <div
+                class="
+                    bg-slate-900/80
+                    border
+                    border-slate-800
+                    rounded-2xl
+                    p-5
+                    shadow-lg
+                "
+            >
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    XP
+                </p>
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-yellow-300
+                    "
+                >
+                     {{ estatisticas.xp }}
+                </strong>
+            </div>
+
+
+            <div
+                class="
+                    bg-slate-900/80
+                    border
+                    border-slate-800
+                    rounded-2xl
+                    p-5
+                    shadow-lg
+                "
+            >
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Precisão
+                </p>
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-emerald-300
+                    "
+                >
+                    {{ estatisticas.precisao }}%
+                </strong>
+            </div>
+
+
+            <div
+                class="
+                    bg-slate-900/80
+                    border
+                    border-slate-800
+                    rounded-2xl
+                    p-5
+                    shadow-lg
+                "
+            >
+                <p
+                    class="
+                        text-slate-400
+                        text-sm
+                        font-bold
+                    "
+                >
+                    Etapas
+                </p>
+
+                <strong
+                    class="
+                        block
+                        text-2xl
+                        mt-1
+                        text-violet-300
+                    "
+                >
+                    {{ estatisticas.etapas_concluidas }}
+                </strong>
+            </div>
+
+        </section>
+
+
+        <section
+            class="
+                mt-6
+                bg-slate-900/80
+                border
+                border-slate-800
+                rounded-3xl
+                p-6
+                shadow-xl
+            "
+        >
 
             <div
                 class="
                     flex
-                    items-center
                     justify-between
                     gap-4
+                    items-center
                 "
             >
 
                 <div>
 
-                    <p
-                        class="
-                            text-indigo-400
-                            uppercase
-                            tracking-wider
-                            font-black
-                            text-sm
-                        "
-                    >
-                        FlashMatty
-                    </p>
-
-
                     <h2
-                        class="
-                            text-2xl
-                            font-black
-                            mt-1
-                        "
-                    >
-                        Progresso 
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            {% if mostrar_progresso and estatisticas %}
-
-                <div
-                    class="
-                        grid
-                        grid-cols-2
-                        lg:grid-cols-4
-                        gap-4
-                        mt-5
-                    "
-                >
-
-                    <!-- NÍVEL -->
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Nível
-                        </p>
-
-                        <p
-                            class="
-                                text-3xl
-                                font-black
-                                mt-2
-                            "
-                        >
-                            {{ estatisticas.nivel }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- XP -->
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            XP
-                        </p>
-
-                        <p
-                            class="
-                                text-3xl
-                                font-black
-                                mt-2
-                                text-indigo-400
-                            "
-                        >
-                            {{ estatisticas.xp }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- MOEDAS -->
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Moedas
-                        </p>
-
-                        <p
-                            class="
-                                text-3xl
-                                font-black
-                                mt-2
-                                text-yellow-400
-                            "
-                        >
-                            🪙 {{ estatisticas.moedas }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- PRECISÃO -->
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Precisão
-                        </p>
-
-                        <p
-                            class="
-                                text-3xl
-                                font-black
-                                mt-2
-                                text-green-400
-                            "
-                        >
-                            {{ estatisticas.precisao }}%
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================= -->
-                <!-- PROGRESSO GERAL -->
-                <!-- ================================================= -->
-
-                <div
-                    class="
-                        bg-slate-800
-                        border
-                        border-slate-700
-                        rounded-2xl
-                        p-6
-                        mt-4
-                    "
-                >
-
-                    <div
-                        class="
-                            flex
-                            justify-between
-                            items-center
-                            gap-4
-                        "
-                    >
-
-                        <div>
-
-                            <p class="font-black">
-                                Progresso geral
-                            </p>
-
-
-                            <p
-                                class="
-                                    text-sm
-                                    text-slate-400
-                                    mt-1
-                                "
-                            >
-
-                                {{ estatisticas.assuntos_concluidos }}
-
-                                de
-
-                                {{ estatisticas.total_assuntos }}
-
-                                assuntos concluídos
-
-                            </p>
-
-                        </div>
-
-
-                        <span
-                            class="
-                                text-xl
-                                font-black
-                                text-indigo-400
-                            "
-                        >
-                            {{ estatisticas.progresso_geral }}%
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            h-3
-                            bg-slate-700
-                            rounded-full
-                            overflow-hidden
-                            mt-4
-                        "
-                    >
-
-                        <div
-                            class="
-                                h-full
-                                bg-indigo-500
-                                rounded-full
-                            "
-
-                            style="
-                                width:
-                                {{ estatisticas.progresso_geral }}%;
-                            "
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================= -->
-                <!-- MAIS ESTATÍSTICAS -->
-                <!-- ================================================= -->
-
-                <div
-                    class="
-                        grid
-                        md:grid-cols-3
-                        gap-4
-                        mt-4
-                    "
-                >
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Acertos
-                        </p>
-
-                        <p
-                            class="
-                                text-2xl
-                                font-black
-                                text-green-400
-                                mt-2
-                            "
-                        >
-                            {{ estatisticas.acertos }}
-                        </p>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Erros
-                        </p>
-
-                        <p
-                            class="
-                                text-2xl
-                                font-black
-                                text-red-400
-                                mt-2
-                            "
-                        >
-                            {{ estatisticas.erros }}
-                        </p>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-2xl
-                            p-5
-                        "
-                    >
-
-                        <p class="text-slate-400 text-sm">
-                            Etapas concluídas
-                        </p>
-
-                        <p
-                            class="
-                                text-2xl
-                                font-black
-                                text-violet-400
-                                mt-2
-                            "
-                        >
-                            {{ estatisticas.etapas_concluidas }}
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-            {% else %}
-
-                <!-- PRIVADO -->
-
-                <div
-                    class="
-                        bg-slate-800
-                        border
-                        border-slate-700
-                        rounded-3xl
-                        p-10
-                        mt-5
-                        text-center
-                    "
-                >
-
-                    <div class="text-5xl">
-                        🔒
-                    </div>
-
-
-                    <h3
                         class="
                             text-xl
                             font-black
-                            mt-4
                         "
                     >
-                        Progresso privado
-                    </h3>
-
+                        Progresso geral
+                    </h2>
 
                     <p
                         class="
                             text-slate-400
-                            mt-2
+                            mt-1
                         "
                     >
-                        Este usuário escolheu não exibir
-                        seu progresso para você.
+                        {{ estatisticas.assuntos_concluidos }}
+                        de
+                        {{ estatisticas.total_assuntos }}
+                        assuntos concluídos.
                     </p>
 
                 </div>
 
-            {% endif %}
+                <strong
+                    class="
+                        text-2xl
+                        text-indigo-300
+                    "
+                >
+                    {{ estatisticas.progresso_geral }}%
+                </strong>
+
+            </div>
+
+
+            <div
+                class="
+                    mt-5
+                    h-4
+                    bg-slate-800
+                    rounded-full
+                    overflow-hidden
+                "
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="{{ estatisticas.progresso_geral }}"
+            >
+
+                {% set progresso =
+                    estatisticas.progresso_geral
+                %}
+
+                <div
+                    class="
+                        h-full
+                        bg-indigo-500
+                        rounded-full
+
+                        {% if progresso >= 100 %}
+                            w-full
+                        {% elif progresso >= 90 %}
+                            w-11/12
+                        {% elif progresso >= 80 %}
+                            w-4/5
+                        {% elif progresso >= 75 %}
+                            w-3/4
+                        {% elif progresso >= 66 %}
+                            w-2/3
+                        {% elif progresso >= 60 %}
+                            w-3/5
+                        {% elif progresso >= 50 %}
+                            w-1/2
+                        {% elif progresso >= 40 %}
+                            w-2/5
+                        {% elif progresso >= 33 %}
+                            w-1/3
+                        {% elif progresso >= 25 %}
+                            w-1/4
+                        {% elif progresso >= 20 %}
+                            w-1/5
+                        {% elif progresso >= 10 %}
+                            w-1/12
+                        {% else %}
+                            w-0
+                        {% endif %}
+                    "
+                ></div>
+
+            </div>
 
         </section>
 
 
-        <!-- ================================================= -->
-        <!-- VOLTAR -->
-        <!-- ================================================= -->
+        {% else %}
 
-        <div class="mt-8">
+        <section
+            class="
+                mt-6
+                bg-slate-900/80
+                border
+                border-slate-800
+                rounded-3xl
+                p-8
+                text-center
+                shadow-xl
+            "
+        >
 
-            <a
-                href="{{ url_for('social.amigos') }}"
+            <div class="text-5xl">
+                🔒
+            </div>
 
+            <h2
                 class="
-                    text-slate-400
-                    hover:text-white
+                    text-xl
                     font-black
-                    transition
+                    mt-4
                 "
             >
-                ← Voltar para amigos
-            </a>
+                Progresso privado
+            </h2>
 
-        </div>
+            <p
+                class="
+                    text-slate-400
+                    mt-2
+                "
+            >
+                Este usuário restringiu
+                a visualização do progresso.
+            </p>
+
+        </section>
+
+        {% endif %}
 
     </div>
 

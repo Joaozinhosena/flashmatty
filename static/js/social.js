@@ -449,7 +449,7 @@
 
 
             console.log(
-                "👥 Sistema social iniciado."
+                " Sistema social iniciado."
             );
 
 

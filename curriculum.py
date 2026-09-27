@@ -2,189 +2,113 @@
 # INTERAÇÕES DISPONÍVEIS POR TIPO DE EXERCÍCIO
 # ============================================================
 
-def interacoes_para_tipo(tipo):
 
-    # --------------------------------------------------------
-    # FIGURAS PLANAS
-    # Pode mostrar desenho, fotos ou associação
-    # --------------------------------------------------------
+def interacoes_para_tipo(tipo):
+    """Define as interfaces que cada família de exercício pode usar."""
 
     if tipo == "figuras_nome":
-
         return [
             "multipla_escolha",
             "imagem_escolha",
-            "associacao"
+            "associacao",
         ]
-
-
-    # --------------------------------------------------------
-    # SÓLIDOS
-    # --------------------------------------------------------
 
     if tipo == "solidos":
-
-        return [
-            "imagem_escolha",
-            "multipla_escolha"
-        ]
-
-
-    # --------------------------------------------------------
-    # COMPRIMENTO
-    # --------------------------------------------------------
-
-    if tipo == "comprimento":
-
         return [
             "imagem_escolha",
             "multipla_escolha",
-            "numero"
         ]
 
-
-    # --------------------------------------------------------
-    # MASSA
-    # --------------------------------------------------------
-
-    if tipo == "massa":
-
+    if tipo in ("comprimento", "massa"):
         return [
             "imagem_escolha",
             "multipla_escolha",
-            "numero"
+            "numero",
+            "verdadeiro_falso",
         ]
-
-
-    # --------------------------------------------------------
-    # PROBABILIDADE
-    # --------------------------------------------------------
 
     if tipo in (
         "probabilidade_basica",
-        "probabilidade"
+        "probabilidade",
+        "probabilidade_desafio",
     ):
-
         return [
+            "multipla_escolha",
+            "verdadeiro_falso",
             "imagem_escolha",
-            "multipla_escolha"
         ]
-
-
-    # --------------------------------------------------------
-    # COMPARAÇÃO
-    # --------------------------------------------------------
 
     if tipo == "comparacao":
-
         return [
             "multipla_escolha",
-            "ordenacao"
+            "ordenacao",
+            "verdadeiro_falso",
         ]
-
-
-    # --------------------------------------------------------
-    # EQUIVALÊNCIA
-    # --------------------------------------------------------
 
     if tipo == "equivalencia":
-
         return [
             "multipla_escolha",
-            "associacao"
+            "associacao",
+            "verdadeiro_falso",
         ]
-
-
-    # --------------------------------------------------------
-    # TEXTOS / NOMES / CLASSIFICAÇÕES
-    # --------------------------------------------------------
 
     if tipo in (
         "figuras_desafio",
         "angulos",
         "grafico_basico",
         "grafico",
-        "grafico_desafio"
+        "grafico_desafio",
+        "poligonos",
+        "poliedros",
     ):
-
-        return [
-            "multipla_escolha"
-        ]
-
-
-    # --------------------------------------------------------
-    # RELÓGIO
-    # Pode perguntar horário ou conversão
-    # --------------------------------------------------------
-
-    if tipo == "tempo":
-
         return [
             "multipla_escolha",
-            "numero"
+            "verdadeiro_falso",
         ]
 
-
-    # --------------------------------------------------------
-    # QUESTÕES VISUAIS PARA CRIANÇAS
-    # --------------------------------------------------------
+    if tipo == "tempo":
+        return [
+            "multipla_escolha",
+            "numero",
+            "verdadeiro_falso",
+        ]
 
     if tipo in (
         "adicao_visual",
         "problema_adicao",
-
         "subtracao_visual",
         "problema_subtracao",
-
         "composicao_visual",
         "composicao",
         "decomposicao",
-
         "multiplicacao_visual",
         "problema_multiplicacao",
-
         "divisao_visual",
         "problema_divisao",
-
         "figuras_lados",
         "figuras_planas",
         "lados_vertices",
-
         "dinheiro_basico",
         "dinheiro",
-
         "fracao_basica",
         "fracao",
-
-        "poligonos",
-
         "temperatura",
-
         "perimetro",
         "area",
         "perimetro_area",
-
         "plano_cartesiano",
-
-        "poliedros",
-
-        "volume"
+        "volume",
     ):
-
         return [
             "multipla_escolha",
-            "numero"
+            "numero",
+            "verdadeiro_falso",
         ]
-
-
-    # --------------------------------------------------------
-    # QUESTÕES NUMÉRICAS GERAIS
-    # --------------------------------------------------------
 
     return [
         "numero",
         "multipla_escolha",
-        "verdadeiro_falso"
+        "verdadeiro_falso",
     ]
 
 
@@ -192,37 +116,31 @@ def interacoes_para_tipo(tipo):
 # ETAPA
 # ============================================================
 
+
 def etapa(
     nome,
     tipo,
-    quantidade=5,
+    quantidade=6,
     desafio=False,
-    interacoes=None
+    interacoes=None,
+    nivel_etapa=1,
+    complexidade="introducao",
+    operacoes=1,
 ):
+    """Cria uma etapa com metadados pedagógicos de progressão."""
 
     if interacoes is None:
-
-        interacoes = interacoes_para_tipo(
-            tipo
-        )
-
+        interacoes = interacoes_para_tipo(tipo)
 
     return {
-
-        "nome":
-            nome,
-
-        "tipo":
-            tipo,
-
-        "quantidade":
-            quantidade,
-
-        "desafio":
-            desafio,
-
-        "interacoes":
-            interacoes
+        "nome": nome,
+        "tipo": tipo,
+        "quantidade": quantidade,
+        "desafio": desafio,
+        "interacoes": interacoes,
+        "nivel_etapa": int(nivel_etapa),
+        "complexidade": str(complexidade),
+        "operacoes": int(operacoes),
     }
 
 
@@ -230,60 +148,63 @@ def etapa(
 # TRILHA
 # ============================================================
 
+
 def trilha(
     tipo1,
     tipo2=None,
     tipo3=None,
     tipo4=None,
-    desafio=None
+    desafio=None,
 ):
+    """Monta uma progressão real, não apenas uma troca de título."""
 
     tipo2 = tipo2 or tipo1
-
     tipo3 = tipo3 or tipo2
-
     tipo4 = tipo4 or tipo3
-
     desafio = desafio or tipo4
 
-
     return {
-
-        "1":
-            etapa(
-                "Primeiros passos",
-                tipo1,
-                5
-            ),
-
-        "2":
-            etapa(
-                "Treinando",
-                tipo2,
-                5
-            ),
-
-        "3":
-            etapa(
-                "Praticando",
-                tipo3,
-                6
-            ),
-
-        "4":
-            etapa(
-                "Aplicando",
-                tipo4,
-                6
-            ),
-
-        "5":
-            etapa(
-                "Desafio final",
-                desafio,
-                8,
-                True
-            )
+        "1": etapa(
+            "Primeiros passos",
+            tipo1,
+            6,
+            nivel_etapa=1,
+            complexidade="introducao",
+            operacoes=1,
+        ),
+        "2": etapa(
+            "Treinando",
+            tipo2,
+            7,
+            nivel_etapa=2,
+            complexidade="treino",
+            operacoes=1,
+        ),
+        "3": etapa(
+            "Praticando",
+            tipo3,
+            8,
+            nivel_etapa=3,
+            complexidade="contexto",
+            operacoes=2,
+        ),
+        "4": etapa(
+            "Aplicando",
+            tipo4,
+            8,
+            nivel_etapa=4,
+            complexidade="aplicacao",
+            operacoes=2,
+        ),
+        "5": etapa(
+            "Desafio final",
+            desafio,
+            10,
+            True,
+            nivel_etapa=5,
+            complexidade="desafio",
+            operacoes=3,
+        ),
     }
 
 
@@ -291,33 +212,22 @@ def trilha(
 # ASSUNTO
 # ============================================================
 
+
 def assunto(
     nome,
     descricao,
     explicacao,
     exemplo,
-    tipos
+    tipos,
 ):
-
     return {
-
-        "nome":
-            nome,
-
-        "descricao":
-            descricao,
-
-        "explicacao":
-            explicacao,
-
-        "exemplo":
-            exemplo,
-
-        "etapas":
-            trilha(
-                *tipos
-            )
+        "nome": nome,
+        "descricao": descricao,
+        "explicacao": explicacao,
+        "exemplo": exemplo,
+        "etapas": trilha(*tipos),
     }
+
 
 CURRICULO = {
 
@@ -979,3 +889,52 @@ CURRICULO = {
         }
     }
 }
+
+# ============================================================
+# PROGRESSÃO PEDAGÓGICA POR ANO
+# ============================================================
+#
+# O mesmo tipo de exercício pode aparecer em séries diferentes.
+# Por isso cada etapa recebe um nível global de 1 a 7, além do
+# nível interno da trilha (1 a 5). O game.py usa esses dados para
+# escolher amplitude numérica, quantidade de etapas de raciocínio,
+# incógnitas, interpretação e composição de operações.
+# ============================================================
+
+NIVEIS_POR_ANO = {
+    1: (1, 1, 2, 2, 3),
+    2: (2, 2, 3, 3, 4),
+    3: (3, 3, 4, 4, 5),
+    4: (4, 4, 5, 5, 6),
+    5: (5, 5, 6, 6, 7),
+}
+
+
+def _aplicar_progressao_curricular():
+    for ano_id, dados_ano in CURRICULO.items():
+        numero_ano = int(dados_ano.get("ordem") or str(ano_id).split("-")[0])
+        niveis = NIVEIS_POR_ANO.get(numero_ano, NIVEIS_POR_ANO[3])
+
+        for tema in dados_ano.get("temas", {}).values():
+            for dados_assunto in tema.get("assuntos", {}).values():
+                for etapa_id, dados_etapa in dados_assunto.get("etapas", {}).items():
+                    posicao = max(1, min(5, int(etapa_id)))
+                    nivel_global = niveis[posicao - 1]
+
+                    dados_etapa["ano"] = numero_ano
+                    dados_etapa["nivel"] = nivel_global
+                    dados_etapa["nivel_etapa"] = posicao
+
+                    # A quantidade de operações cresce mais nas séries maiores.
+                    if posicao <= 2:
+                        operacoes = 1
+                    elif posicao <= 4:
+                        operacoes = 2 if numero_ano >= 2 else 1
+                    else:
+                        operacoes = 3 if numero_ano >= 3 else 2
+
+                    dados_etapa["operacoes"] = operacoes
+                    dados_etapa["desafio"] = bool(posicao == 5 or dados_etapa.get("desafio"))
+
+
+_aplicar_progressao_curricular()

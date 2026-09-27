@@ -43,6 +43,7 @@ from datetime import datetime
 
 from social.models import PerfilUsuario
 from social.routes import social_bp
+from loja.routes import loja_bp
 
 
 # ============================================================
@@ -51,15 +52,6 @@ from social.routes import social_bp
 
 from multiplayer import socketio
 from multiplayer.routes import multiplayer_bp
-
-
-
-
-
-
-
-
-
 # ============================================================
 # APP
 # ============================================================
@@ -129,16 +121,29 @@ socketio.init_app(
 app.register_blueprint(
     multiplayer_bp
 )
-from notificacoes.routes import notificacoes_bp
-app.register_blueprint(
-    notificacoes_bp
-)
+
+
 
 app.register_blueprint(
     social_bp
 )
 
 
+app.register_blueprint(
+    loja_bp
+)
+
+
+#regristo blueprint da rotas das notificações
+from notificacoes.routes import notificacoes_bp
+
+app.register_blueprint(
+    notificacoes_bp
+)
+
+
+
+# IMPORTANTE:
 # eventos somente depois de configurar SocketIO
 import multiplayer.socket_events
 
@@ -635,7 +640,10 @@ def questao_publica(
         for chave, valor
         in questao.items()
 
-        if chave != "resposta"
+        if chave not in (
+            "resposta",
+            "explicacao"
+        )
     }
 
 
@@ -1592,7 +1600,36 @@ def etapa(
             "tipo"
         ],
 
-        interacoes
+        interacoes,
+
+        nivel=
+            dados_etapa.get(
+                "nivel"
+            ),
+
+        ano=
+            dados_etapa.get(
+                "ano",
+                dados_ano.get(
+                    "ordem"
+                )
+            ),
+
+        complexidade=
+            dados_etapa.get(
+                "complexidade"
+            ),
+
+        operacoes=
+            dados_etapa.get(
+                "operacoes"
+            ),
+
+        desafio=
+            dados_etapa.get(
+                "desafio",
+                False
+            )
     )
 
 
@@ -1661,7 +1698,54 @@ def etapa(
             ],
 
         "interacoes":
-            interacoes
+            interacoes,
+
+        "nivel":
+            dados_etapa.get(
+                "nivel",
+                2
+            ),
+
+        "ano_numero":
+            dados_etapa.get(
+                "ano",
+                dados_ano.get(
+                    "ordem",
+                    1
+                )
+            ),
+
+        "complexidade":
+            dados_etapa.get(
+                "complexidade",
+                "pratica"
+            ),
+
+        "operacoes":
+            dados_etapa.get(
+                "operacoes",
+                1
+            ),
+
+        "desafio":
+            bool(
+                dados_etapa.get(
+                    "desafio",
+                    False
+                )
+            ),
+
+        "explicacao":
+            nova_questao.get(
+                "explicacao",
+                ""
+            ),
+
+        "habilidade":
+            nova_questao.get(
+                "habilidade",
+                ""
+            )
     }
 
 
@@ -1898,6 +1982,27 @@ def responder():
 
                 f"{resposta_para_texto(correta)}."
             )
+
+
+        # ====================================================
+        # FEEDBACK PEDAGÓGICO
+        # ====================================================
+
+        explicacao = (
+            tentativa.get(
+                "explicacao",
+                ""
+            )
+            or ""
+        ).strip()
+
+
+        if explicacao:
+
+            mensagem = (
+                f"{mensagem} "
+                f"{explicacao}"
+            ).strip()
 
 
         tentativa[
@@ -2157,7 +2262,33 @@ def responder():
             tentativa.get(
                 "interacoes",
                 []
-            )
+            ),
+
+            nivel=
+                tentativa.get(
+                    "nivel"
+                ),
+
+            ano=
+                tentativa.get(
+                    "ano_numero"
+                ),
+
+            complexidade=
+                tentativa.get(
+                    "complexidade"
+                ),
+
+            operacoes=
+                tentativa.get(
+                    "operacoes"
+                ),
+
+            desafio=
+                tentativa.get(
+                    "desafio",
+                    False
+                )
         )
 
 
@@ -2198,6 +2329,22 @@ def responder():
         ] = nova_questao[
             "resposta"
         ]
+
+
+        tentativa[
+            "explicacao"
+        ] = nova_questao.get(
+            "explicacao",
+            ""
+        )
+
+
+        tentativa[
+            "habilidade"
+        ] = nova_questao.get(
+            "habilidade",
+            ""
+        )
 
 
         session[

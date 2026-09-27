@@ -554,32 +554,7 @@ def pode_ver_progresso(
         sao_amigos(
             current_user.id,
             alvo.id
-
-
         )
-
-        and
-
-
-
-        enviar_push_usuario(
-
-    alvo.id,
-
-    "🎮 Novo desafio!",
-
-    f"{current_user.nome} desafiou você para uma partida no FlashMatty.",
-
-    url=url_for(
-        "multiplayer.inicio"
-    ),
-
-    categoria="desafios",
-
-    tag="desafio-multiplayer"
-
-)
-
 
     )
 
@@ -1671,7 +1646,7 @@ def enviar_amizade(
 
     alvo.id,
 
-    "👥 Nova solicitação de amizade",
+    " Nova solicitação de amizade",
 
     f"{current_user.nome} quer ser seu amigo no FlashMatty.",
 
@@ -1928,6 +1903,17 @@ def remover_amigo(
     validar_csrf()
 
 
+    if (
+        usuario_id
+        ==
+        current_user.id
+    ):
+
+        abort(
+            400
+        )
+
+
     relacao = obter_relacao(
 
         current_user.id,
@@ -1946,4 +1932,40 @@ def remover_amigo(
     ):
 
         abort(
-            404)
+            404
+        )
+
+
+    try:
+
+        db.session.delete(
+            relacao
+        )
+
+
+        db.session.commit()
+
+
+    except Exception:
+
+        db.session.rollback()
+
+        raise
+
+
+    flash(
+        "Amigo removido com sucesso."
+    )
+
+
+    return redirect(
+
+        request.referrer
+
+        or
+
+        url_for(
+            "social.amigos"
+        )
+
+    )

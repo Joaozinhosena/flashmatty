@@ -768,7 +768,7 @@ document.addEventListener(
                 if (vol <= 0) {
 
                     mostrarAviso(
-                        "🔇 O volume está em 0%"
+                        " O volume está em 0%"
                     );
 
                     return;
@@ -884,7 +884,7 @@ document.addEventListener(
 
                     ativo
                         ?
-                        "♿ Animações reduzidas"
+                        " Animações reduzidas"
                         :
                         "✓ Animações normais"
 
@@ -925,7 +925,7 @@ document.addEventListener(
 
                     ativo
                         ?
-                        "🔎 Texto maior ativado"
+                        " Texto maior ativado"
                         :
                         "✓ Texto normal"
 
@@ -975,7 +975,14 @@ document.addEventListener(
                     `
                     <p>
                        Desenvolvimento:
+
+                      
+                    </p>
+                    <p>
+                       
+
                         <strong>Programador : Sena  </strong>.
+                        
                          <strong>Designer : yure </strong>.
 
                     </p>
@@ -1176,7 +1183,7 @@ document.addEventListener(
         // ====================================================
 
         console.log(
-            "⚙️ Configurações FlashMatty carregadas."
+            " Configurações FlashMatty carregadas."
         );
 
 

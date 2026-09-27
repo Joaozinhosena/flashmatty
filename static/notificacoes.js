@@ -1,6 +1,14 @@
-// ============================================================
+
 // FLASHMATTY - NOTIFICAÇÕES WEB PUSH
 // ============================================================
+
+// Evita inicialização duplicada caso o arquivo seja incluído
+// mais de uma vez por engano.
+if (window.__flashMattyNotificacoesCarregado) {
+    console.warn("🔔 notificacoes.js já foi carregado.");
+} else {
+
+    window.__flashMattyNotificacoesCarregado = true;
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -373,28 +381,65 @@ document.addEventListener(
             assinatura
         ) {
 
+            const dadosAssinatura =
+                assinatura.toJSON();
+
+
+            const opcoesBase = {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                }
+
+            };
+
+
+            // Primeiro tenta o formato cru:
+            // { endpoint, expirationTime, keys }
+            try {
+
+                return await fetchJson(
+                    "/notificacoes/assinar",
+                    {
+                        ...opcoesBase,
+
+                        body:
+                            JSON.stringify(
+                                dadosAssinatura
+                            )
+                    }
+                );
+
+            } catch (erroFormatoCru) {
+
+                console.warn(
+                    "Formato cru da assinatura não aceito; tentando formato encapsulado.",
+                    erroFormatoCru
+                );
+
+            }
+
+
+            // Compatibilidade com backend que espera:
+            // { subscription: { endpoint, keys, ... } }
             return fetchJson(
                 "/notificacoes/assinar",
                 {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
+                    ...opcoesBase,
 
                     body:
                         JSON.stringify({
 
                             subscription:
-                                assinatura.toJSON()
+                                dadosAssinatura
 
                         })
-
                 }
             );
 
@@ -646,7 +691,16 @@ document.addEventListener(
                     );
 
 
-                if (!dados.chave) {
+                const chavePublica =
+
+                    dados.chave
+                    ||
+                    dados.publicKey
+                    ||
+                    dados.public_key;
+
+
+                if (!chavePublica) {
 
                     throw new Error(
                         "A chave VAPID pública não foi retornada pelo servidor."
@@ -665,7 +719,7 @@ document.addEventListener(
 
                             applicationServerKey:
                                 urlBase64ParaUint8Array(
-                                    dados.chave
+                                    chavePublica
                                 )
 
                         });
@@ -865,10 +919,24 @@ document.addEventListener(
                             );
 
 
-                        if (
+                        const quantidadeEnviada =
                             Number(
+
                                 dados.enviados
-                            )
+                                ??
+                                dados.enviadas
+                                ??
+                                dados.resultado?.enviadas
+                                ??
+                                dados.resultado?.enviados
+                                ??
+                                0
+
+                            );
+
+
+                        if (
+                            quantidadeEnviada
                             <=
                             0
                         ) {
@@ -926,6 +994,12 @@ document.addEventListener(
                     );
 
 
+                const dadosPreferencias =
+                    dados.preferencias
+                    ??
+                    dados;
+
+
                 Object.entries(
                     preferencias
                 )
@@ -936,7 +1010,9 @@ document.addEventListener(
 
                             elemento.checked =
                                 Boolean(
-                                    dados[chave]
+                                    dadosPreferencias[
+                                        chave
+                                    ]
                                 );
 
                         }
@@ -984,27 +1060,59 @@ document.addEventListener(
 
             try {
 
-                await fetchJson(
-                    "/notificacoes/preferencias",
-                    {
+                const opcoesBase = {
 
-                        method:
-                            "POST",
+                    method:
+                        "POST",
 
-                        headers: {
+                    headers: {
 
-                            "Content-Type":
-                                "application/json"
-
-                        },
-
-                        body:
-                            JSON.stringify(
-                                dados
-                            )
+                        "Content-Type":
+                            "application/json"
 
                     }
-                );
+
+                };
+
+
+                try {
+
+                    await fetchJson(
+                        "/notificacoes/preferencias",
+                        {
+                            ...opcoesBase,
+
+                            body:
+                                JSON.stringify(
+                                    dados
+                                )
+                        }
+                    );
+
+                } catch (erroFormatoPlano) {
+
+                    console.warn(
+                        "Formato plano das preferências não aceito; tentando formato encapsulado.",
+                        erroFormatoPlano
+                    );
+
+
+                    await fetchJson(
+                        "/notificacoes/preferencias",
+                        {
+                            ...opcoesBase,
+
+                            body:
+                                JSON.stringify({
+
+                                    preferencias:
+                                        dados
+
+                                })
+                        }
+                    );
+
+                }
 
 
                 console.log(
@@ -1071,3 +1179,5 @@ document.addEventListener(
 
     }
 );
+
+}
