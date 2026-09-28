@@ -42,7 +42,7 @@ Resultado da partida | Matemática
                 md:text-8xl
             "
         >
-            🏆
+            <img src="https://images.icon-icons.com/1193/PNG/512/1490877818-sport-badges05_82419.png">
         </div>
 
 
@@ -85,7 +85,7 @@ Resultado da partida | Matemática
                 font-bold
             "
         >
-            🎮 Sala
+             Sala
             <span class="tracking-widest">
                 {{ codigo }}
             </span>
@@ -159,7 +159,7 @@ Resultado da partida | Matemática
                     text-2xl
                 "
             >
-                🏅
+                
             </div>
 
         </div>
@@ -270,17 +270,23 @@ const socket =
 
 
 
-/* ==========================================
-   EVITA INSERÇÃO DE HTML PELO NOME
-========================================== */
+// ==========================================================
+// SEGURANÇA
+// ==========================================================
 
-function escaparHtml(valor) {
+function escaparHtml(
+    valor
+) {
 
     const elemento =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     elemento.textContent =
         valor ?? "";
+
 
     return elemento.innerHTML;
 
@@ -288,9 +294,245 @@ function escaparHtml(valor) {
 
 
 
-/* ==========================================
-   CONEXÃO
-========================================== */
+// ==========================================================
+// COSMÉTICOS
+// ==========================================================
+
+function cosmeticosDe(
+    jogador
+) {
+
+    if (
+        jogador
+        &&
+        jogador.cosmeticos
+        &&
+        typeof jogador.cosmeticos
+        ===
+        "object"
+    ) {
+
+        return jogador.cosmeticos;
+
+    }
+
+
+    return {};
+
+}
+
+
+function idCosmetico(
+    cosmeticos,
+    tipo
+) {
+
+    return (
+        cosmeticos?.[tipo]?.id
+        ||
+        ""
+    );
+
+}
+
+
+function classesFundo(
+    itemId
+) {
+
+    const mapa = {
+
+        fundo_ceu_noturno:
+            "bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950",
+
+        fundo_sunset:
+            "bg-gradient-to-r from-orange-950 via-rose-900 to-indigo-950",
+
+        fundo_neon:
+            "bg-gradient-to-r from-cyan-950 via-violet-950 to-fuchsia-950",
+
+        fundo_galaxia:
+            "bg-gradient-to-r from-slate-950 via-indigo-950 to-purple-950",
+
+        fundo_esmeralda:
+            "bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950"
+
+    };
+
+
+    return (
+        mapa[itemId]
+        ||
+        ""
+    );
+
+}
+
+
+function classesCard(
+    itemId
+) {
+
+    const mapa = {
+
+        card_vidro:
+            "bg-slate-900/70 backdrop-blur-xl border-slate-500/30",
+
+        card_neon:
+            "bg-slate-950 border-violet-500 shadow-[0_0_28px_rgba(139,92,246,0.30)]",
+
+        card_ouro:
+            "bg-gradient-to-r from-amber-950 to-slate-950 border-yellow-400 shadow-[0_0_28px_rgba(245,158,11,0.28)]",
+
+        card_galactico:
+            "bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-950 border-purple-400 shadow-[0_0_32px_rgba(168,85,247,0.30)]"
+
+    };
+
+
+    return (
+        mapa[itemId]
+        ||
+        ""
+    );
+
+}
+
+
+function classesMoldura(
+    itemId
+) {
+
+    const mapa = {
+
+        moldura_indigo:
+            "ring-4 ring-indigo-400 shadow-[0_0_22px_rgba(99,102,241,0.60)]",
+
+        moldura_fogo:
+            "ring-4 ring-orange-400 shadow-[0_0_24px_rgba(239,68,68,0.66)]",
+
+        moldura_gelo:
+            "ring-4 ring-cyan-300 shadow-[0_0_24px_rgba(14,165,233,0.64)]",
+
+        moldura_ouro:
+            "ring-4 ring-yellow-400 shadow-[0_0_26px_rgba(245,158,11,0.72)]",
+
+        moldura_arco_iris:
+            "ring-4 ring-fuchsia-400 shadow-[0_0_28px_rgba(34,211,238,0.58)]"
+
+    };
+
+
+    return (
+        mapa[itemId]
+        ||
+        "ring-2 ring-slate-300"
+    );
+
+}
+
+
+function classesNome(
+    itemId
+) {
+
+    const mapa = {
+
+        nome_ciano:
+            "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.48)]",
+
+        nome_dourado:
+            "text-yellow-300 drop-shadow-[0_0_8px_rgba(250,204,21,0.48)]",
+
+        nome_gradiente:
+            "bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent",
+
+        nome_esmeralda:
+            "text-emerald-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.45)]",
+
+        nome_lendario:
+            "bg-gradient-to-r from-yellow-200 via-orange-400 to-fuchsia-400 bg-clip-text text-transparent"
+
+    };
+
+
+    return (
+        mapa[itemId]
+        ||
+        "text-slate-900"
+    );
+
+}
+
+
+function htmlEfeito(
+    itemId
+) {
+
+    if (
+        itemId
+        ===
+        "efeito_estrelas"
+    ) {
+
+        return `
+            <span class="absolute top-4 left-[16%] w-2 h-2 rounded-full bg-white/80 animate-pulse"></span>
+            <span class="absolute top-9 right-[20%] w-2 h-2 rounded-full bg-cyan-200/80 animate-ping"></span>
+            <span class="absolute bottom-5 left-[42%] w-1.5 h-1.5 rounded-full bg-violet-200/80 animate-pulse"></span>
+        `;
+
+    }
+
+
+    if (
+        itemId
+        ===
+        "efeito_grade"
+    ) {
+
+        return `
+            <span class="absolute inset-3 rounded-xl border border-cyan-400/20 bg-cyan-400/5 animate-pulse"></span>
+        `;
+
+    }
+
+
+    if (
+        itemId
+        ===
+        "efeito_aurora"
+    ) {
+
+        return `
+            <span class="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-cyan-500/20 blur-2xl animate-pulse"></span>
+            <span class="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-fuchsia-500/20 blur-2xl animate-pulse"></span>
+        `;
+
+    }
+
+
+    if (
+        itemId
+        ===
+        "efeito_scan"
+    ) {
+
+        return `
+            <span class="absolute inset-x-5 top-1/2 h-px bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,0.85)] animate-pulse"></span>
+        `;
+
+    }
+
+
+    return "";
+
+}
+
+
+
+// ==========================================================
+// CONEXÃO
+// ==========================================================
 
 socket.on(
     "connect",
@@ -302,18 +544,11 @@ socket.on(
         );
 
 
-        /*
-        Solicita o ranking novamente.
-
-        Isso é importante porque o jogador
-        pode abrir resultado.html depois que
-        o evento final já foi enviado.
-        */
-
         socket.emit(
             "pedir_ranking",
             {
-                codigo: codigo
+                codigo:
+                    codigo
             }
         );
 
@@ -322,9 +557,9 @@ socket.on(
 
 
 
-/* ==========================================
-   RANKING FINAL
-========================================== */
+// ==========================================================
+// RANKING FINAL
+// ==========================================================
 
 socket.on(
     "ranking_final",
@@ -332,8 +567,11 @@ socket.on(
     dados => {
 
         if (
-            !dados ||
-            !Array.isArray(dados.ranking)
+            !dados
+            ||
+            !Array.isArray(
+                dados.ranking
+            )
         ) {
 
             podio.innerHTML = `
@@ -350,6 +588,7 @@ socket.on(
             `;
 
             return;
+
         }
 
 
@@ -378,6 +617,7 @@ socket.on(
             `;
 
             return;
+
         }
 
 
@@ -401,7 +641,7 @@ socket.on(
                     "bg-slate-100 text-slate-700";
 
 
-                let classeCard =
+                let classeBorda =
                     "border-slate-200";
 
 
@@ -409,12 +649,13 @@ socket.on(
                     posicao === 1
                 ) {
 
-                    medalha = "🥇";
+                    medalha =
+                        "🥇";
 
                     classePosicao =
                         "bg-amber-50 text-amber-700";
 
-                    classeCard =
+                    classeBorda =
                         "border-amber-300";
 
                 }
@@ -424,12 +665,13 @@ socket.on(
                     posicao === 2
                 ) {
 
-                    medalha = "🥈";
+                    medalha =
+                        "🥈";
 
                     classePosicao =
                         "bg-slate-100 text-slate-700";
 
-                    classeCard =
+                    classeBorda =
                         "border-slate-300";
 
                 }
@@ -439,12 +681,13 @@ socket.on(
                     posicao === 3
                 ) {
 
-                    medalha = "🥉";
+                    medalha =
+                        "🥉";
 
                     classePosicao =
                         "bg-orange-50 text-orange-700";
 
-                    classeCard =
+                    classeBorda =
                         "border-orange-200";
 
                 }
@@ -452,150 +695,431 @@ socket.on(
 
                 const nome =
                     escaparHtml(
-                        jogador.nome || "Jogador"
+                        jogador.nome
+                        ||
+                        "Jogador"
                     );
 
 
                 const acertos =
                     Number(
-                        jogador.acertos || 0
+                        jogador.acertos
+                        ||
+                        0
                     );
 
 
                 const pontos =
                     Number(
-                        jogador.pontos || 0
+                        jogador.pontos
+                        ||
+                        0
                     );
+
+
+                const cosmeticos =
+                    cosmeticosDe(
+                        jogador
+                    );
+
+
+                const titulo =
+                    cosmeticos?.titulo;
+
+
+                const badge =
+                    cosmeticos?.badge;
+
+
+                const usuarioId =
+                    Number(
+                        jogador.usuario_id
+                    );
+
+
+                const avatarUrl =
+                    (
+                        Number.isFinite(
+                            usuarioId
+                        )
+                        &&
+                        usuarioId > 0
+                    )
+                    ?
+                    `/social/foto/${usuarioId}`
+                    :
+                    "";
+
+
+                const fundoId =
+                    idCosmetico(
+                        cosmeticos,
+                        "fundo"
+                    );
+
+
+                const cardId =
+                    idCosmetico(
+                        cosmeticos,
+                        "card"
+                    );
+
+
+                const molduraId =
+                    idCosmetico(
+                        cosmeticos,
+                        "moldura"
+                    );
+
+
+                const nomeId =
+                    idCosmetico(
+                        cosmeticos,
+                        "nome"
+                    );
+
+
+                const efeitoId =
+                    idCosmetico(
+                        cosmeticos,
+                        "efeito"
+                    );
+
+
+                const fundoClasse =
+                    classesFundo(
+                        fundoId
+                    );
+
+
+                const cardClasse =
+                    classesCard(
+                        cardId
+                    );
+
+
+                const molduraClasse =
+                    classesMoldura(
+                        molduraId
+                    );
+
+
+                const nomeClasse =
+                    classesNome(
+                        nomeId
+                    );
+
+
+                const efeitoHtml =
+                    htmlEfeito(
+                        efeitoId
+                    );
+
+
+                const temTemaEscuro =
+                    Boolean(
+                        fundoClasse
+                        ||
+                        cardClasse
+                    );
+
+
+                const textoSecundario =
+                    temTemaEscuro
+                    ?
+                    "text-slate-300"
+                    :
+                    "text-slate-500";
+
+
+                const textoPontos =
+                    temTemaEscuro
+                    ?
+                    "text-indigo-300"
+                    :
+                    "text-indigo-600";
 
 
                 html += `
 
                     <div
                         class="
-                            flex
-                            items-center
-                            justify-between
-                            gap-4
-                            bg-white
+                            relative
+                            overflow-hidden
                             border-2
-                            ${classeCard}
+                            ${classeBorda}
+                            ${fundoClasse}
+                            ${cardClasse}
+                            ${
+                                !fundoClasse
+                                &&
+                                !cardClasse
+                                ?
+                                "bg-white"
+                                :
+                                ""
+                            }
                             rounded-2xl
                             p-4
                             md:p-5
                             transition
-                            hover:shadow-md
+                            hover:shadow-lg
                         "
                     >
+
+                        ${
+                            efeitoHtml
+                            ?
+                            `
+                            <div
+                                class="
+                                    absolute
+                                    inset-0
+                                    pointer-events-none
+                                    overflow-hidden
+                                "
+                                aria-hidden="true"
+                            >
+                                ${efeitoHtml}
+                            </div>
+                            `
+                            :
+                            ""
+                        }
 
 
                         <div
                             class="
+                                relative
+                                z-10
                                 flex
                                 items-center
+                                justify-between
                                 gap-4
-                                min-w-0
                             "
                         >
 
 
-                            <!-- POSIÇÃO -->
-
                             <div
                                 class="
-                                    ${classePosicao}
-                                    w-12
-                                    h-12
-                                    md:w-14
-                                    md:h-14
-                                    rounded-2xl
                                     flex
                                     items-center
-                                    justify-center
-                                    text-2xl
-                                    md:text-3xl
-                                    font-black
-                                    shrink-0
+                                    gap-4
+                                    min-w-0
                                 "
                             >
-                                ${medalha}
+
+
+                                <div
+                                    class="
+                                        ${classePosicao}
+                                        w-12
+                                        h-12
+                                        md:w-14
+                                        md:h-14
+                                        rounded-2xl
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-2xl
+                                        md:text-3xl
+                                        font-black
+                                        shrink-0
+                                    "
+                                >
+                                    ${medalha}
+                                </div>
+
+
+                                ${
+                                    avatarUrl
+                                    ?
+                                    `
+                                    <div
+                                        class="
+                                            relative
+                                            w-14
+                                            h-14
+                                            md:w-16
+                                            md:h-16
+                                            rounded-full
+                                            shrink-0
+                                            ${molduraClasse}
+                                        "
+                                    >
+
+                                        <img
+                                            src="${avatarUrl}"
+                                            alt="Foto de ${nome}"
+                                            class="
+                                                w-full
+                                                h-full
+                                                rounded-full
+                                                object-cover
+                                                bg-slate-800
+                                            "
+                                        >
+
+                                        ${
+                                            badge?.valor?.simbolo
+                                            ?
+                                            `
+                                            <span
+                                                class="
+                                                    absolute
+                                                    -right-2
+                                                    -bottom-1
+                                                    min-w-8
+                                                    h-8
+                                                    px-1
+                                                    rounded-full
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    bg-slate-950
+                                                    border-2
+                                                    border-white/20
+                                                    text-base
+                                                    shadow-lg
+                                                "
+                                                title="${escaparHtml(
+                                                    badge.nome
+                                                    ||
+                                                    "Badge"
+                                                )}"
+                                            >
+                                                ${escaparHtml(
+                                                    badge.valor.simbolo
+                                                )}
+                                            </span>
+                                            `
+                                            :
+                                            ""
+                                        }
+
+                                    </div>
+                                    `
+                                    :
+                                    ""
+                                }
+
+
+                                <div
+                                    class="
+                                        text-left
+                                        min-w-0
+                                    "
+                                >
+
+                                    <strong
+                                        class="
+                                            block
+                                            text-base
+                                            md:text-lg
+                                            font-black
+                                            truncate
+                                            ${nomeClasse}
+                                        "
+                                    >
+                                        ${nome}
+                                    </strong>
+
+
+                                    ${
+                                        titulo?.valor?.texto
+                                        ?
+                                        `
+                                        <div
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                gap-1
+                                                mt-1
+                                                rounded-full
+                                                border
+                                                border-white/10
+                                                bg-slate-950/50
+                                                px-2.5
+                                                py-1
+                                                text-[11px]
+                                                font-black
+                                                text-slate-200
+                                                max-w-full
+                                            "
+                                        >
+                                            <span>
+                                                ${escaparHtml(
+                                                    titulo.icone
+                                                    ||
+                                                    "✨"
+                                                )}
+                                            </span>
+
+                                            <span class="truncate">
+                                                ${escaparHtml(
+                                                    titulo.valor.texto
+                                                )}
+                                            </span>
+                                        </div>
+                                        `
+                                        :
+                                        ""
+                                    }
+
+
+                                    <p
+                                        class="
+                                            text-sm
+                                            ${textoSecundario}
+                                            mt-1
+                                        "
+                                    >
+                                        ✅ ${acertos}
+                                        ${
+                                            acertos === 1
+                                            ?
+                                            "acerto"
+                                            :
+                                            "acertos"
+                                        }
+                                    </p>
+
+                                </div>
+
                             </div>
 
 
-
-                            <!-- JOGADOR -->
-
                             <div
                                 class="
-                                    text-left
-                                    min-w-0
+                                    text-right
+                                    shrink-0
                                 "
                             >
 
                                 <strong
                                     class="
                                         block
-                                        text-base
-                                        md:text-lg
-                                        text-slate-900
-                                        truncate
+                                        text-xl
+                                        md:text-2xl
+                                        ${textoPontos}
+                                        font-black
                                     "
                                 >
-                                    ${nome}
+                                    ${pontos}
                                 </strong>
 
 
-                                <p
+                                <span
                                     class="
-                                        text-sm
-                                        text-slate-500
-                                        mt-1
+                                        text-xs
+                                        ${textoSecundario}
+                                        font-bold
                                     "
                                 >
-                                    ✅ ${acertos}
-                                    ${
-                                        acertos === 1
-                                        ? "acerto"
-                                        : "acertos"
-                                    }
-                                </p>
+                                    PONTOS
+                                </span>
 
                             </div>
-
-                        </div>
-
-
-
-                        <!-- PONTUAÇÃO -->
-
-                        <div
-                            class="
-                                text-right
-                                shrink-0
-                            "
-                        >
-
-                            <strong
-                                class="
-                                    block
-                                    text-xl
-                                    md:text-2xl
-                                    text-indigo-600
-                                    font-black
-                                "
-                            >
-                                ${pontos}
-                            </strong>
-
-
-                            <span
-                                class="
-                                    text-xs
-                                    text-slate-400
-                                    font-bold
-                                "
-                            >
-                                PONTOS
-                            </span>
 
                         </div>
 
@@ -615,9 +1139,9 @@ socket.on(
 
 
 
-/* ==========================================
-   ERRO DE CONEXÃO
-========================================== */
+// ==========================================================
+// ERRO DE CONEXÃO
+// ==========================================================
 
 socket.on(
     "connect_error",

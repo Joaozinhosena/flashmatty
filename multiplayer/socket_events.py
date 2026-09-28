@@ -2,6 +2,10 @@ import time
 
 from flask import request, session
 
+from flask_login import (
+    current_user,
+)
+
 from flask_socketio import (
     emit,
     join_room
@@ -17,298 +21,169 @@ from multiplayer.room_manager import (
     ranking
 )
 
-from multiplayer.questions import (
-    gerar_partida
+from multiplayer.questions import gerar_partida
+
+from loja.services import (
+    personalizacao_publica,
 )
-
-from multiplayer.scoring import (
-    calcular_pontos
-)
-
-
-# ============================================================
-# CONFIGURAÇÕES
-# ============================================================
-
-MINIMO_JOGADORES = 1
-
-TOLERANCIA_RESPOSTA = 1.0
 
 
 # ============================================================
 # AUXILIARES
 # ============================================================
 
-def obter_jogador_sessao():
+def obter_personalizacao_usuario():
+    """
+    Lê do banco os cosméticos equipados da conta autenticada.
 
+    O multiplayer possui um jogador_id próprio, que pode conter
+    um UUID. Por isso a loja sempre deve usar current_user.id.
+    """
+
+    if not current_user.is_authenticated:
+
+        return (
+            None,
+            {}
+        )
+
+    usuario_id = int(
+        current_user.id
+    )
+
+    try:
+
+        cosmeticos = (
+            personalizacao_publica(
+                usuario_id
+            )
+            or
+            {}
+        )
+
+    except Exception as erro:
+
+        print(
+            "ERRO AO CARREGAR COSMÉTICOS "
+            "DO MULTIPLAYER:",
+            erro
+        )
+
+        cosmeticos = {}
+
+    return (
+        usuario_id,
+        cosmeticos
+    )
+
+
+
+def obter_jogador_sessao():
     return str(
         session.get(
             "multiplayer_jogador",
             ""
         )
-        or
-        ""
-    ).strip()
-
-
-def obter_jogador_evento(
-    dados=None
-):
-    """
-    Utiliza preferencialmente o ID armazenado
-    na sessão Flask.
-
-    O ID enviado pelo navegador é usado apenas
-    como fallback.
-    """
-
-    dados = dados or {}
-
-    jogador_sessao = (
-        obter_jogador_sessao()
-    )
-
-    jogador_recebido = str(
-        dados.get(
-            "jogador_id",
-            ""
-        )
-        or
-        ""
-    ).strip()
-
-
-    # Se existem os dois e são diferentes,
-    # há inconsistência de identidade.
-    if (
-        jogador_sessao
-        and
-        jogador_recebido
-        and
-        jogador_sessao
-        !=
-        jogador_recebido
-    ):
-
-        return ""
-
-
-    return (
-        jogador_sessao
-        or
-        jogador_recebido
     )
 
 
-def jogador_e_host(
-    sala,
-    jogador_id
-):
-
-    if not sala:
-        return False
-
+def jogador_e_host(sala, jogador_id):
     return (
         bool(jogador_id)
         and
-        str(jogador_id)
-        ==
-        str(
-            sala.get(
-                "host_id",
-                ""
-            )
-        )
+        jogador_id == str(sala["host_id"])
     )
 
 
-def jogadores_online(
-    sala
-):
-
-    if not sala:
-        return []
-
+def jogadores_online(sala):
     return [
-
         jogador
-
-        for jogador
-        in sala[
-            "jogadores"
-        ].values()
-
-        if jogador.get(
-            "online",
-            False
-        )
-
+        for jogador in sala["jogadores"].values()
+        if jogador.get("online", False)
     ]
 
 
-def ids_jogadores_online(
-    sala
-):
-
+def ids_jogadores_online(sala):
     return {
-
-        str(
-            jogador["id"]
-        )
-
-        for jogador
-        in jogadores_online(
-            sala
-        )
-
+        str(jogador["id"])
+        for jogador in jogadores_online(sala)
     }
-
-
-def atualizar_atividade(
-    sala
-):
-
-    if not sala:
-        return
-
-    sala[
-        "ultima_atividade"
-    ] = time.time()
 
 
 # ============================================================
 # ENTRAR NO SOCKET DA SALA
 # ============================================================
 
-@socketio.on(
-    "entrar_socket"
-)
-def entrar_socket(
-    dados
-):
-
-    dados = dados or {}
+@socketio.on("entrar_socket")
+def entrar_socket(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
 
+    # Primeiro tenta utilizar o ID recebido pelo navegador.
+    jogador_id = str(
+        dados.get("jogador_id", "")
+    ).strip()
 
-    jogador_id = (
-        obter_jogador_evento(
-            dados
-        )
-    )
-
-
-    if not codigo:
-
-        emit(
-            "erro_sala",
-            {
-                "mensagem":
-                    "Código da sala inválido."
-            }
-        )
-
-        return
-
-
+    # Se não veio, utiliza a sessão Flask.
     if not jogador_id:
+        jogador_id = obter_jogador_sessao()
 
-        emit(
-            "erro_sala",
-            {
-                "mensagem":
-                    "Jogador inválido."
-            }
-        )
-
-        return
-
-
-    sala = buscar_sala(
-        codigo
-    )
-
+    sala = buscar_sala(codigo)
 
     if not sala:
 
         emit(
             "erro_sala",
             {
-                "mensagem":
-                    "Sala não encontrada."
+                "mensagem": "Sala não encontrada."
             }
         )
 
         return
 
+    usuario_id, cosmeticos = (
+        obter_personalizacao_usuario()
+    )
 
     with LOCK:
 
-        if (
-            jogador_id
-            not in
-            sala[
-                "jogadores"
-            ]
-        ):
+        if jogador_id not in sala["jogadores"]:
 
             emit(
                 "erro_sala",
                 {
-                    "mensagem":
-                        "Jogador não pertence a esta sala."
+                    "mensagem": "Jogador inválido."
                 }
             )
 
             return
 
+        join_room(codigo)
 
-        jogador = (
-            sala[
-                "jogadores"
-            ][
-                jogador_id
-            ]
+        jogador = sala[
+            "jogadores"
+        ][jogador_id]
+
+        jogador["sid"] = request.sid
+        jogador["online"] = True
+
+        # ID real da conta do FlashMatty.
+        jogador["usuario_id"] = (
+            usuario_id
         )
 
-
-        # Atualiza o Socket atual.
-        jogador[
-            "sid"
-        ] = request.sid
-
-        jogador[
-            "online"
-        ] = True
-
-
-        atualizar_atividade(
-            sala
+        # Snapshot atualizado da personalização equipada.
+        jogador["cosmeticos"] = (
+            cosmeticos
         )
-
-
-    # Adiciona a conexão Socket.IO
-    # ao room correspondente.
-    join_room(
-        codigo
-    )
-
 
     emit(
         "jogadores_atualizados",
         {
             "jogadores":
-                serializar_jogadores(
-                    codigo
-                )
+                serializar_jogadores(codigo)
         },
         to=codigo
     )
@@ -318,50 +193,27 @@ def entrar_socket(
 # INICIAR PARTIDA
 # ============================================================
 
-@socketio.on(
-    "iniciar_partida"
-)
-def iniciar_partida(
-    dados
-):
-
-    dados = dados or {}
-
+@socketio.on("iniciar_partida")
+def iniciar_partida(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
 
-
-    sala = buscar_sala(
-        codigo
-    )
-
+    sala = buscar_sala(codigo)
 
     if not sala:
 
         emit(
             "erro_sala",
             {
-                "mensagem":
-                    "Sala não encontrada."
+                "mensagem": "Sala não encontrada."
             }
         )
 
         return
 
-
-    jogador_id = (
-        obter_jogador_evento(
-            dados
-        )
-    )
-
+    jogador_id = obter_jogador_sessao()
 
     if not jogador_e_host(
         sala,
@@ -372,22 +224,15 @@ def iniciar_partida(
             "erro_sala",
             {
                 "mensagem":
-                    "Somente o anfitrião pode iniciar a partida."
+                    "Somente o criador da sala pode iniciar."
             }
         )
 
         return
 
-
     with LOCK:
 
-        if (
-            sala.get(
-                "estado"
-            )
-            !=
-            "lobby"
-        ):
+        if sala["estado"] != "lobby":
 
             emit(
                 "erro_sala",
@@ -399,38 +244,21 @@ def iniciar_partida(
 
             return
 
+        online = jogadores_online(sala)
 
-        online = (
-            jogadores_online(
-                sala
-            )
-        )
-
-
-        if (
-            len(online)
-            <
-            MINIMO_JOGADORES
-        ):
+        if len(online) < 1:
 
             emit(
                 "erro_sala",
                 {
                     "mensagem":
-                        "Não existem jogadores suficientes para iniciar."
+                        "Não existem jogadores conectados."
                 }
             )
 
             return
 
-
-        config = (
-            sala.get(
-                "configuracao",
-                {}
-            )
-        )
-
+        config = sala["configuracao"]
 
         try:
 
@@ -441,16 +269,6 @@ def iniciar_partida(
                 )
             )
 
-        except (
-            TypeError,
-            ValueError
-        ):
-
-            quantidade = 10
-
-
-        try:
-
             tempo = int(
                 config.get(
                     "tempo",
@@ -458,54 +276,32 @@ def iniciar_partida(
                 )
             )
 
-        except (
-            TypeError,
-            ValueError
-        ):
+        except (TypeError, ValueError):
 
+            quantidade = 10
             tempo = 20
-
 
         quantidade = max(
             1,
-            min(
-                50,
-                quantidade
-            )
+            min(50, quantidade)
         )
-
 
         tempo = max(
             5,
-            min(
-                120,
-                tempo
-            )
+            min(120, tempo)
         )
 
-
-        config[
-            "quantidade"
-        ] = quantidade
-
-        config[
-            "tempo"
-        ] = tempo
-
+        config["quantidade"] = quantidade
+        config["tempo"] = tempo
 
         try:
 
-            questoes = (
-                gerar_partida(
-
-                    config.get(
-                        "assunto",
-                        "misto"
-                    ),
-
-                    quantidade
-
-                )
+            questoes = gerar_partida(
+                config.get(
+                    "assunto",
+                    "misto"
+                ),
+                quantidade
             )
 
         except Exception as erro:
@@ -514,7 +310,6 @@ def iniciar_partida(
                 "ERRO AO GERAR PARTIDA:",
                 erro
             )
-
 
             emit(
                 "erro_sala",
@@ -525,7 +320,6 @@ def iniciar_partida(
             )
 
             return
-
 
         if not questoes:
 
@@ -539,242 +333,58 @@ def iniciar_partida(
 
             return
 
+        sala["questoes"] = questoes
+        sala["estado"] = "jogando"
+        sala["rodada"] = 0
+        sala["questao_atual"] = None
+        sala["inicio_questao"] = None
+        sala["respostas_rodada"] = set()
+        sala["ranking_rodada"] = []
 
-        sala[
-            "questoes"
-        ] = questoes
+        # Zera pontuação da partida.
+        for jogador in sala[
+            "jogadores"
+        ].values():
 
-        sala[
-            "estado"
-        ] = "jogando"
-
-        sala[
-            "rodada"
-        ] = 0
-
-        sala[
-            "questao_atual"
-        ] = None
-
-        sala[
-            "inicio_questao"
-        ] = None
-
-        sala[
-            "respostas_rodada"
-        ] = set()
-
-        sala[
-            "ranking_rodada"
-        ] = []
-
-
-        # Reinicia as estatísticas.
-        for jogador in (
-            sala[
-                "jogadores"
-            ].values()
-        ):
-
-            jogador[
-                "pontos"
-            ] = 0
-
-            jogador[
-                "acertos"
-            ] = 0
-
-            jogador[
-                "erros"
-            ] = 0
-
-            jogador[
-                "sequencia"
-            ] = 0
-
-            jogador[
-                "maior_sequencia"
-            ] = 0
-
-            jogador[
-                "respondeu"
-            ] = False
-
-
-        atualizar_atividade(
-            sala
-        )
-
+            jogador["pontos"] = 0
+            jogador["acertos"] = 0
+            jogador["erros"] = 0
+            jogador["sequencia"] = 0
+            jogador["maior_sequencia"] = 0
+            jogador["respondeu"] = False
 
     print(
-        f"PARTIDA INICIADA | "
-        f"SALA {codigo} | "
+        f"PARTIDA INICIADA | SALA {codigo} | "
         f"{len(online)} JOGADORES"
     )
 
-
+    # Todos que fizeram join_room recebem.
     emit(
         "partida_iniciada",
         {
-            "codigo":
-                codigo
+            "codigo": codigo
         },
         to=codigo
     )
 
 
 # ============================================================
-# TIMER DO SERVIDOR
-# ============================================================
-
-def vigiar_tempo_questao(
-    codigo,
-    numero_rodada,
-    inicio_questao,
-    tempo_limite
-):
-    """
-    Timer executado pelo servidor.
-
-    Dessa forma a partida não depende
-    exclusivamente do navegador do host.
-    """
-
-    socketio.sleep(
-        tempo_limite
-        +
-        0.5
-    )
-
-
-    sala = buscar_sala(
-        codigo
-    )
-
-
-    if not sala:
-        return
-
-
-    deve_encerrar = False
-
-
-    with LOCK:
-
-        if (
-            sala.get(
-                "estado"
-            )
-            !=
-            "jogando"
-        ):
-            return
-
-
-        if not sala.get(
-            "questao_atual"
-        ):
-            return
-
-
-        # Verifica se ainda estamos
-        # na mesma rodada.
-        rodada_atual = (
-            sala.get(
-                "rodada",
-                0
-            )
-            +
-            1
-        )
-
-
-        if (
-            rodada_atual
-            !=
-            numero_rodada
-        ):
-            return
-
-
-        inicio_atual = (
-            sala.get(
-                "inicio_questao"
-            )
-        )
-
-
-        if (
-            inicio_atual
-            !=
-            inicio_questao
-        ):
-            return
-
-
-        decorrido = (
-            time.time()
-            -
-            inicio_atual
-        )
-
-
-        if (
-            decorrido
-            >=
-            tempo_limite
-        ):
-
-            deve_encerrar = True
-
-
-    if deve_encerrar:
-
-        encerrar_rodada(
-            codigo,
-            motivo="tempo"
-        )
-
-
-# ============================================================
 # PRÓXIMA QUESTÃO
 # ============================================================
 
-@socketio.on(
-    "proxima_questao"
-)
-def proxima_questao(
-    dados
-):
-
-    dados = dados or {}
-
+@socketio.on("proxima_questao")
+def proxima_questao(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
 
-
-    sala = buscar_sala(
-        codigo
-    )
-
+    sala = buscar_sala(codigo)
 
     if not sala:
         return
 
-
-    jogador_id = (
-        obter_jogador_evento(
-            dados
-        )
-    )
-
+    jogador_id = obter_jogador_sessao()
 
     if not jogador_e_host(
         sala,
@@ -782,52 +392,29 @@ def proxima_questao(
     ):
         return
 
-
     with LOCK:
 
-        if (
-            sala.get(
-                "estado"
-            )
-            !=
-            "jogando"
-        ):
+        if sala["estado"] != "jogando":
             return
 
-
-        # Já existe uma questão ativa.
-        if sala.get(
-            "questao_atual"
-        ):
+        # Evita criar outra questão enquanto uma
+        # ainda está ativa.
+        if sala.get("questao_atual"):
             return
 
-
-        # Proteção adicional.
         if (
-            sala[
-                "rodada"
-            ]
+            sala["rodada"]
             >=
-            len(
-                sala[
-                    "questoes"
-                ]
-            )
+            len(sala["questoes"])
         ):
 
-            sala[
-                "estado"
-            ] = "finalizado"
+            sala["estado"] = "finalizado"
 
-
-            classificacao = (
-                ranking(
-                    codigo
-                )
+            classificacao = ranking(
+                codigo
             )
 
-
-            socketio.emit(
+            emit(
                 "partida_finalizada",
                 {
                     "ranking":
@@ -838,102 +425,57 @@ def proxima_questao(
 
             return
 
-
-        questao = (
-            sala[
-                "questoes"
-            ][
-                sala[
-                    "rodada"
-                ]
-            ]
-        )
-
+        questao = sala[
+            "questoes"
+        ][sala["rodada"]]
 
         sala[
             "questao_atual"
         ] = questao
 
-
-        inicio_questao = (
-            time.time()
-        )
-
-
         sala[
             "inicio_questao"
-        ] = inicio_questao
-
+        ] = time.time()
 
         sala[
             "respostas_rodada"
         ] = set()
 
-
         sala[
             "ranking_rodada"
         ] = []
 
-
-        for jogador in (
-            sala[
-                "jogadores"
-            ].values()
-        ):
+        for jogador in sala[
+            "jogadores"
+        ].values():
 
             jogador[
                 "respondeu"
             ] = False
 
-
         numero_rodada = (
-            sala[
-                "rodada"
-            ]
-            +
-            1
+            sala["rodada"] + 1
         )
-
 
         total = len(
-            sala[
-                "questoes"
-            ]
+            sala["questoes"]
         )
-
 
         tempo = int(
-            sala[
-                "configuracao"
-            ][
-                "tempo"
-            ]
+            sala["configuracao"]["tempo"]
         )
 
-
-        atualizar_atividade(
-            sala
-        )
-
-
-    socketio.emit(
+    emit(
         "nova_questao",
         {
-            "rodada":
-                numero_rodada,
-
-            "total":
-                total,
+            "rodada": numero_rodada,
+            "total": total,
 
             "pergunta":
-                questao[
-                    "pergunta"
-                ],
+                questao["pergunta"],
 
             "alternativas":
-                questao[
-                    "alternativas"
-                ],
+                questao["alternativas"],
 
             "tempo":
                 tempo
@@ -942,128 +484,42 @@ def proxima_questao(
     )
 
 
-    # Inicia o relógio também no servidor.
-    socketio.start_background_task(
-
-        vigiar_tempo_questao,
-
-        codigo,
-
-        numero_rodada,
-
-        inicio_questao,
-
-        tempo
-
-    )
-
-
 # ============================================================
 # RESPONDER
 # ============================================================
 
-@socketio.on(
-    "responder"
-)
-def responder(
-    dados
-):
-
-    dados = dados or {}
-
+@socketio.on("responder")
+def responder(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
-
 
     resposta = str(
-        dados.get(
-            "resposta",
-            ""
-        )
-        or
-        ""
+        dados.get("resposta", "")
     ).strip()
 
+    jogador_id = obter_jogador_sessao()
 
-    jogador_id = (
-        obter_jogador_evento(
-            dados
-        )
-    )
-
-
-    sala = buscar_sala(
-        codigo
-    )
-
+    sala = buscar_sala(codigo)
 
     if (
         not sala
         or
-        sala.get(
-            "estado"
-        )
-        !=
-        "jogando"
+        sala["estado"] != "jogando"
     ):
         return
 
-
-    acertou = False
-
-    pontos = 0
-
-    sequencia_atual = 0
-
-    todos_responderam = False
-
-
     with LOCK:
 
-        if (
-            jogador_id
-            not in
-            sala[
-                "jogadores"
-            ]
-        ):
+        if jogador_id not in sala[
+            "jogadores"
+        ]:
             return
 
-
-        jogador = (
-            sala[
-                "jogadores"
-            ][
-                jogador_id
-            ]
-        )
-
-
-        # O socket que respondeu precisa ser
-        # o socket atualmente associado ao jogador.
-        sid_jogador = (
-            jogador.get(
-                "sid"
-            )
-        )
-
-
-        if (
-            sid_jogador
-            and
-            sid_jogador
-            !=
-            request.sid
-        ):
-            return
-
+        jogador = sala[
+            "jogadores"
+        ][jogador_id]
 
         if not jogador.get(
             "online",
@@ -1071,68 +527,42 @@ def responder(
         ):
             return
 
-
         if jogador.get(
             "respondeu",
             False
         ):
             return
 
-
-        questao = (
-            sala.get(
-                "questao_atual"
-            )
+        questao = sala.get(
+            "questao_atual"
         )
-
 
         if not questao:
             return
 
-
-        inicio = (
-            sala.get(
-                "inicio_questao"
-            )
+        inicio = sala.get(
+            "inicio_questao"
         )
-
 
         if not inicio:
             return
 
-
         tempo_limite = int(
-            sala[
-                "configuracao"
-            ][
-                "tempo"
-            ]
+            sala["configuracao"]["tempo"]
         )
-
 
         decorrido = (
-            time.time()
-            -
-            inicio
+            time.time() - inicio
         )
 
-
-        # Respostas excessivamente atrasadas
-        # não são aceitas.
-        if (
-            decorrido
-            >
-            tempo_limite
-            +
-            TOLERANCIA_RESPOSTA
+        if decorrido > (
+            tempo_limite + 1
         ):
             return
-
 
         jogador[
             "respondeu"
         ] = True
-
 
         sala[
             "respostas_rodada"
@@ -1140,23 +570,17 @@ def responder(
             jogador_id
         )
 
-
         acertou = (
-
             resposta.casefold()
-
             ==
-
             str(
-                questao[
-                    "correta"
-                ]
+                questao["correta"]
             )
             .strip()
             .casefold()
-
         )
 
+        pontos = 0
 
         if acertou:
 
@@ -1164,55 +588,58 @@ def responder(
                 "acertos"
             ] += 1
 
-
             jogador[
                 "sequencia"
             ] += 1
 
-
-            sequencia_atual = (
+            jogador[
+                "maior_sequencia"
+            ] = max(
+                jogador[
+                    "maior_sequencia"
+                ],
                 jogador[
                     "sequencia"
                 ]
             )
 
-
-            jogador[
-                "maior_sequencia"
-            ] = max(
-
-                jogador[
-                    "maior_sequencia"
-                ],
-
-                sequencia_atual
-
+            restante = max(
+                0,
+                tempo_limite
+                -
+                decorrido
             )
 
-
-            # Usa o scoring.py.
-            pontos = (
-                calcular_pontos(
-
-                    acertou=True,
-
-                    tempo_resposta=
-                        decorrido,
-
-                    tempo_limite=
-                        tempo_limite,
-
-                    sequencia=
-                        sequencia_atual
-
+            bonus_tempo = round(
+                (
+                    restante
+                    /
+                    tempo_limite
                 )
+                *
+                500
             )
 
+            bonus_sequencia = min(
+                jogador[
+                    "sequencia"
+                ]
+                *
+                25,
+                200
+            )
+
+            pontos = (
+                500
+                +
+                bonus_tempo
+                +
+                bonus_sequencia
+            )
 
             jogador[
                 "pontos"
             ] += pontos
-
 
         else:
 
@@ -1220,25 +647,12 @@ def responder(
                 "erros"
             ] += 1
 
-
             jogador[
                 "sequencia"
             ] = 0
 
-
-            sequencia_atual = 0
-
-
-            pontos = 0
-
-
-        atualizar_atividade(
-            sala
-        )
-
-
         # ---------------------------------------------
-        # JOGADORES ONLINE
+        # SOMENTE JOGADORES ONLINE CONTAM
         # ---------------------------------------------
 
         online_ids = (
@@ -1247,50 +661,23 @@ def responder(
             )
         )
 
-
         responderam_online = (
-
             sala[
                 "respostas_rodada"
             ]
-
             &
-
             online_ids
-
         )
-
 
         todos_responderam = (
-
-            len(
-                online_ids
-            )
-            >
-            0
-
+            len(online_ids) > 0
             and
-
-            len(
-                responderam_online
-            )
+            len(responderam_online)
             >=
-            len(
-                online_ids
-            )
-
+            len(online_ids)
         )
 
-
-        total_pontos = (
-            jogador[
-                "pontos"
-            ]
-        )
-
-
-    # Apenas o jogador que respondeu recebe
-    # esse retorno.
+    # Resposta somente para quem respondeu.
     emit(
         "resposta_recebida",
         {
@@ -1298,66 +685,34 @@ def responder(
                 acertou,
 
             "pontos":
-                pontos,
-
-            "total_pontos":
-                total_pontos,
-
-            "sequencia":
-                sequencia_atual
+                pontos
         }
     )
 
-
-    # Se todos responderam, não é necessário
-    # aguardar o cronômetro acabar.
     if todos_responderam:
 
         encerrar_rodada(
-            codigo,
-            motivo="todos_responderam"
+            codigo
         )
 
 
 # ============================================================
-# TEMPO ESGOTADO PELO CLIENTE
+# TEMPO ESGOTADO
 # ============================================================
 
-@socketio.on(
-    "tempo_esgotado"
-)
-def tempo_esgotado(
-    dados
-):
-
-    dados = dados or {}
-
+@socketio.on("tempo_esgotado")
+def tempo_esgotado(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
 
-
-    sala = buscar_sala(
-        codigo
-    )
-
+    sala = buscar_sala(codigo)
 
     if not sala:
         return
 
-
-    jogador_id = (
-        obter_jogador_evento(
-            dados
-        )
-    )
-
+    jogador_id = obter_jogador_sessao()
 
     if not jogador_e_host(
         sala,
@@ -1365,51 +720,8 @@ def tempo_esgotado(
     ):
         return
 
-
-    with LOCK:
-
-        inicio = (
-            sala.get(
-                "inicio_questao"
-            )
-        )
-
-
-        if not inicio:
-            return
-
-
-        tempo_limite = int(
-            sala[
-                "configuracao"
-            ][
-                "tempo"
-            ]
-        )
-
-
-        decorrido = (
-            time.time()
-            -
-            inicio
-        )
-
-
-    # Impede que o host finalize
-    # a rodada antes da hora.
-    if (
-        decorrido
-        <
-        tempo_limite
-        -
-        0.3
-    ):
-        return
-
-
     encerrar_rodada(
-        codigo,
-        motivo="tempo"
+        codigo
     )
 
 
@@ -1417,149 +729,63 @@ def tempo_esgotado(
 # ENCERRAR RODADA
 # ============================================================
 
-def encerrar_rodada(
-    codigo,
-    motivo="normal"
-):
+def encerrar_rodada(codigo):
 
     sala = buscar_sala(
         codigo
     )
 
-
     if not sala:
         return
 
-
     with LOCK:
 
-        if (
-            sala.get(
-                "estado"
-            )
-            !=
-            "jogando"
-        ):
+        if sala[
+            "estado"
+        ] != "jogando":
             return
 
-
-        questao = (
-            sala.get(
-                "questao_atual"
-            )
+        questao = sala.get(
+            "questao_atual"
         )
 
-
-        # Se já foi limpa, outra chamada já
-        # encerrou essa rodada.
+        # Evita encerrar duas vezes.
         if not questao:
             return
 
+        correta = questao[
+            "correta"
+        ]
 
-        correta = (
-            questao[
-                "correta"
-            ]
-        )
-
-
-        # =============================================
-        # JOGADORES QUE NÃO RESPONDERAM
-        # =============================================
-
-        for jogador in (
-            sala[
-                "jogadores"
-            ].values()
-        ):
-
-            if not jogador.get(
-                "online",
-                False
-            ):
-                continue
-
-
-            if jogador.get(
-                "respondeu",
-                False
-            ):
-                continue
-
-
-            jogador[
-                "respondeu"
-            ] = True
-
-
-            jogador[
-                "erros"
-            ] += 1
-
-
-            jogador[
-                "sequencia"
-            ] = 0
-
-
-        # =============================================
-        # LIMPA QUESTÃO ANTES DE EMITIR
-        # =============================================
-
+        # IMPORTANTE:
+        # limpa antes de emitir para impedir
+        # duplo encerramento.
         sala[
             "questao_atual"
         ] = None
-
 
         sala[
             "inicio_questao"
         ] = None
 
-
         sala[
             "rodada"
         ] += 1
 
-
-        classificacao = (
-            ranking(
-                codigo
-            )
+        classificacao = ranking(
+            codigo
         )
-
 
         terminou = (
-
-            sala[
-                "rodada"
-            ]
-
+            sala["rodada"]
             >=
-
-            len(
-                sala[
-                    "questoes"
-                ]
-            )
-
+            len(sala["questoes"])
         )
-
 
         if terminou:
+            sala["estado"] = "finalizado"
 
-            sala[
-                "estado"
-            ] = "finalizado"
-
-
-        atualizar_atividade(
-            sala
-        )
-
-
-    # socketio.emit é usado porque esta função
-    # também pode ser chamada por background task.
-    socketio.emit(
+    emit(
         "rodada_finalizada",
         {
             "correta":
@@ -1569,18 +795,14 @@ def encerrar_rodada(
                 classificacao,
 
             "terminou":
-                terminou,
-
-            "motivo":
-                motivo
+                terminou
         },
         to=codigo
     )
 
-
     if terminou:
 
-        socketio.emit(
+        emit(
             "partida_finalizada",
             {
                 "ranking":
@@ -1594,50 +816,25 @@ def encerrar_rodada(
 # RANKING FINAL
 # ============================================================
 
-@socketio.on(
-    "pedir_ranking"
-)
-def pedir_ranking(
-    dados
-):
-
-    dados = dados or {}
-
+@socketio.on("pedir_ranking")
+def pedir_ranking(dados):
 
     codigo = str(
-        dados.get(
-            "codigo",
-            ""
-        )
-        or
-        ""
+        dados.get("codigo", "")
     ).strip()
-
 
     sala = buscar_sala(
         codigo
     )
 
-
     if not sala:
-
-        emit(
-            "ranking_final",
-            {
-                "ranking": []
-            }
-        )
-
         return
-
 
     emit(
         "ranking_final",
         {
             "ranking":
-                ranking(
-                    codigo
-                )
+                ranking(codigo)
         }
     )
 
@@ -1646,15 +843,12 @@ def pedir_ranking(
 # DESCONECTOU
 # ============================================================
 
-@socketio.on(
-    "disconnect"
-)
+@socketio.on("disconnect")
 def desconectou():
 
     sid = request.sid
 
     salas_afetadas = []
-
 
     with LOCK:
 
@@ -1662,63 +856,32 @@ def desconectou():
             SALAS.items()
         ):
 
-            encontrou = False
+            for jogador in sala[
+                "jogadores"
+            ].values():
 
-
-            for jogador in (
-                sala[
-                    "jogadores"
-                ].values()
-            ):
-
-                # Só marca offline se o SID ainda
-                # pertence a essa conexão.
-                if (
-                    jogador.get(
-                        "sid"
-                    )
-                    ==
-                    sid
-                ):
+                if jogador.get(
+                    "sid"
+                ) == sid:
 
                     jogador[
                         "online"
                     ] = False
 
-
                     jogador[
                         "sid"
                     ] = None
-
-
-                    atualizar_atividade(
-                        sala
-                    )
-
 
                     salas_afetadas.append(
                         codigo
                     )
 
-
-                    encontrou = True
-
                     break
 
+    # Emit fora do LOCK.
+    for codigo in salas_afetadas:
 
-            if encontrou:
-                continue
-
-
-    # =============================================
-    # AVISA OS OUTROS JOGADORES
-    # =============================================
-
-    for codigo in (
-        salas_afetadas
-    ):
-
-        socketio.emit(
+        emit(
             "jogadores_atualizados",
             {
                 "jogadores":
@@ -1729,81 +892,44 @@ def desconectou():
             to=codigo
         )
 
-
         sala = buscar_sala(
             codigo
         )
 
-
-        if not sala:
-            continue
-
-
         if (
-            sala.get(
-                "estado"
-            )
-            !=
-            "jogando"
+            sala
+            and
+            sala["estado"] == "jogando"
+            and
+            sala.get("questao_atual")
         ):
-            continue
 
+            with LOCK:
 
-        if not sala.get(
-            "questao_atual"
-        ):
-            continue
-
-
-        todos_responderam = False
-
-
-        with LOCK:
-
-            online_ids = (
-                ids_jogadores_online(
-                    sala
+                online_ids = (
+                    ids_jogadores_online(
+                        sala
+                    )
                 )
-            )
 
-
-            responderam = (
-
-                sala[
-                    "respostas_rodada"
-                ]
-
-                &
-
-                online_ids
-
-            )
-
-
-            todos_responderam = (
-
-                len(
-                    online_ids
-                )
-                >
-                0
-
-                and
-
-                len(
-                    responderam
-                )
-                >=
-                len(
+                responderam = (
+                    sala[
+                        "respostas_rodada"
+                    ]
+                    &
                     online_ids
                 )
 
-            )
+                todos_responderam = (
+                    len(online_ids) > 0
+                    and
+                    len(responderam)
+                    >=
+                    len(online_ids)
+                )
 
+            if todos_responderam:
 
-        if todos_responderam:
-
-            encerrar_rodada(
-                codigo,
-                motivo="desconexao"
-            )
+                encerrar_rodada(
+                    codigo
+                )

@@ -6670,7 +6670,7 @@ def gerar_questao(
                             "quadrado",
 
                         "texto":
-                            "o",
+                            "",
 
                         "imagem":
                             IMAGENS_REAIS[
@@ -6989,7 +6989,7 @@ def gerar_questao(
                             "cone",
 
                         "texto":
-                            "Cone",
+                            "",
 
                         "imagem":
                             IMAGENS_REAIS[

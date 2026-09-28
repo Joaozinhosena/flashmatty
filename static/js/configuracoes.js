@@ -1188,7 +1188,7 @@ document.addEventListener(
 
 
         console.log(
-            "🎨 Tema:",
+            " Tema:",
             obterTemaAtual()
         );
 

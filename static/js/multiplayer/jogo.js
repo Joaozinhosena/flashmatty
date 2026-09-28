@@ -2,9 +2,6 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        "use strict";
-
-
         // ====================================================
         // ELEMENTO PRINCIPAL
         // ====================================================
@@ -14,84 +11,8 @@ document.addEventListener(
                 "multiplayerGame"
             );
 
-
         if (!jogo) {
-
-            console.warn(
-                "[MULTIPLAYER] #multiplayerGame não encontrado."
-            );
-
             return;
-        }
-
-
-        // ====================================================
-        // HELPERS
-        // ====================================================
-
-        function pegarElemento(id) {
-
-            return document.getElementById(
-                id
-            );
-        }
-
-
-        function converterBoolean(valor) {
-
-            const convertido =
-                String(
-                    valor ?? ""
-                )
-                .trim()
-                .toLowerCase();
-
-
-            return [
-                "true",
-                "1",
-                "sim",
-                "yes"
-            ].includes(
-                convertido
-            );
-        }
-
-
-        function escaparHtml(valor) {
-
-            const elemento =
-                document.createElement(
-                    "div"
-                );
-
-
-            elemento.textContent =
-                valor ?? "";
-
-
-            return elemento.innerHTML;
-        }
-
-
-        function numeroSeguro(
-            valor,
-            padrao = 0
-        ) {
-
-            const numero =
-                Number(
-                    valor
-                );
-
-
-            return Number.isFinite(
-                numero
-            )
-                ?
-                numero
-                :
-                padrao;
         }
 
 
@@ -100,499 +21,1475 @@ document.addEventListener(
         // ====================================================
 
         const codigo =
-            String(
-                jogo.dataset.codigo ||
-                ""
-            )
-            .trim();
-
+            jogo.dataset.codigo || "";
 
         const jogadorId =
-            String(
-                jogo.dataset.jogador ||
-                ""
-            )
-            .trim();
-
+            jogo.dataset.jogador || "";
 
         const host =
-            converterBoolean(
-                jogo.dataset.host
-            );
+            jogo.dataset.host === "true";
 
 
         // ====================================================
-        // DEBUG INICIAL
-        // ====================================================
-
-        console.log(
-            "========================================"
-        );
-
-        console.log(
-            "🎮 FLASHMATTY MULTIPLAYER"
-        );
-
-        console.log(
-            "Código:",
-            codigo
-        );
-
-        console.log(
-            "Jogador:",
-            jogadorId
-        );
-
-        console.log(
-            "Host:",
-            host
-        );
-
-        console.log(
-            "data-host:",
-            jogo.dataset.host
-        );
-
-        console.log(
-            "========================================"
-        );
-
-
-        // ====================================================
-        // VERIFICAÇÃO DE DADOS
-        // ====================================================
-
-        if (!codigo) {
-
-            console.error(
-                "[MULTIPLAYER] Código da sala ausente."
-            );
-
-            return;
-        }
-
-
-        if (!jogadorId) {
-
-            console.error(
-                "[MULTIPLAYER] ID do jogador ausente."
-            );
-
-            return;
-        }
-
-
-        // ====================================================
-        // ELEMENTOS DA PÁGINA
+        // ELEMENTOS
         // ====================================================
 
         const area =
-            pegarElemento(
+            document.getElementById(
                 "areaPergunta"
             );
 
-
         const rodada =
-            pegarElemento(
+            document.getElementById(
                 "rodada"
             );
 
-
         const total =
-            pegarElemento(
+            document.getElementById(
                 "total"
             );
 
-
         const cronometro =
-            pegarElemento(
+            document.getElementById(
                 "cronometro"
             );
 
-
         const barra =
-            pegarElemento(
+            document.getElementById(
                 "tempoBarra"
             );
-
-
-        if (!area) {
-
-            console.error(
-                "[MULTIPLAYER] #areaPergunta não encontrado."
-            );
-
-            return;
-        }
-
-
-        // ====================================================
-        // SOCKET.IO DISPONÍVEL?
-        // ====================================================
-
-        if (
-            typeof window.io !==
-            "function"
-        ) {
-
-            console.error(
-                "[MULTIPLAYER] Socket.IO não foi carregado."
-            );
-
-
-            area.innerHTML = `
-
-                <div
-                    class="
-                        text-center
-                        bg-red-50
-                        border
-                        border-red-200
-                        rounded-3xl
-                        p-8
-                    "
-                >
-
-                    <div class="text-5xl">
-                        ⚠️
-                    </div>
-
-                    <h2
-                        class="
-                            text-2xl
-                            font-black
-                            text-red-700
-                            mt-4
-                        "
-                    >
-                        Falha no multiplayer
-                    </h2>
-
-                    <p
-                        class="
-                            text-red-600
-                            mt-2
-                        "
-                    >
-                        O Socket.IO não foi carregado.
-                    </p>
-
-                </div>
-
-            `;
-
-
-            return;
-        }
 
 
         // ====================================================
         // SOCKET.IO
         // ====================================================
 
-        const socket =
-            window.io(
-                {
-                    transports: [
-                        "websocket",
-                        "polling"
-                    ],
-
-                    reconnection:
-                        true,
-
-                    reconnectionAttempts:
-                        Infinity,
-
-                    reconnectionDelay:
-                        800,
-
-                    reconnectionDelayMax:
-                        4000,
-
-                    timeout:
-                        10000
-                }
-            );
+        const socket = io();
 
 
         // ====================================================
         // ESTADO LOCAL
         // ====================================================
 
-        let timer =
-            null;
+        let timer = null;
 
+        let respondeu = false;
 
-        let respondeu =
-            false;
-
-
-        let rodadaEncerrada =
-            false;
-
+        let rodadaEncerrada = false;
 
         let redirecionando =
             false;
 
 
-        let questaoAtiva =
-            false;
-
-
-        let solicitandoQuestao =
-            false;
-
-
-        let primeiraQuestaoSolicitada =
-            false;
-
-
-        let tempoEsgotadoEnviado =
-            false;
-
-
-        let ultimaRodada =
-            null;
-
-
         // ====================================================
-        // SONS
+        // SEGURANÇA
         // ====================================================
 
-        function tocarSom(nome) {
+        function escaparHtml(valor) {
 
-            try {
-
-                const funcao =
-                    window[
-                        nome
-                    ];
-
-
-                if (
-                    typeof funcao ===
-                    "function"
-                ) {
-
-                    funcao();
-                }
-
-            } catch (erro) {
-
-                console.warn(
-                    `[SOM] Falha em ${nome}:`,
-                    erro
-                );
-            }
-        }
-
-
-        // ====================================================
-        // STATUS DE CONEXÃO
-        // ====================================================
-
-        function obterStatusConexao() {
-
-            let status =
-                document.getElementById(
-                    "statusMultiplayer"
-                );
-
-
-            if (status) {
-
-                return status;
-            }
-
-
-            status =
+            const elemento =
                 document.createElement(
                     "div"
                 );
 
+            elemento.textContent =
+                valor ?? "";
 
-            status.id =
-                "statusMultiplayer";
-
-
-            status.className = `
-                fixed
-                bottom-4
-                right-4
-                z-50
-                rounded-full
-                px-4
-                py-2
-                text-xs
-                font-black
-                shadow-lg
-                transition
-                duration-300
-            `;
+            return elemento.innerHTML;
+        }
 
 
-            document.body.appendChild(
-                status
+
+        // ====================================================
+        // PERSONALIZAÇÃO NO RANKING
+        // ====================================================
+
+        function cosmeticosRanking(
+            jogador
+        ) {
+
+            return (
+                jogador?.cosmeticos
+                &&
+                typeof jogador.cosmeticos
+                ===
+                "object"
+            )
+                ?
+                jogador.cosmeticos
+                :
+                {};
+
+        }
+
+
+        function idRanking(
+            cosmeticos,
+            tipo
+        ) {
+
+            return (
+                cosmeticos?.[tipo]?.id
+                ||
+                ""
             );
 
-
-            return status;
         }
 
 
-        function mostrarStatus(
-            mensagem,
-            tipo = "normal"
+        function classesRankingCard(
+            cardId,
+            fundoId
         ) {
 
-            const status =
-                obterStatusConexao();
+            const cards = {
+
+                card_vidro:
+                    "bg-slate-900/70 backdrop-blur-xl border-slate-500/30",
+
+                card_neon:
+                    "bg-slate-950 border-violet-500 shadow-[0_0_22px_rgba(139,92,246,0.28)]",
+
+                card_ouro:
+                    "bg-gradient-to-r from-amber-950 to-slate-950 border-yellow-400",
+
+                card_galactico:
+                    "bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-950 border-purple-400"
+
+            };
 
 
-            status.textContent =
-                mensagem;
+            const fundos = {
+
+                fundo_ceu_noturno:
+                    "bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950",
+
+                fundo_sunset:
+                    "bg-gradient-to-r from-orange-950 via-rose-900 to-indigo-950",
+
+                fundo_neon:
+                    "bg-gradient-to-r from-cyan-950 via-violet-950 to-fuchsia-950",
+
+                fundo_galaxia:
+                    "bg-gradient-to-r from-slate-950 via-indigo-950 to-purple-950",
+
+                fundo_esmeralda:
+                    "bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950"
+
+            };
 
 
-            status.className = `
-                fixed
-                bottom-4
-                right-4
-                z-50
-                rounded-full
-                px-4
-                py-2
-                text-xs
-                font-black
-                shadow-lg
-                transition
-                duration-300
-            `;
+            return (
+                cards[cardId]
+                ||
+                fundos[fundoId]
+                ||
+                "bg-slate-900 border-slate-700"
+            );
 
-
-            if (
-                tipo ===
-                "online"
-            ) {
-
-                status.classList.add(
-                    "bg-green-600",
-                    "text-white"
-                );
-
-            }
-
-            else if (
-                tipo ===
-                "erro"
-            ) {
-
-                status.classList.add(
-                    "bg-red-600",
-                    "text-white"
-                );
-
-            }
-
-            else {
-
-                status.classList.add(
-                    "bg-slate-800",
-                    "text-white"
-                );
-            }
-
-
-            if (
-                tipo ===
-                "online"
-            ) {
-
-                setTimeout(
-                    () => {
-
-                        if (
-                            status.textContent ===
-                            mensagem
-                        ) {
-
-                            status.style.opacity =
-                                "0";
-
-                        }
-
-                    },
-                    1800
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        status.style.display =
-                            "none";
-
-                    },
-                    2200
-                );
-
-            } else {
-
-                status.style.display =
-                    "block";
-
-                status.style.opacity =
-                    "1";
-            }
         }
 
 
-        // ====================================================
-        // ALTERAR TEXTO COM SEGURANÇA
-        // ====================================================
-
-        function definirTexto(
-            elemento,
-            valor
+        function classesRankingNome(
+            itemId
         ) {
 
-            if (!elemento) {
-                return;
-            }
+            const mapa = {
+
+                nome_ciano:
+                    "text-cyan-300",
+
+                nome_dourado:
+                    "text-yellow-300",
+
+                nome_gradiente:
+                    "bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent",
+
+                nome_esmeralda:
+                    "text-emerald-300",
+
+                nome_lendario:
+                    "bg-gradient-to-r from-yellow-200 via-orange-400 to-fuchsia-400 bg-clip-text text-transparent"
+
+            };
 
 
-            elemento.textContent =
-                valor;
+            return (
+                mapa[itemId]
+                ||
+                "text-white"
+            );
+
+        }
+
+
+        function classesRankingMoldura(
+            itemId
+        ) {
+
+            const mapa = {
+
+                moldura_indigo:
+                    "ring-2 ring-indigo-400",
+
+                moldura_fogo:
+                    "ring-2 ring-orange-400",
+
+                moldura_gelo:
+                    "ring-2 ring-cyan-300",
+
+                moldura_ouro:
+                    "ring-2 ring-yellow-400",
+
+                moldura_arco_iris:
+                    "ring-2 ring-fuchsia-400"
+
+            };
+
+
+            return (
+                mapa[itemId]
+                ||
+                "ring-1 ring-slate-500"
+            );
+
         }
 
 
         // ====================================================
-        // BARRA DO TEMPO
+        // CONECTOU
         // ====================================================
 
-        function definirBarra(
-            porcentagem
-        ) {
+        socket.on(
+            "connect",
+            () => {
 
-            if (!barra) {
-                return;
+                console.log(
+                    "Conectado ao multiplayer:",
+                    socket.id
+                );
+
+
+                // Entra novamente na room Socket.IO.
+                socket.emit(
+                    "entrar_socket",
+                    {
+                        codigo: codigo,
+                        jogador_id: jogadorId
+                    }
+                );
+
+
+                /*
+                Somente o host solicita a primeira
+                questão.
+
+                O servidor impede duplicação caso
+                já exista uma questão ativa.
+                */
+
+                if (host) {
+
+                    setTimeout(
+                        () => {
+
+                            if (
+                                socket.connected
+                                &&
+                                !rodadaEncerrada
+                            ) {
+
+                                socket.emit(
+                                    "proxima_questao",
+                                    {
+                                        codigo:
+                                            codigo,
+
+                                        jogador_id:
+                                            jogadorId
+                                    }
+                                );
+
+                            }
+
+                        },
+                        1500
+                    );
+
+                }
+
             }
+        );
 
 
-            const valor =
-                Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        numeroSeguro(
-                            porcentagem
-                        )
+        // ====================================================
+        // ERRO DE CONEXÃO
+        // ====================================================
+
+        socket.on(
+            "connect_error",
+            erro => {
+
+                console.error(
+                    "Erro Socket.IO:",
+                    erro
+                );
+
+            }
+        );
+
+
+        // ====================================================
+        // NOVA QUESTÃO
+        // ====================================================
+
+        socket.on(
+            "nova_questao",
+            dados => {
+
+                if (!dados) {
+                    return;
+                }
+
+
+                respondeu =
+                    false;
+
+                rodadaEncerrada =
+                    false;
+
+
+                rodada.textContent =
+                    dados.rodada ?? "-";
+
+                total.textContent =
+                    dados.total ?? "-";
+
+
+                // ============================================
+                // DADOS DO MODO ESPECIAL
+                // ============================================
+
+                const modo =
+                    dados.modo ||
+                    "classico";
+
+                const modoNome =
+                    dados.modo_nome ||
+                    "Clássico";
+
+                const modoIcone =
+                    dados.modo_icone ||
+                    "🎮";
+
+                const efeito =
+                    dados.efeito || "";
+
+                const multiplicador =
+                    Number(
+                        dados.multiplicador ||
+                        1
+                    );
+
+
+                let avisoModo = "";
+
+
+                // Não precisa ocupar muito espaço
+                // no modo clássico.
+                if (
+                    modo !== "classico"
+                    ||
+                    efeito
+                ) {
+
+                    avisoModo = `
+                        <div
+                            class="
+                                max-w-xl
+                                mx-auto
+                                mb-7
+                                bg-indigo-50
+                                border
+                                border-indigo-100
+                                rounded-2xl
+                                p-4
+                                text-center
+                            "
+                        >
+
+                            <div
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-indigo-700
+                                "
+                            >
+                                ${escaparHtml(modoIcone)}
+                                ${escaparHtml(modoNome)}
+                            </div>
+
+                            ${
+                                efeito
+                                ?
+                                `
+                                <p
+                                    class="
+                                        text-sm
+                                        text-indigo-600
+                                        mt-1
+                                    "
+                                >
+                                    ${escaparHtml(efeito)}
+                                </p>
+                                `
+                                :
+                                ""
+                            }
+
+                            ${
+                                multiplicador > 1
+                                ?
+                                `
+                                <div
+                                    class="
+                                        inline-flex
+                                        mt-2
+                                        px-3
+                                        py-1
+                                        rounded-full
+                                        bg-indigo-600
+                                        text-white
+                                        text-xs
+                                        font-black
+                                    "
+                                >
+                                    ${multiplicador}x PONTOS
+                                </div>
+                                `
+                                :
+                                ""
+                            }
+
+                        </div>
+                    `;
+
+                }
+
+
+                // ============================================
+                // PERGUNTA
+                // ============================================
+
+                area.innerHTML = `
+
+                    ${avisoModo}
+
+                    <h1
+                        class="
+                            text-2xl
+                            md:text-4xl
+                            font-black
+                            text-center
+                            text-slate-900
+                            leading-tight
+                            px-2
+                        "
+                    >
+                        ${escaparHtml(
+                            dados.pergunta
+                        )}
+                    </h1>
+
+
+                    <div
+                        id="alternativas"
+                        class="
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-2
+                            gap-4
+                            mt-10
+                        "
+                    >
+                    </div>
+
+                `;
+
+
+                const container =
+                    document.getElementById(
+                        "alternativas"
+                    );
+
+
+                if (
+                    !container
+                    ||
+                    !Array.isArray(
+                        dados.alternativas
+                    )
+                ) {
+                    return;
+                }
+
+
+                // ============================================
+                // ALTERNATIVAS
+                // ============================================
+
+                const simbolos = [
+                    "▲",
+                    "◆",
+                    "●",
+                    "■"
+                ];
+
+
+                dados.alternativas.forEach(
+                    (
+                        alternativa,
+                        indice
+                    ) => {
+
+                        const botao =
+                            document.createElement(
+                                "button"
+                            );
+
+
+                        botao.type =
+                            "button";
+
+
+                        botao.className = `
+                            min-h-28
+                            border-2
+                            border-slate-200
+                            rounded-3xl
+                            p-5
+                            text-xl
+                            md:text-2xl
+                            font-black
+                            bg-white
+                            text-slate-900
+                            shadow-sm
+                            transition
+                            duration-200
+                            hover:border-indigo-500
+                            hover:bg-indigo-50
+                            hover:-translate-y-1
+                            disabled:cursor-not-allowed
+                            disabled:opacity-70
+                        `;
+
+
+                        botao.textContent =
+                            `${simbolos[indice] || "●"} ${alternativa}`;
+
+
+                        botao.addEventListener(
+                            "click",
+                            () => {
+
+                                if (
+                                    respondeu
+                                    ||
+                                    rodadaEncerrada
+                                ) {
+                                    return;
+                                }
+
+
+                                respondeu =
+                                    true;
+
+
+                                // Desativa todas.
+                                const botoes =
+                                    container
+                                    .querySelectorAll(
+                                        "button"
+                                    );
+
+
+                                botoes.forEach(
+                                    b => {
+
+                                        b.disabled =
+                                            true;
+
+                                    }
+                                );
+
+
+                                // Marca a selecionada.
+                                botao.classList.add(
+                                    "border-indigo-600",
+                                    "bg-indigo-50"
+                                );
+
+
+                                socket.emit(
+                                    "responder",
+                                    {
+                                        codigo:
+                                            codigo,
+
+                                        jogador_id:
+                                            jogadorId,
+
+                                        resposta:
+                                            String(
+                                                alternativa
+                                            )
+                                    }
+                                );
+
+                            }
+                        );
+
+
+                        container.appendChild(
+                            botao
+                        );
+
+                    }
+                );
+
+
+                // ============================================
+                // CRONÔMETRO
+                // ============================================
+
+                iniciarTimer(
+                    Number(
+                        dados.tempo || 20
                     )
                 );
 
+            }
+        );
 
-            barra.style.width =
-                `${valor}%`;
+
+        // ====================================================
+        // RESPOSTA RECEBIDA
+        // ====================================================
+
+        socket.on(
+            "resposta_recebida",
+            dados => {
+
+                if (!dados) {
+                    return;
+                }
+
+
+                // Evita mensagens duplicadas.
+                const anterior =
+                    document.getElementById(
+                        "feedbackResposta"
+                    );
+
+                if (anterior) {
+                    anterior.remove();
+                }
+
+
+                const feedback =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                feedback.id =
+                    "feedbackResposta";
+
+
+                // ============================================
+                // ACERTO
+                // ============================================
+
+                if (dados.correto) {
+
+                    feedback.className = `
+                        mt-6
+                        text-center
+                        bg-green-100
+                        border
+                        border-green-200
+                        text-green-700
+                        rounded-2xl
+                        p-4
+                        font-black
+                    `;
+
+
+                    const pontos =
+                        Number(
+                            dados.pontos || 0
+                        );
+
+
+                    const totalPontos =
+                        Number(
+                            dados.total_pontos || 0
+                        );
+
+
+                    const sequencia =
+                        Number(
+                            dados.sequencia || 0
+                        );
+
+
+                    feedback.innerHTML = `
+
+                        <div
+                            class="
+                                text-xl
+                                md:text-2xl
+                            "
+                        >
+                            ✓ Correto!
+                        </div>
+
+                        <div
+                            class="
+                                text-2xl
+                                md:text-3xl
+                                mt-2
+                            "
+                        >
+                            +${pontos} pontos
+                        </div>
+
+                        ${
+                            sequencia > 1
+                            ?
+                            `
+                            <div
+                                class="
+                                    mt-2
+                                    text-sm
+                                    text-orange-600
+                                "
+                            >
+                                🔥 ${sequencia}
+                                acertos seguidos
+                            </div>
+                            `
+                            :
+                            ""
+                        }
+
+                        ${
+                            totalPontos > 0
+                            ?
+                            `
+                            <div
+                                class="
+                                    mt-2
+                                    text-xs
+                                    text-green-600
+                                "
+                            >
+                                Total:
+                                ${totalPontos}
+                                pontos
+                            </div>
+                            `
+                            :
+                            ""
+                        }
+
+                    `;
+
+                }
+
+
+                // ============================================
+                // ERRO
+                // ============================================
+
+                else {
+
+                    feedback.className = `
+                        mt-6
+                        text-center
+                        bg-red-100
+                        border
+                        border-red-200
+                        text-red-600
+                        rounded-2xl
+                        p-4
+                        font-black
+                    `;
+
+
+                    const pontos =
+                        Number(
+                            dados.pontos || 0
+                        );
+
+
+                    let penalidade = "";
+
+
+                    // Dobro ou Nada pode retornar
+                    // pontuação negativa.
+                    if (pontos < 0) {
+
+                        penalidade = `
+                            <div
+                                class="
+                                    mt-2
+                                    text-xl
+                                "
+                            >
+                                ${pontos} pontos
+                            </div>
+                        `;
+
+                    }
+
+
+                    feedback.innerHTML = `
+                        <div class="text-xl">
+                            ✕ Resposta incorreta
+                        </div>
+
+                        ${penalidade}
+                    `;
+
+                }
+
+
+                area.appendChild(
+                    feedback
+                );
+
+            }
+        );
+
+
+        // ====================================================
+        // RODADA FINALIZADA
+        // ====================================================
+
+        socket.on(
+            "rodada_finalizada",
+            dados => {
+
+                if (!dados) {
+                    return;
+                }
+
+
+                rodadaEncerrada =
+                    true;
+
+
+                respondeu =
+                    true;
+
+
+                pararTimer();
+
+
+                cronometro.textContent =
+                    "⏱️ 0";
+
+
+                barra.style.width =
+                    "0%";
+
+
+                const ranking =
+                    Array.isArray(
+                        dados.ranking
+                    )
+                    ?
+                    dados.ranking
+                    :
+                    [];
+
+
+                let rankingHtml =
+                    "";
+
+
+                ranking
+                    .slice(
+                        0,
+                        5
+                    )
+                    .forEach(
+                        jogador => {
+
+                            let medalha =
+                                `${jogador.posicao}º`;
+
+
+                            if (
+                                Number(
+                                    jogador.posicao
+                                )
+                                ===
+                                1
+                            ) {
+
+                                medalha =
+                                    "🥇";
+
+                            }
+
+                            else if (
+                                Number(
+                                    jogador.posicao
+                                )
+                                ===
+                                2
+                            ) {
+
+                                medalha =
+                                    "🥈";
+
+                            }
+
+                            else if (
+                                Number(
+                                    jogador.posicao
+                                )
+                                ===
+                                3
+                            ) {
+
+                                medalha =
+                                    "🥉";
+
+                            }
+
+
+                            const cosmeticos =
+                                cosmeticosRanking(
+                                    jogador
+                                );
+
+
+                            const titulo =
+                                cosmeticos?.titulo;
+
+
+                            const badge =
+                                cosmeticos?.badge;
+
+
+                            const usuarioId =
+                                Number(
+                                    jogador.usuario_id
+                                );
+
+
+                            const avatarUrl =
+                                (
+                                    Number.isFinite(
+                                        usuarioId
+                                    )
+                                    &&
+                                    usuarioId > 0
+                                )
+                                ?
+                                `/social/foto/${usuarioId}`
+                                :
+                                "";
+
+
+                            const cardClasses =
+                                classesRankingCard(
+                                    idRanking(
+                                        cosmeticos,
+                                        "card"
+                                    ),
+                                    idRanking(
+                                        cosmeticos,
+                                        "fundo"
+                                    )
+                                );
+
+
+                            const nomeClasses =
+                                classesRankingNome(
+                                    idRanking(
+                                        cosmeticos,
+                                        "nome"
+                                    )
+                                );
+
+
+                            const molduraClasses =
+                                classesRankingMoldura(
+                                    idRanking(
+                                        cosmeticos,
+                                        "moldura"
+                                    )
+                                );
+
+
+                            rankingHtml += `
+
+                                <div
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-4
+                                        border
+                                        rounded-2xl
+                                        p-4
+                                        ${cardClasses}
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            flex
+                                            items-center
+                                            gap-3
+                                            min-w-0
+                                        "
+                                    >
+
+                                        <span
+                                            class="
+                                                text-2xl
+                                                shrink-0
+                                            "
+                                        >
+                                            ${medalha}
+                                        </span>
+
+
+                                        ${
+                                            avatarUrl
+                                            ?
+                                            `
+                                            <div
+                                                class="
+                                                    relative
+                                                    shrink-0
+                                                    w-11
+                                                    h-11
+                                                    rounded-full
+                                                    ${molduraClasses}
+                                                "
+                                            >
+                                                <img
+                                                    src="${avatarUrl}"
+                                                    alt=""
+                                                    class="
+                                                        w-full
+                                                        h-full
+                                                        rounded-full
+                                                        object-cover
+                                                        bg-slate-800
+                                                    "
+                                                >
+
+                                                ${
+                                                    badge?.valor?.simbolo
+                                                    ?
+                                                    `
+                                                    <span
+                                                        class="
+                                                            absolute
+                                                            -right-2
+                                                            -bottom-1
+                                                            text-sm
+                                                        "
+                                                    >
+                                                        ${escaparHtml(
+                                                            badge.valor.simbolo
+                                                        )}
+                                                    </span>
+                                                    `
+                                                    :
+                                                    ""
+                                                }
+                                            </div>
+                                            `
+                                            :
+                                            ""
+                                        }
+
+
+                                        <div class="min-w-0">
+
+                                            <div
+                                                class="
+                                                    font-black
+                                                    truncate
+                                                    ${nomeClasses}
+                                                "
+                                            >
+                                                ${escaparHtml(
+                                                    jogador.nome
+                                                    ||
+                                                    "Jogador"
+                                                )}
+                                            </div>
+
+
+                                            ${
+                                                titulo?.valor?.texto
+                                                ?
+                                                `
+                                                <div
+                                                    class="
+                                                        text-[11px]
+                                                        text-slate-300
+                                                        font-bold
+                                                        truncate
+                                                    "
+                                                >
+                                                    ${escaparHtml(
+                                                        titulo.icone
+                                                        ||
+                                                        "✨"
+                                                    )}
+                                                    ${escaparHtml(
+                                                        titulo.valor.texto
+                                                    )}
+                                                </div>
+                                                `
+                                                :
+                                                ""
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <strong
+                                        class="
+                                            text-indigo-300
+                                            shrink-0
+                                        "
+                                    >
+                                        ${
+                                            Number(
+                                                jogador.pontos
+                                            )
+                                            ||
+                                            0
+                                        }
+                                    </strong>
+
+                                </div>
+
+                            `;
+
+                        }
+                    );
+
+
+                // ============================================
+                // MOTIVO DO FIM
+                // ============================================
+
+                let mensagemFim =
+                    "";
+
+
+                if (
+                    dados.motivo === "tempo"
+                ) {
+
+                    mensagemFim = `
+                        <p
+                            class="
+                                text-orange-500
+                                font-bold
+                                mt-2
+                            "
+                        >
+                            ⏱️ Tempo esgotado
+                        </p>
+                    `;
+
+                }
+
+
+                // ============================================
+                // RANKING
+                // ============================================
+
+                area.innerHTML = `
+
+                    <div class="text-center">
+
+                        <div class="text-5xl">
+                            🏆
+                        </div>
+
+                        <h2
+                            class="
+                                text-3xl
+                                font-black
+                                text-slate-900
+                                mt-3
+                            "
+                        >
+                            Ranking
+                        </h2>
+
+
+                        ${mensagemFim}
+
+
+                        <p
+                            class="
+                                text-slate-500
+                                mt-3
+                            "
+                        >
+                            Resposta correta:
+
+                            <strong
+                                class="
+                                    text-green-600
+                                "
+                            >
+                                ${escaparHtml(
+                                    dados.correta
+                                )}
+                            </strong>
+
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            space-y-2
+                            mt-7
+                        "
+                    >
+                        ${rankingHtml}
+                    </div>
+
+                `;
+
+
+                // ============================================
+                // HOST
+                // ============================================
+
+                if (host) {
+
+                    const proximo =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    proximo.type =
+                        "button";
+
+
+                    proximo.className = `
+                        w-full
+                        bg-indigo-600
+                        hover:bg-indigo-700
+                        active:scale-[0.99]
+                        text-white
+                        rounded-2xl
+                        p-4
+                        text-lg
+                        font-black
+                        mt-7
+                        shadow-lg
+                        transition
+                    `;
+
+
+                    proximo.textContent =
+                        dados.terminou
+                            ?
+                            "Ver pódio 🏆"
+                            :
+                            "Próxima rodada →";
+
+
+                    proximo.addEventListener(
+                        "click",
+                        () => {
+
+                            proximo.disabled =
+                                true;
+
+
+                            if (
+                                dados.terminou
+                            ) {
+
+                                irResultado();
+
+                                return;
+                            }
+
+
+                            proximo.textContent =
+                                "Carregando...";
+
+
+                            socket.emit(
+                                "proxima_questao",
+                                {
+                                    codigo:
+                                        codigo,
+
+                                    jogador_id:
+                                        jogadorId
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    area.appendChild(
+                        proximo
+                    );
+
+                }
+
+
+                // ============================================
+                // OUTROS JOGADORES
+                // ============================================
+
+                else {
+
+                    const espera =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    espera.className = `
+                        text-center
+                        text-slate-500
+                        font-bold
+                        mt-7
+                    `;
+
+
+                    espera.textContent =
+                        dados.terminou
+                            ?
+                            "Preparando o pódio..."
+                            :
+                            "⏳ Aguardando o anfitrião...";
+
+
+                    area.appendChild(
+                        espera
+                    );
+
+
+                    if (
+                        dados.terminou
+                    ) {
+
+                        setTimeout(
+                            irResultado,
+                            1500
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        // ====================================================
+        // PARTIDA FINALIZADA
+        // ====================================================
+
+        socket.on(
+            "partida_finalizada",
+            () => {
+
+                /*
+                Pequeno atraso para o jogador enxergar
+                a finalização antes do pódio.
+                */
+
+                setTimeout(
+                    irResultado,
+                    900
+                );
+
+            }
+        );
+
+
+        // ====================================================
+        // ERRO DA SALA
+        // ====================================================
+
+        socket.on(
+            "erro_sala",
+            dados => {
+
+                const mensagem =
+                    dados?.mensagem ||
+                    "Ocorreu um erro na partida.";
+
+
+                console.error(
+                    mensagem
+                );
+
+
+                alert(
+                    mensagem
+                );
+
+            }
+        );
+
+
+        // ====================================================
+        // IR PARA RESULTADO
+        // ====================================================
+
+        function irResultado() {
+
+            if (redirecionando) {
+                return;
+            }
+
+
+            redirecionando =
+                true;
+
+
+            pararTimer();
+
+
+            window.location.href =
+                `/multiplayer/resultado/${
+                    encodeURIComponent(
+                        codigo
+                    )
+                }`;
+
         }
 
 
@@ -625,1718 +1522,26 @@ document.addEventListener(
 
                     }
                 );
+
         }
 
 
         // ====================================================
-        // PARAR CRONÔMETRO
+        // PARAR TIMER
         // ====================================================
 
         function pararTimer() {
 
-            if (
-                timer !==
-                null
-            ) {
+            if (timer) {
 
                 clearInterval(
                     timer
                 );
 
-
                 timer =
                     null;
-            }
-        }
-
-
-        // ====================================================
-        // ENTRAR NA SALA SOCKET
-        // ====================================================
-
-        function entrarNaSalaSocket() {
-
-            if (
-                !socket.connected
-            ) {
-
-                return;
-            }
-
-
-            console.log(
-                "[MULTIPLAYER] Entrando na sala:",
-                codigo,
-                jogadorId
-            );
-
-
-            socket.emit(
-                "entrar_socket",
-                {
-                    codigo:
-                        codigo,
-
-                    jogador_id:
-                        jogadorId
-                }
-            );
-        }
-
-
-        // ====================================================
-        // SOLICITAR PRÓXIMA QUESTÃO
-        // ====================================================
-
-        function solicitarProximaQuestao() {
-
-            if (!host) {
-
-                console.warn(
-                    "[MULTIPLAYER] Apenas o host pode solicitar questão."
-                );
-
-                return;
-            }
-
-
-            if (
-                !socket.connected
-            ) {
-
-                console.warn(
-                    "[MULTIPLAYER] Socket desconectado."
-                );
-
-                mostrarStatus(
-                    "Reconectando...",
-                    "erro"
-                );
-
-                return;
-            }
-
-
-            if (
-                solicitandoQuestao
-            ) {
-
-                console.log(
-                    "[MULTIPLAYER] Já existe uma solicitação de questão."
-                );
-
-                return;
-            }
-
-
-            solicitandoQuestao =
-                true;
-
-
-            console.log(
-                "[MULTIPLAYER] Solicitando próxima questão."
-            );
-
-
-            socket.emit(
-                "proxima_questao",
-                {
-                    codigo:
-                        codigo,
-
-                    jogador_id:
-                        jogadorId
-                }
-            );
-
-
-            /*
-            Se o servidor não responder,
-            permitimos nova tentativa.
-            */
-
-            setTimeout(
-                () => {
-
-                    if (
-                        solicitandoQuestao
-                        &&
-                        !questaoAtiva
-                    ) {
-
-                        console.warn(
-                            "[MULTIPLAYER] Servidor não retornou questão."
-                        );
-
-
-                        solicitandoQuestao =
-                            false;
-                    }
-
-                },
-                6000
-            );
-        }
-
-
-        // ====================================================
-        // SOCKET CONECTADO
-        // ====================================================
-
-        socket.on(
-            "connect",
-            () => {
-
-                console.log(
-                    "[MULTIPLAYER] Socket conectado:",
-                    socket.id
-                );
-
-
-                mostrarStatus(
-                    "● Conectado",
-                    "online"
-                );
-
-
-                entrarNaSalaSocket();
-
-
-                /*
-                O host solicita a primeira pergunta.
-
-                Pequeno atraso garante que o evento
-                entrar_socket chegue antes.
-                */
-
-                if (
-                    host
-                    &&
-                    !questaoAtiva
-                    &&
-                    !primeiraQuestaoSolicitada
-                ) {
-
-                    primeiraQuestaoSolicitada =
-                        true;
-
-
-                    setTimeout(
-                        () => {
-
-                            if (
-                                socket.connected
-                                &&
-                                !questaoAtiva
-                                &&
-                                !rodadaEncerrada
-                            ) {
-
-                                console.log(
-                                    "[MULTIPLAYER] Host solicitando primeira questão."
-                                );
-
-
-                                solicitarProximaQuestao();
-                            }
-
-                        },
-                        1000
-                    );
-                }
 
             }
-        );
-
-
-        // ====================================================
-        // DESCONECTADO
-        // ====================================================
-
-        socket.on(
-            "disconnect",
-            motivo => {
-
-                console.warn(
-                    "[MULTIPLAYER] Socket desconectado:",
-                    motivo
-                );
-
-
-                mostrarStatus(
-                    "● Reconectando...",
-                    "erro"
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // ERRO DE CONEXÃO
-        // ====================================================
-
-        socket.on(
-            "connect_error",
-            erro => {
-
-                console.error(
-                    "[MULTIPLAYER] Erro Socket.IO:",
-                    erro
-                );
-
-
-                mostrarStatus(
-                    "Falha de conexão",
-                    "erro"
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // RECONEXÃO
-        // ====================================================
-
-        if (
-            socket.io
-        ) {
-
-            socket.io.on(
-                "reconnect_attempt",
-                tentativa => {
-
-                    console.log(
-                        "[MULTIPLAYER] Tentando reconectar:",
-                        tentativa
-                    );
-
-
-                    mostrarStatus(
-                        "Reconectando...",
-                        "erro"
-                    );
-
-                }
-            );
-
-
-            socket.io.on(
-                "reconnect",
-                tentativa => {
-
-                    console.log(
-                        "[MULTIPLAYER] Reconectado após",
-                        tentativa,
-                        "tentativas."
-                    );
-
-                }
-            );
-        }
-
-
-        // ====================================================
-        // NOVA QUESTÃO
-        // ====================================================
-
-        socket.on(
-            "nova_questao",
-            dados => {
-
-                console.log(
-                    "[MULTIPLAYER] Nova questão:",
-                    dados
-                );
-
-
-                if (!dados) {
-
-                    return;
-                }
-
-
-                pararTimer();
-
-
-                solicitandoQuestao =
-                    false;
-
-
-                questaoAtiva =
-                    true;
-
-
-                respondeu =
-                    false;
-
-
-                rodadaEncerrada =
-                    false;
-
-
-                tempoEsgotadoEnviado =
-                    false;
-
-
-                ultimaRodada =
-                    dados.rodada ??
-                    ultimaRodada;
-
-
-                definirTexto(
-                    rodada,
-                    dados.rodada ??
-                    "-"
-                );
-
-
-                definirTexto(
-                    total,
-                    dados.total ??
-                    "-"
-                );
-
-
-                // ============================================
-                // DADOS DO MODO
-                // ============================================
-
-                const modo =
-                    dados.modo ||
-                    "classico";
-
-
-                const modoNome =
-                    dados.modo_nome ||
-                    "Clássico";
-
-
-                const modoIcone =
-                    dados.modo_icone ||
-                    "🎮";
-
-
-                const efeito =
-                    dados.efeito ||
-                    "";
-
-
-                const multiplicador =
-                    numeroSeguro(
-                        dados.multiplicador,
-                        1
-                    );
-
-
-                let avisoModo =
-                    "";
-
-
-                if (
-                    modo !==
-                    "classico"
-                    ||
-                    efeito
-                    ||
-                    multiplicador > 1
-                ) {
-
-                    avisoModo = `
-
-                        <div
-                            class="
-                                max-w-xl
-                                mx-auto
-                                mb-7
-
-                                bg-indigo-50
-
-                                border
-                                border-indigo-100
-
-                                rounded-2xl
-
-                                p-4
-                                text-center
-                            "
-                        >
-
-                            <div
-                                class="
-                                    text-sm
-                                    font-black
-                                    text-indigo-700
-                                "
-                            >
-                                ${escaparHtml(modoIcone)}
-                                ${escaparHtml(modoNome)}
-                            </div>
-
-
-                            ${
-                                efeito
-                                    ?
-                                    `
-                                    <p
-                                        class="
-                                            text-sm
-                                            text-indigo-600
-                                            mt-1
-                                        "
-                                    >
-                                        ${escaparHtml(efeito)}
-                                    </p>
-                                    `
-                                    :
-                                    ""
-                            }
-
-
-                            ${
-                                multiplicador > 1
-                                    ?
-                                    `
-                                    <div
-                                        class="
-                                            inline-flex
-
-                                            mt-3
-
-                                            px-3
-                                            py-1
-
-                                            rounded-full
-
-                                            bg-indigo-600
-                                            text-white
-
-                                            text-xs
-                                            font-black
-                                        "
-                                    >
-                                        ⚡ ${multiplicador}x PONTOS
-                                    </div>
-                                    `
-                                    :
-                                    ""
-                            }
-
-                        </div>
-
-                    `;
-                }
-
-
-                // ============================================
-                // PERGUNTA
-                // ============================================
-
-                area.innerHTML = `
-
-                    ${avisoModo}
-
-                    <div
-                        class="
-                            max-w-3xl
-                            mx-auto
-                        "
-                    >
-
-                        <h1
-                            class="
-                                text-2xl
-                                md:text-4xl
-
-                                font-black
-                                text-center
-                                text-slate-900
-
-                                leading-tight
-
-                                px-2
-                            "
-                        >
-                            ${escaparHtml(
-                                dados.pergunta ||
-                                "Questão"
-                            )}
-                        </h1>
-
-
-                        <div
-                            id="alternativas"
-
-                            class="
-                                grid
-                                grid-cols-1
-                                sm:grid-cols-2
-
-                                gap-4
-
-                                mt-10
-                            "
-                        >
-                        </div>
-
-                    </div>
-
-                `;
-
-
-                const container =
-                    document.getElementById(
-                        "alternativas"
-                    );
-
-
-                const alternativas =
-                    Array.isArray(
-                        dados.alternativas
-                    )
-                        ?
-                        dados.alternativas
-                        :
-                        [];
-
-
-                if (
-                    !container
-                ) {
-
-                    console.error(
-                        "[MULTIPLAYER] Container de alternativas ausente."
-                    );
-
-                    return;
-                }
-
-
-                if (
-                    alternativas.length ===
-                    0
-                ) {
-
-                    container.innerHTML = `
-
-                        <div
-                            class="
-                                sm:col-span-2
-                                text-center
-                                bg-red-50
-                                text-red-600
-                                rounded-2xl
-                                p-5
-                                font-bold
-                            "
-                        >
-                            Nenhuma alternativa foi recebida.
-                        </div>
-
-                    `;
-
-
-                    console.error(
-                        "[MULTIPLAYER] Questão sem alternativas:",
-                        dados
-                    );
-
-
-                    return;
-                }
-
-
-                // ============================================
-                // ALTERNATIVAS
-                // ============================================
-
-                const simbolos = [
-                    "▲",
-                    "◆",
-                    "●",
-                    "■",
-                    "★",
-                    "⬢"
-                ];
-
-
-                alternativas.forEach(
-                    (
-                        alternativa,
-                        indice
-                    ) => {
-
-                        const botao =
-                            document.createElement(
-                                "button"
-                            );
-
-
-                        botao.type =
-                            "button";
-
-
-                        botao.dataset.resposta =
-                            String(
-                                alternativa
-                            );
-
-
-                        botao.className = `
-                            min-h-28
-
-                            border-2
-                            border-slate-200
-
-                            rounded-3xl
-
-                            p-5
-
-                            text-xl
-                            md:text-2xl
-
-                            font-black
-
-                            bg-white
-                            text-slate-900
-
-                            shadow-sm
-
-                            transition
-                            duration-200
-
-                            hover:border-indigo-500
-                            hover:bg-indigo-50
-                            hover:-translate-y-1
-
-                            active:scale-[0.98]
-
-                            disabled:cursor-not-allowed
-                            disabled:opacity-70
-                        `;
-
-
-                        const simbolo =
-                            simbolos[
-                                indice
-                            ]
-                            ||
-                            "●";
-
-
-                        botao.textContent =
-                            `${simbolo} ${alternativa}`;
-
-
-                        botao.addEventListener(
-                            "click",
-                            () => {
-
-                                if (
-                                    respondeu
-                                    ||
-                                    rodadaEncerrada
-                                    ||
-                                    !questaoAtiva
-                                ) {
-
-                                    return;
-                                }
-
-
-                                tocarSom(
-                                    "somSelecao"
-                                );
-
-
-                                respondeu =
-                                    true;
-
-
-                                const botoes =
-                                    container
-                                        .querySelectorAll(
-                                            "button"
-                                        );
-
-
-                                botoes.forEach(
-                                    outroBotao => {
-
-                                        outroBotao.disabled =
-                                            true;
-
-                                    }
-                                );
-
-
-                                botao.classList.remove(
-                                    "border-slate-200",
-                                    "bg-white"
-                                );
-
-
-                                botao.classList.add(
-                                    "border-indigo-600",
-                                    "bg-indigo-100",
-                                    "ring-4",
-                                    "ring-indigo-100"
-                                );
-
-
-                                console.log(
-                                    "[MULTIPLAYER] Resposta enviada:",
-                                    alternativa
-                                );
-
-
-                                socket.emit(
-                                    "responder",
-                                    {
-                                        codigo:
-                                            codigo,
-
-                                        jogador_id:
-                                            jogadorId,
-
-                                        resposta:
-                                            String(
-                                                alternativa
-                                            )
-                                    }
-                                );
-
-                            }
-                        );
-
-
-                        container.appendChild(
-                            botao
-                        );
-                    }
-                );
-
-
-                // ============================================
-                // CRONÔMETRO
-                // ============================================
-
-                iniciarTimer(
-                    numeroSeguro(
-                        dados.tempo,
-                        20
-                    )
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // RESPOSTA RECEBIDA
-        // ====================================================
-
-        socket.on(
-            "resposta_recebida",
-            dados => {
-
-                console.log(
-                    "[MULTIPLAYER] Resposta recebida:",
-                    dados
-                );
-
-
-                if (!dados) {
-
-                    return;
-                }
-
-
-                const anterior =
-                    document.getElementById(
-                        "feedbackResposta"
-                    );
-
-
-                if (anterior) {
-
-                    anterior.remove();
-                }
-
-
-                const feedback =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                feedback.id =
-                    "feedbackResposta";
-
-
-                // ============================================
-                // ACERTO
-                // ============================================
-
-                if (
-                    dados.correto
-                ) {
-
-                    tocarSom(
-                        "somAcerto"
-                    );
-
-
-                    feedback.className = `
-                        max-w-xl
-                        mx-auto
-
-                        mt-6
-
-                        text-center
-
-                        bg-green-100
-
-                        border
-                        border-green-200
-
-                        text-green-700
-
-                        rounded-2xl
-
-                        p-4
-
-                        font-black
-                    `;
-
-
-                    const pontos =
-                        numeroSeguro(
-                            dados.pontos
-                        );
-
-
-                    const totalPontos =
-                        numeroSeguro(
-                            dados.total_pontos
-                        );
-
-
-                    const sequencia =
-                        numeroSeguro(
-                            dados.sequencia
-                        );
-
-
-                    feedback.innerHTML = `
-
-                        <div
-                            class="
-                                text-xl
-                                md:text-2xl
-                            "
-                        >
-                            ✅ Correto!
-                        </div>
-
-
-                        <div
-                            class="
-                                text-2xl
-                                md:text-3xl
-
-                                mt-2
-                            "
-                        >
-                            +${pontos} pontos
-                        </div>
-
-
-                        ${
-                            sequencia > 1
-                                ?
-                                `
-                                <div
-                                    class="
-                                        mt-2
-                                        text-sm
-                                        text-orange-600
-                                    "
-                                >
-                                    🔥 ${sequencia}
-                                    acertos seguidos
-                                </div>
-                                `
-                                :
-                                ""
-                        }
-
-
-                        ${
-                            totalPontos > 0
-                                ?
-                                `
-                                <div
-                                    class="
-                                        mt-2
-                                        text-xs
-                                        text-green-600
-                                    "
-                                >
-                                    Total:
-                                    ${totalPontos}
-                                    pontos
-                                </div>
-                                `
-                                :
-                                ""
-                        }
-
-                    `;
-
-                }
-
-                // ============================================
-                // ERRO
-                // ============================================
-
-                else {
-
-                    tocarSom(
-                        "somErro"
-                    );
-
-
-                    feedback.className = `
-                        max-w-xl
-                        mx-auto
-
-                        mt-6
-
-                        text-center
-
-                        bg-red-100
-
-                        border
-                        border-red-200
-
-                        text-red-600
-
-                        rounded-2xl
-
-                        p-4
-
-                        font-black
-                    `;
-
-
-                    const pontos =
-                        numeroSeguro(
-                            dados.pontos
-                        );
-
-
-                    let penalidade =
-                        "";
-
-
-                    if (
-                        pontos < 0
-                    ) {
-
-                        penalidade = `
-
-                            <div
-                                class="
-                                    mt-2
-                                    text-xl
-                                "
-                            >
-                                ${pontos} pontos
-                            </div>
-
-                        `;
-                    }
-
-
-                    feedback.innerHTML = `
-
-                        <div
-                            class="
-                                text-xl
-                            "
-                        >
-                            ❌ Resposta incorreta
-                        </div>
-
-                        ${penalidade}
-
-                    `;
-                }
-
-
-                area.appendChild(
-                    feedback
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // RODADA FINALIZADA
-        // ====================================================
-
-        socket.on(
-            "rodada_finalizada",
-            dados => {
-
-                console.log(
-                    "[MULTIPLAYER] Rodada finalizada:",
-                    dados
-                );
-
-
-                if (!dados) {
-
-                    return;
-                }
-
-
-                rodadaEncerrada =
-                    true;
-
-
-                respondeu =
-                    true;
-
-
-                questaoAtiva =
-                    false;
-
-
-                solicitandoQuestao =
-                    false;
-
-
-                pararTimer();
-
-
-                definirTexto(
-                    cronometro,
-                    "⏱️ 0"
-                );
-
-
-                definirBarra(
-                    0
-                );
-
-
-                desabilitarAlternativas();
-
-
-                const ranking =
-                    Array.isArray(
-                        dados.ranking
-                    )
-                        ?
-                        dados.ranking
-                        :
-                        [];
-
-
-                let rankingHtml =
-                    "";
-
-
-                ranking
-                    .slice(
-                        0,
-                        5
-                    )
-                    .forEach(
-                        jogador => {
-
-                            const posicao =
-                                numeroSeguro(
-                                    jogador.posicao
-                                );
-
-
-                            let medalha =
-                                `${posicao}º`;
-
-
-                            if (
-                                posicao === 1
-                            ) {
-
-                                medalha =
-                                    "🥇";
-
-                            }
-
-                            else if (
-                                posicao === 2
-                            ) {
-
-                                medalha =
-                                    "🥈";
-
-                            }
-
-                            else if (
-                                posicao === 3
-                            ) {
-
-                                medalha =
-                                    "🥉";
-                            }
-
-
-                            const jogadorAtual =
-                                String(
-                                    jogador.id ??
-                                    ""
-                                )
-                                ===
-                                String(
-                                    jogadorId
-                                );
-
-
-                            rankingHtml += `
-
-                                <div
-                                    class="
-                                        flex
-                                        items-center
-                                        justify-between
-
-                                        gap-4
-
-                                        ${
-                                            jogadorAtual
-                                                ?
-                                                "bg-indigo-50 border-indigo-300"
-                                                :
-                                                "bg-slate-100 border-slate-200"
-                                        }
-
-                                        border
-
-                                        rounded-2xl
-
-                                        p-4
-                                    "
-                                >
-
-                                    <div
-                                        class="
-                                            flex
-                                            items-center
-                                            gap-3
-                                            min-w-0
-                                        "
-                                    >
-
-                                        <span
-                                            class="
-                                                text-2xl
-                                                shrink-0
-                                            "
-                                        >
-                                            ${medalha}
-                                        </span>
-
-
-                                        <span
-                                            class="
-                                                font-bold
-                                                truncate
-                                            "
-                                        >
-                                            ${escaparHtml(
-                                                jogador.nome ||
-                                                "Jogador"
-                                            )}
-
-                                            ${
-                                                jogadorAtual
-                                                    ?
-                                                    " (você)"
-                                                    :
-                                                    ""
-                                            }
-                                        </span>
-
-                                    </div>
-
-
-                                    <strong
-                                        class="
-                                            text-indigo-600
-                                            shrink-0
-                                        "
-                                    >
-                                        ${numeroSeguro(
-                                            jogador.pontos
-                                        )}
-                                    </strong>
-
-                                </div>
-
-                            `;
-                        }
-                    );
-
-
-                if (!rankingHtml) {
-
-                    rankingHtml = `
-
-                        <div
-                            class="
-                                text-center
-                                text-slate-500
-                                p-4
-                            "
-                        >
-                            Ranking indisponível.
-                        </div>
-
-                    `;
-                }
-
-
-                // ============================================
-                // MOTIVO
-                // ============================================
-
-                let mensagemFim =
-                    "";
-
-
-                if (
-                    dados.motivo ===
-                    "tempo"
-                ) {
-
-                    mensagemFim = `
-
-                        <p
-                            class="
-                                text-orange-500
-                                font-bold
-                                mt-2
-                            "
-                        >
-                            ⏱️ Tempo esgotado
-                        </p>
-
-                    `;
-                }
-
-
-                // ============================================
-                // RANKING
-                // ============================================
-
-                area.innerHTML = `
-
-                    <div
-                        class="
-                            max-w-2xl
-                            mx-auto
-                        "
-                    >
-
-                        <div class="text-center">
-
-                            <div class="text-5xl">
-                                🏆
-                            </div>
-
-
-                            <h2
-                                class="
-                                    text-3xl
-                                    font-black
-                                    text-slate-900
-
-                                    mt-3
-                                "
-                            >
-                                Ranking
-                            </h2>
-
-
-                            ${mensagemFim}
-
-
-                            <p
-                                class="
-                                    text-slate-500
-                                    mt-3
-                                "
-                            >
-                                Resposta correta:
-
-                                <strong
-                                    class="
-                                        text-green-600
-                                    "
-                                >
-                                    ${escaparHtml(
-                                        dados.correta ??
-                                        "-"
-                                    )}
-                                </strong>
-
-                            </p>
-
-                        </div>
-
-
-                        <div
-                            class="
-                                space-y-2
-                                mt-7
-                            "
-                        >
-                            ${rankingHtml}
-                        </div>
-
-                    </div>
-
-                `;
-
-
-                // ============================================
-                // HOST
-                // ============================================
-
-                if (
-                    host
-                ) {
-
-                    const proximo =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    proximo.type =
-                        "button";
-
-
-                    proximo.className = `
-                        block
-
-                        w-full
-                        max-w-2xl
-                        mx-auto
-
-                        bg-indigo-600
-                        hover:bg-indigo-700
-
-                        active:scale-[0.99]
-
-                        text-white
-
-                        rounded-2xl
-
-                        p-4
-
-                        text-lg
-                        font-black
-
-                        mt-7
-
-                        shadow-lg
-
-                        transition
-
-                        disabled:opacity-60
-                        disabled:cursor-not-allowed
-                    `;
-
-
-                    proximo.textContent =
-                        dados.terminou
-                            ?
-                            "Ver pódio 🏆"
-                            :
-                            "Próxima rodada →";
-
-
-                    proximo.addEventListener(
-                        "click",
-                        () => {
-
-                            if (
-                                proximo.disabled
-                            ) {
-
-                                return;
-                            }
-
-
-                            tocarSom(
-                                "somClique"
-                            );
-
-
-                            proximo.disabled =
-                                true;
-
-
-                            if (
-                                dados.terminou
-                            ) {
-
-                                irResultado();
-
-                                return;
-                            }
-
-
-                            proximo.textContent =
-                                "⏳ Carregando...";
-
-
-                            rodadaEncerrada =
-                                false;
-
-
-                            solicitarProximaQuestao();
-
-                        }
-                    );
-
-
-                    area.appendChild(
-                        proximo
-                    );
-
-                }
-
-                // ============================================
-                // OUTROS JOGADORES
-                // ============================================
-
-                else {
-
-                    const espera =
-                        document.createElement(
-                            "p"
-                        );
-
-
-                    espera.className = `
-                        text-center
-
-                        text-slate-500
-                        font-bold
-
-                        mt-7
-                    `;
-
-
-                    espera.textContent =
-                        dados.terminou
-                            ?
-                            "🏆 Preparando o pódio..."
-                            :
-                            "⏳ Aguardando o anfitrião...";
-
-
-                    area.appendChild(
-                        espera
-                    );
-
-
-                    if (
-                        dados.terminou
-                    ) {
-
-                        setTimeout(
-                            irResultado,
-                            1800
-                        );
-                    }
-
-                }
-
-            }
-        );
-
-
-        // ====================================================
-        // PARTIDA FINALIZADA
-        // ====================================================
-
-        socket.on(
-            "partida_finalizada",
-            dados => {
-
-                console.log(
-                    "[MULTIPLAYER] Partida finalizada:",
-                    dados
-                );
-
-
-                questaoAtiva =
-                    false;
-
-
-                rodadaEncerrada =
-                    true;
-
-
-                pararTimer();
-
-
-                tocarSom(
-                    "somConcluido"
-                );
-
-
-                setTimeout(
-                    irResultado,
-                    1000
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // ERRO DA SALA
-        // ====================================================
-
-        socket.on(
-            "erro_sala",
-            dados => {
-
-                const mensagem =
-                    dados?.mensagem ||
-                    "Ocorreu um erro na partida.";
-
-
-                console.error(
-                    "[MULTIPLAYER] erro_sala:",
-                    mensagem,
-                    dados
-                );
-
-
-                solicitandoQuestao =
-                    false;
-
-
-                mostrarStatus(
-                    mensagem,
-                    "erro"
-                );
-
-
-                /*
-                Não usamos apenas alert.
-                A mensagem também aparece na tela.
-                */
-
-                const erroAnterior =
-                    document.getElementById(
-                        "erroMultiplayer"
-                    );
-
-
-                if (
-                    erroAnterior
-                ) {
-
-                    erroAnterior.remove();
-                }
-
-
-                const aviso =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                aviso.id =
-                    "erroMultiplayer";
-
-
-                aviso.className = `
-                    max-w-xl
-                    mx-auto
-
-                    bg-red-100
-
-                    border
-                    border-red-200
-
-                    text-red-700
-
-                    rounded-2xl
-
-                    p-4
-                    mt-5
-
-                    text-center
-                    font-bold
-                `;
-
-
-                aviso.textContent =
-                    mensagem;
-
-
-                area.appendChild(
-                    aviso
-                );
-
-            }
-        );
-
-
-        // ====================================================
-        // IR PARA RESULTADO
-        // ====================================================
-
-        function irResultado() {
-
-            if (
-                redirecionando
-            ) {
-
-                return;
-            }
-
-
-            redirecionando =
-                true;
-
-
-            pararTimer();
-
-
-            console.log(
-                "[MULTIPLAYER] Indo para resultado."
-            );
-
-
-            window.location.href =
-                `/multiplayer/resultado/${
-                    encodeURIComponent(
-                        codigo
-                    )
-                }`;
 
         }
 
@@ -2353,27 +1558,23 @@ document.addEventListener(
 
 
             segundos =
-                numeroSeguro(
-                    segundos,
-                    20
+                Number(
+                    segundos
                 );
 
 
             if (
+                !Number.isFinite(
+                    segundos
+                )
+                ||
                 segundos <= 0
             ) {
 
                 segundos =
                     20;
+
             }
-
-
-            tempoEsgotadoEnviado =
-                false;
-
-
-            const duracao =
-                segundos * 1000;
 
 
             const inicio =
@@ -2381,29 +1582,21 @@ document.addEventListener(
 
 
             const fim =
-                inicio + duracao;
-
-
-            definirTexto(
-                cronometro,
-                `⏱️ ${segundos}`
-            );
-
-
-            definirBarra(
-                100
-            );
-
-
-            if (
-                cronometro
-            ) {
-
-                cronometro.classList.remove(
-                    "text-red-600",
-                    "text-orange-500"
+                inicio
+                +
+                (
+                    segundos
+                    *
+                    1000
                 );
-            }
+
+
+            cronometro.textContent =
+                `⏱️ ${segundos}`;
+
+
+            barra.style.width =
+                "100%";
 
 
             function atualizar() {
@@ -2412,7 +1605,7 @@ document.addEventListener(
                     Date.now();
 
 
-                const restanteMs =
+                const milissegundosRestantes =
                     Math.max(
                         0,
                         fim - agora
@@ -2421,75 +1614,70 @@ document.addEventListener(
 
                 const restante =
                     Math.ceil(
-                        restanteMs /
+                        milissegundosRestantes
+                        /
                         1000
                     );
 
 
                 const porcentagem =
-                    (
-                        restanteMs /
-                        duracao
-                    )
-                    *
-                    100;
-
-
-                definirTexto(
-                    cronometro,
-                    `⏱️ ${restante}`
-                );
-
-
-                definirBarra(
-                    porcentagem
-                );
-
-
-                // ============================================
-                // CORES DO TEMPO
-                // ============================================
-
-                if (
-                    cronometro
-                ) {
-
-                    cronometro.classList.remove(
-                        "text-red-600",
-                        "text-orange-500"
+                    Math.max(
+                        0,
+                        Math.min(
+                            100,
+                            (
+                                milissegundosRestantes
+                                /
+                                (
+                                    segundos
+                                    *
+                                    1000
+                                )
+                            )
+                            *
+                            100
+                        )
                     );
 
 
-                    if (
-                        porcentagem <=
-                        25
-                    ) {
+                cronometro.textContent =
+                    `⏱️ ${restante}`;
 
-                        cronometro.classList.add(
-                            "text-red-600"
-                        );
 
-                    }
+                barra.style.width =
+                    `${porcentagem}%`;
 
-                    else if (
-                        porcentagem <=
-                        50
-                    ) {
 
-                        cronometro.classList.add(
-                            "text-orange-500"
-                        );
-                    }
+                // --------------------------------------------
+                // AVISOS VISUAIS
+                // --------------------------------------------
+
+                if (
+                    porcentagem <= 25
+                ) {
+
+                    cronometro.classList.add(
+                        "text-red-600"
+                    );
+
+                }
+
+                else {
+
+                    cronometro.classList.remove(
+                        "text-red-600"
+                    );
 
                 }
 
 
-                // ============================================
-                // TEMPO ESGOTADO
-                // ============================================
+                // --------------------------------------------
+                // ACABOU
+                // --------------------------------------------
 
                 if (
-                    restanteMs <=
+                    milissegundosRestantes
+                    <=
                     0
                 ) {
 
@@ -2500,36 +1688,19 @@ document.addEventListener(
                         true;
 
 
-                    respondeu =
-                        true;
-
-
                     desabilitarAlternativas();
 
 
                     /*
-                    O servidor também pode possuir timer.
+                    O servidor possui seu próprio
+                    temporizador.
 
-                    Esta flag garante que este navegador
-                    nunca envie tempo_esgotado duas vezes.
+                    O evento abaixo serve como
+                    confirmação adicional quando
+                    este navegador é o host.
                     */
 
-                    if (
-                        host
-                        &&
-                        !tempoEsgotadoEnviado
-                        &&
-                        socket.connected
-                    ) {
-
-                        tempoEsgotadoEnviado =
-                            true;
-
-
-                        console.log(
-                            "[MULTIPLAYER] Host informou tempo esgotado."
-                        );
-
+                    if (host) {
 
                         socket.emit(
                             "tempo_esgotado",
@@ -2538,12 +1709,10 @@ document.addEventListener(
                                     codigo,
 
                                 jogador_id:
-                                    jogadorId,
-
-                                rodada:
-                                    ultimaRodada
+                                    jogadorId
                             }
                         );
+
                     }
 
                 }
@@ -2559,21 +1728,8 @@ document.addEventListener(
                     atualizar,
                     100
                 );
+
         }
-
-
-        // ====================================================
-        // SAÍDA DA PÁGINA
-        // ====================================================
-
-        window.addEventListener(
-            "beforeunload",
-            () => {
-
-                pararTimer();
-
-            }
-        );
 
     }
 );

@@ -2,9 +2,6 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        "use strict";
-
-
         // ====================================================
         // ELEMENTO PRINCIPAL
         // ====================================================
@@ -16,59 +13,7 @@ document.addEventListener(
 
 
         if (!lobby) {
-
-            console.warn(
-                "[LOBBY] Elemento #lobby não encontrado."
-            );
-
             return;
-        }
-
-
-        // ====================================================
-        // HELPERS
-        // ====================================================
-
-        function booleano(valor) {
-
-            return [
-                "true",
-                "1",
-                "sim",
-                "yes"
-            ].includes(
-                String(
-                    valor ?? ""
-                )
-                    .trim()
-                    .toLowerCase()
-            );
-        }
-
-
-        function tocarSom(nome) {
-
-            try {
-
-                const funcao =
-                    window[nome];
-
-
-                if (
-                    typeof funcao ===
-                    "function"
-                ) {
-
-                    funcao();
-                }
-
-            } catch (erro) {
-
-                console.warn(
-                    `[LOBBY] Erro ao tocar ${nome}:`,
-                    erro
-                );
-            }
         }
 
 
@@ -77,35 +22,19 @@ document.addEventListener(
         // ====================================================
 
         const codigo =
-            String(
-                lobby.dataset.codigo ||
-                ""
-            )
-                .trim();
+            lobby.dataset.codigo || "";
 
 
         const jogadorId =
-            String(
-                lobby.dataset.jogador ||
-                ""
-            )
-                .trim();
+            lobby.dataset.jogador || "";
 
 
-        /*
-        Usamos let porque podemos corrigir
-        a informação quando o servidor enviar
-        jogadores_atualizados.
-        */
-
-        let ehHost =
-            booleano(
-                lobby.dataset.host
-            );
+        const host =
+            lobby.dataset.host === "true";
 
 
         // ====================================================
-        // ELEMENTOS
+        // ELEMENTOS DA TELA
         // ====================================================
 
         const lista =
@@ -132,78 +61,402 @@ document.addEventListener(
             );
 
 
-        // ====================================================
-        // DEBUG INICIAL
-        // ====================================================
-
-        console.log(
-            "====================================="
-        );
-
-        console.log(
-            "🎮 FLASHMATTY - LOBBY"
-        );
-
-        console.log(
-            "Sala:",
-            codigo
-        );
-
-        console.log(
-            "Jogador:",
-            jogadorId
-        );
-
-        console.log(
-            "Host informado pelo HTML:",
-            ehHost
-        );
-
-        console.log(
-            "====================================="
-        );
-
 
         // ====================================================
-        // VALIDAÇÃO
+        // PERSONALIZAÇÃO DO JOGADOR
         // ====================================================
 
-        if (!codigo) {
-
-            console.error(
-                "[LOBBY] Código da sala não informado."
-            );
-
-            return;
-        }
-
-
-        if (!jogadorId) {
-
-            console.error(
-                "[LOBBY] ID do jogador não informado."
-            );
-
-            return;
-        }
-
-
-        if (
-            typeof window.io !==
-            "function"
+        function cosmeticosDe(
+            jogador
         ) {
 
-            console.error(
-                "[LOBBY] Socket.IO não foi carregado."
+            if (
+                jogador
+                &&
+                jogador.cosmeticos
+                &&
+                typeof jogador.cosmeticos
+                ===
+                "object"
+            ) {
+
+                return jogador.cosmeticos;
+
+            }
+
+            return {};
+
+        }
+
+
+        function idCosmetico(
+            cosmeticos,
+            tipo
+        ) {
+
+            return (
+                cosmeticos?.[tipo]?.id
+                ||
+                ""
             );
 
+        }
 
-            mostrarAviso(
-                "Não foi possível conectar ao multiplayer.",
-                "erro"
+
+        function classesFundo(
+            itemId
+        ) {
+
+            const mapa = {
+
+                fundo_ceu_noturno:
+                    "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950",
+
+                fundo_sunset:
+                    "bg-gradient-to-br from-orange-950 via-rose-900 to-indigo-950",
+
+                fundo_neon:
+                    "bg-gradient-to-br from-cyan-950 via-violet-950 to-fuchsia-950",
+
+                fundo_galaxia:
+                    "bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950",
+
+                fundo_esmeralda:
+                    "bg-gradient-to-br from-emerald-950 via-teal-950 to-slate-950"
+
+            };
+
+            return (
+                mapa[itemId]
+                ||
+                "bg-gradient-to-br from-slate-900 to-slate-800"
             );
 
-            return;
+        }
+
+
+        function classesCard(
+            itemId
+        ) {
+
+            const mapa = {
+
+                card_vidro:
+                    "bg-slate-900/70 backdrop-blur-xl border-slate-500/30",
+
+                card_neon:
+                    "bg-slate-950 border-violet-500 shadow-[0_0_28px_rgba(139,92,246,0.30)]",
+
+                card_ouro:
+                    "bg-gradient-to-br from-amber-950 to-slate-950 border-yellow-400 shadow-[0_0_28px_rgba(245,158,11,0.28)]",
+
+                card_galactico:
+                    "bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 border-purple-400 shadow-[0_0_32px_rgba(168,85,247,0.30)]"
+
+            };
+
+            return (
+                mapa[itemId]
+                ||
+                "bg-slate-900 border-slate-700"
+            );
+
+        }
+
+
+        function classesMoldura(
+            itemId
+        ) {
+
+            const mapa = {
+
+                moldura_indigo:
+                    "ring-4 ring-indigo-400 shadow-[0_0_22px_rgba(99,102,241,0.60)]",
+
+                moldura_fogo:
+                    "ring-4 ring-orange-400 shadow-[0_0_24px_rgba(239,68,68,0.66)]",
+
+                moldura_gelo:
+                    "ring-4 ring-cyan-300 shadow-[0_0_24px_rgba(14,165,233,0.64)]",
+
+                moldura_ouro:
+                    "ring-4 ring-yellow-400 shadow-[0_0_26px_rgba(245,158,11,0.72)]",
+
+                moldura_arco_iris:
+                    "ring-4 ring-fuchsia-400 shadow-[0_0_28px_rgba(34,211,238,0.58)]"
+
+            };
+
+            return (
+                mapa[itemId]
+                ||
+                "ring-2 ring-slate-500"
+            );
+
+        }
+
+
+        function classesNome(
+            itemId
+        ) {
+
+            const mapa = {
+
+                nome_ciano:
+                    "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.48)]",
+
+                nome_dourado:
+                    "text-yellow-300 drop-shadow-[0_0_8px_rgba(250,204,21,0.48)]",
+
+                nome_gradiente:
+                    "bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent",
+
+                nome_esmeralda:
+                    "text-emerald-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.45)]",
+
+                nome_lendario:
+                    "bg-gradient-to-r from-yellow-200 via-orange-400 to-fuchsia-400 bg-clip-text text-transparent"
+
+            };
+
+            return (
+                mapa[itemId]
+                ||
+                "text-white"
+            );
+
+        }
+
+
+        function criarAvatar(
+            jogador,
+            cosmeticos
+        ) {
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+
+            wrapper.className = `
+                relative
+                mx-auto
+                w-20
+                h-20
+                rounded-full
+                ${classesMoldura(
+                    idCosmetico(
+                        cosmeticos,
+                        "moldura"
+                    )
+                )}
+            `;
+
+
+            const usuarioId =
+                Number(
+                    jogador.usuario_id
+                );
+
+
+            if (
+                Number.isFinite(
+                    usuarioId
+                )
+                &&
+                usuarioId > 0
+            ) {
+
+                const imagem =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                imagem.src =
+                    `/social/foto/${usuarioId}`;
+
+                imagem.alt =
+                    `Foto de ${
+                        jogador.nome
+                        ||
+                        "Jogador"
+                    }`;
+
+                imagem.className = `
+                    w-full
+                    h-full
+                    rounded-full
+                    object-cover
+                    bg-slate-800
+                `;
+
+
+                wrapper.appendChild(
+                    imagem
+                );
+
+            } else {
+
+                const fallback =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                fallback.className = `
+                    w-full
+                    h-full
+                    rounded-full
+                    bg-slate-800
+                    flex
+                    items-center
+                    justify-center
+                    text-3xl
+                `;
+
+                fallback.textContent =
+                    "";
+
+
+                wrapper.appendChild(
+                    fallback
+                );
+
+            }
+
+
+            const badge =
+                cosmeticos?.badge;
+
+
+            if (
+                badge?.valor?.simbolo
+            ) {
+
+                const selo =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                selo.className = `
+                    absolute
+                    -right-2
+                    bottom-0
+                    min-w-9
+                    h-9
+                    px-1
+                    rounded-full
+                    flex
+                    items-center
+                    justify-center
+                    bg-slate-950
+                    border-2
+                    border-white/20
+                    text-lg
+                    shadow-lg
+                `;
+
+
+                selo.textContent =
+                    badge.valor.simbolo;
+
+
+                wrapper.appendChild(
+                    selo
+                );
+
+            }
+
+
+            return wrapper;
+
+        }
+
+
+        function adicionarEfeito(
+            card,
+            efeitoId
+        ) {
+
+            if (!efeitoId) {
+                return;
+            }
+
+
+            const efeito =
+                document.createElement(
+                    "div"
+                );
+
+
+            efeito.className = `
+                absolute
+                inset-0
+                pointer-events-none
+                overflow-hidden
+                rounded-2xl
+            `;
+
+
+            if (
+                efeitoId
+                ===
+                "efeito_estrelas"
+            ) {
+
+                efeito.innerHTML = `
+                    <span class="absolute top-4 left-[15%] w-2 h-2 rounded-full bg-white/80 animate-pulse"></span>
+                    <span class="absolute top-10 right-[18%] w-2 h-2 rounded-full bg-cyan-200/80 animate-ping"></span>
+                    <span class="absolute bottom-6 left-[38%] w-1.5 h-1.5 rounded-full bg-violet-200/80 animate-pulse"></span>
+                `;
+
+            }
+
+            else if (
+                efeitoId
+                ===
+                "efeito_grade"
+            ) {
+
+                efeito.innerHTML = `
+                    <span class="absolute inset-3 rounded-xl border border-cyan-400/20 bg-cyan-400/5 animate-pulse"></span>
+                `;
+
+            }
+
+            else if (
+                efeitoId
+                ===
+                "efeito_aurora"
+            ) {
+
+                efeito.innerHTML = `
+                    <span class="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-cyan-500/20 blur-2xl animate-pulse"></span>
+                    <span class="absolute -bottom-10 -right-10 w-36 h-36 rounded-full bg-fuchsia-500/20 blur-2xl animate-pulse"></span>
+                `;
+
+            }
+
+            else if (
+                efeitoId
+                ===
+                "efeito_scan"
+            ) {
+
+                efeito.innerHTML = `
+                    <span class="absolute inset-x-5 top-1/2 h-px bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,0.85)] animate-pulse"></span>
+                `;
+
+            }
+
+
+            card.appendChild(
+                efeito
+            );
+
         }
 
 
@@ -211,383 +464,11 @@ document.addEventListener(
         // SOCKET.IO
         // ====================================================
 
-        const socket =
-            window.io(
-                {
-                    transports: [
-                        "websocket",
-                        "polling"
-                    ],
-
-                    reconnection:
-                        true,
-
-                    reconnectionAttempts:
-                        Infinity,
-
-                    reconnectionDelay:
-                        800,
-
-                    reconnectionDelayMax:
-                        4000,
-
-                    timeout:
-                        10000
-                }
-            );
+        const socket = io();
 
 
         // ====================================================
-        // ESTADO
-        // ====================================================
-
-        let redirecionando =
-            false;
-
-
-        let timeoutInicio =
-            null;
-
-
-        let quantidadeOnline =
-            0;
-
-
-        // ====================================================
-        // STATUS DE CONEXÃO
-        // ====================================================
-
-        function obterStatus() {
-
-            let elemento =
-                document.getElementById(
-                    "statusLobbySocket"
-                );
-
-
-            if (elemento) {
-
-                return elemento;
-            }
-
-
-            elemento =
-                document.createElement(
-                    "div"
-                );
-
-
-            elemento.id =
-                "statusLobbySocket";
-
-
-            elemento.className = `
-                fixed
-                right-4
-                bottom-4
-                z-50
-
-                rounded-full
-
-                px-4
-                py-2
-
-                text-xs
-                font-black
-
-                shadow-lg
-
-                transition
-                duration-300
-            `;
-
-
-            document.body.appendChild(
-                elemento
-            );
-
-
-            return elemento;
-        }
-
-
-        function mostrarStatus(
-            mensagem,
-            tipo = "normal"
-        ) {
-
-            const elemento =
-                obterStatus();
-
-
-            elemento.style.display =
-                "block";
-
-
-            elemento.style.opacity =
-                "1";
-
-
-            elemento.textContent =
-                mensagem;
-
-
-            elemento.className = `
-                fixed
-                right-4
-                bottom-4
-                z-50
-
-                rounded-full
-
-                px-4
-                py-2
-
-                text-xs
-                font-black
-
-                shadow-lg
-
-                transition
-                duration-300
-            `;
-
-
-            if (
-                tipo ===
-                "online"
-            ) {
-
-                elemento.classList.add(
-                    "bg-green-600",
-                    "text-white"
-                );
-
-            }
-
-            else if (
-                tipo ===
-                "erro"
-            ) {
-
-                elemento.classList.add(
-                    "bg-red-600",
-                    "text-white"
-                );
-
-            }
-
-            else {
-
-                elemento.classList.add(
-                    "bg-slate-800",
-                    "text-white"
-                );
-            }
-
-
-            if (
-                tipo ===
-                "online"
-            ) {
-
-                setTimeout(
-                    () => {
-
-                        elemento.style.opacity =
-                            "0";
-
-                    },
-                    1700
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        elemento.style.display =
-                            "none";
-
-                    },
-                    2100
-                );
-            }
-        }
-
-
-        // ====================================================
-        // AVISO NA TELA
-        // ====================================================
-
-        function mostrarAviso(
-            mensagem,
-            tipo = "erro"
-        ) {
-
-            const anterior =
-                document.getElementById(
-                    "avisoLobby"
-                );
-
-
-            if (anterior) {
-
-                anterior.remove();
-            }
-
-
-            const aviso =
-                document.createElement(
-                    "div"
-                );
-
-
-            aviso.id =
-                "avisoLobby";
-
-
-            aviso.className = `
-                max-w-xl
-                mx-auto
-
-                mt-5
-
-                rounded-2xl
-
-                p-4
-
-                text-center
-                font-bold
-            `;
-
-
-            if (
-                tipo ===
-                "sucesso"
-            ) {
-
-                aviso.classList.add(
-                    "bg-green-100",
-                    "border",
-                    "border-green-200",
-                    "text-green-700"
-                );
-
-            } else {
-
-                aviso.classList.add(
-                    "bg-red-100",
-                    "border",
-                    "border-red-200",
-                    "text-red-700"
-                );
-            }
-
-
-            aviso.textContent =
-                mensagem;
-
-
-            lobby.appendChild(
-                aviso
-            );
-        }
-
-
-        // ====================================================
-        // ESTADO DO BOTÃO
-        // ====================================================
-
-        function definirBotaoInicio(
-            estado
-        ) {
-
-            if (!iniciar) {
-
-                return;
-            }
-
-
-            if (
-                estado ===
-                "iniciando"
-            ) {
-
-                iniciar.dataset.iniciando =
-                    "true";
-
-
-                iniciar.disabled =
-                    true;
-
-
-                iniciar.textContent =
-                    "⏳ Iniciando partida...";
-
-
-                return;
-            }
-
-
-            iniciar.dataset.iniciando =
-                "false";
-
-
-            if (!ehHost) {
-
-                iniciar.disabled =
-                    true;
-
-
-                return;
-            }
-
-
-            iniciar.disabled =
-                false;
-
-
-            iniciar.textContent =
-                "▶ Iniciar partida";
-        }
-
-
-        // ====================================================
-        // ENTRAR NA ROOM
-        // ====================================================
-
-        function entrarNaSalaSocket() {
-
-            if (
-                !socket.connected
-            ) {
-
-                return;
-            }
-
-
-            console.log(
-                "[LOBBY] Entrando na room:",
-                codigo,
-                jogadorId
-            );
-
-
-            socket.emit(
-                "entrar_socket",
-                {
-                    codigo:
-                        codigo,
-
-                    jogador_id:
-                        jogadorId
-                }
-            );
-        }
-
-
-        // ====================================================
-        // CONEXÃO
+        // CONECTOU
         // ====================================================
 
         socket.on(
@@ -595,18 +476,18 @@ document.addEventListener(
             () => {
 
                 console.log(
-                    "[LOBBY] Socket conectado:",
+                    "Socket conectado:",
                     socket.id
                 );
 
 
-                mostrarStatus(
-                    "● Conectado",
-                    "online"
+                socket.emit(
+                    "entrar_socket",
+                    {
+                        codigo: codigo,
+                        jogador_id: jogadorId
+                    }
                 );
-
-
-                entrarNaSalaSocket();
 
             }
         );
@@ -620,30 +501,10 @@ document.addEventListener(
             "disconnect",
             motivo => {
 
-                console.warn(
-                    "[LOBBY] Socket desconectado:",
+                console.log(
+                    "Socket desconectado:",
                     motivo
                 );
-
-
-                mostrarStatus(
-                    "● Reconectando...",
-                    "erro"
-                );
-
-
-                if (
-                    iniciar
-                    &&
-                    iniciar.dataset.iniciando
-                    ===
-                    "true"
-                ) {
-
-                    definirBotaoInicio(
-                        "normal"
-                    );
-                }
 
             }
         );
@@ -658,54 +519,12 @@ document.addEventListener(
             erro => {
 
                 console.error(
-                    "[LOBBY] Erro Socket.IO:",
+                    "Erro ao conectar Socket.IO:",
                     erro
-                );
-
-
-                mostrarStatus(
-                    "Falha na conexão",
-                    "erro"
                 );
 
             }
         );
-
-
-        // ====================================================
-        // RECONEXÃO
-        // ====================================================
-
-        if (
-            socket.io
-        ) {
-
-            socket.io.on(
-                "reconnect_attempt",
-                tentativa => {
-
-                    console.log(
-                        "[LOBBY] Tentativa de reconexão:",
-                        tentativa
-                    );
-
-                }
-            );
-
-
-            socket.io.on(
-                "reconnect",
-                tentativa => {
-
-                    console.log(
-                        "[LOBBY] Reconectado após",
-                        tentativa,
-                        "tentativas."
-                    );
-
-                }
-            );
-        }
 
 
         // ====================================================
@@ -716,25 +535,12 @@ document.addEventListener(
             "jogadores_atualizados",
             dados => {
 
-                console.log(
-                    "[LOBBY] Jogadores atualizados:",
-                    dados
-                );
-
-
                 if (
-                    !dados
-                    ||
+                    !dados ||
                     !Array.isArray(
                         dados.jogadores
                     )
                 ) {
-
-                    console.warn(
-                        "[LOBBY] Lista inválida:",
-                        dados
-                    );
-
                     return;
                 }
 
@@ -743,115 +549,58 @@ document.addEventListener(
                     dados.jogadores;
 
 
-                // ============================================
-                // IDENTIFICA O JOGADOR ATUAL
-                // ============================================
+                // --------------------------------------------
+                // LIMPA LISTA
+                // --------------------------------------------
 
-                const eu =
-                    jogadores.find(
-                        jogador =>
-
-                            String(
-                                jogador.id
-                            )
-                            ===
-                            String(
-                                jogadorId
-                            )
-                    );
-
-
-                /*
-                Se o HTML informou host incorretamente,
-                usamos a informação vinda do servidor.
-                */
-
-                if (eu) {
-
-                    const hostServidor =
-                        Boolean(
-                            eu.host
-                        );
-
-
-                    if (
-                        hostServidor !==
-                        ehHost
-                    ) {
-
-                        console.warn(
-                            "[LOBBY] Host corrigido pelo servidor:",
-                            hostServidor
-                        );
-
-
-                        ehHost =
-                            hostServidor;
-                    }
+                if (lista) {
+                    lista.innerHTML = "";
                 }
 
 
-                // ============================================
-                // QUANTIDADE ONLINE
-                // ============================================
+                // --------------------------------------------
+                // QUANTIDADE
+                // --------------------------------------------
 
-                const jogadoresOnline =
+                const online =
                     jogadores.filter(
                         jogador =>
-                            Boolean(
-                                jogador.online
-                            )
+                            jogador.online
                     );
-
-
-                quantidadeOnline =
-                    jogadoresOnline.length;
 
 
                 if (quantidade) {
 
                     quantidade.textContent =
-                        quantidadeOnline;
+                        online.length;
+
                 }
 
 
-                // ============================================
-                // LISTA VAZIA
-                // ============================================
+                // --------------------------------------------
+                // MENSAGEM DE LISTA VAZIA
+                // --------------------------------------------
 
                 if (
                     mensagemListaVazia
                 ) {
 
                     mensagemListaVazia.style.display =
-                        jogadores.length
-                            ?
-                            "none"
-                            :
-                            "block";
+                        jogadores.length > 0
+                            ? "none"
+                            : "block";
+
                 }
 
 
-                // ============================================
-                // LIMPA LISTA
-                // ============================================
-
-                if (lista) {
-
-                    lista.innerHTML =
-                        "";
-                }
-
-
-                // ============================================
-                // MONTA OS JOGADORES
-                // ============================================
+                // --------------------------------------------
+                // MONTA JOGADORES
+                // --------------------------------------------
 
                 jogadores.forEach(
                     jogador => {
 
                         if (!lista) {
-
                             return;
                         }
 
@@ -862,46 +611,114 @@ document.addEventListener(
                             );
 
 
-                        const jogadorAtual =
-                            String(
-                                jogador.id
-                            )
-                            ===
-                            String(
-                                jogadorId
+                        const cosmeticos =
+                            cosmeticosDe(
+                                jogador
+                            );
+
+
+                        const fundoId =
+                            idCosmetico(
+                                cosmeticos,
+                                "fundo"
+                            );
+
+
+                        const cardId =
+                            idCosmetico(
+                                cosmeticos,
+                                "card"
+                            );
+
+
+                        const nomeId =
+                            idCosmetico(
+                                cosmeticos,
+                                "nome"
+                            );
+
+
+                        const efeitoId =
+                            idCosmetico(
+                                cosmeticos,
+                                "efeito"
                             );
 
 
                         elemento.className = `
                             relative
-
-                            ${
-                                jogadorAtual
-                                    ?
-                                    "bg-indigo-50 border-indigo-300"
-                                    :
-                                    "bg-slate-100 border-slate-200"
-                            }
-
+                            overflow-hidden
                             border
-
                             rounded-2xl
-
                             p-4
-
                             text-center
-
                             transition
                             duration-200
-
-                            hover:shadow-md
-                            hover:-translate-y-0.5
+                            hover:-translate-y-1
+                            hover:shadow-xl
+                            ${classesCard(
+                                cardId
+                            )}
                         `;
 
 
-                        // ====================================
-                        // STATUS
-                        // ====================================
+                        adicionarEfeito(
+                            elemento,
+                            efeitoId
+                        );
+
+
+                        const conteudo =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        conteudo.className = `
+                            relative
+                            z-10
+                        `;
+
+
+                        const faixa =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        faixa.className = `
+                            -mx-4
+                            -mt-4
+                            mb-4
+                            h-16
+                            ${classesFundo(
+                                fundoId
+                            )}
+                            opacity-90
+                        `;
+
+
+                        conteudo.appendChild(
+                            faixa
+                        );
+
+
+                        const avatar =
+                            criarAvatar(
+                                jogador,
+                                cosmeticos
+                            );
+
+
+                        avatar.classList.add(
+                            "-mt-12"
+                        );
+
+
+                        conteudo.appendChild(
+                            avatar
+                        );
+
 
                         const status =
                             document.createElement(
@@ -909,26 +726,32 @@ document.addEventListener(
                             );
 
 
-                        status.className =
-                            "text-3xl";
+                        status.className = `
+                            mt-3
+                            text-xs
+                            font-black
+                            ${
+                                jogador.online
+                                    ?
+                                    "text-emerald-400"
+                                    :
+                                    "text-slate-500"
+                            }
+                        `;
 
 
                         status.textContent =
                             jogador.online
                                 ?
-                                "🟢"
+                                "● Online"
                                 :
-                                "⚫";
+                                "● Desconectado";
 
 
-                        elemento.appendChild(
+                        conteudo.appendChild(
                             status
                         );
 
-
-                        // ====================================
-                        // NOME
-                        // ====================================
 
                         const nome =
                             document.createElement(
@@ -937,33 +760,76 @@ document.addEventListener(
 
 
                         nome.className = `
-                            mt-2
-
+                            mt-1
+                            text-lg
                             font-black
-
-                            text-slate-900
-
                             truncate
+                            ${classesNome(
+                                nomeId
+                            )}
                         `;
 
 
                         nome.textContent =
-                            jogador.nome ||
+                            jogador.nome
+                            ||
                             "Jogador";
 
 
-                        elemento.appendChild(
+                        conteudo.appendChild(
                             nome
                         );
 
 
-                        // ====================================
-                        // HOST
-                        // ====================================
+                        const titulo =
+                            cosmeticos?.titulo;
+
 
                         if (
-                            jogador.host
+                            titulo?.valor?.texto
                         ) {
+
+                            const tituloElemento =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            tituloElemento.className = `
+                                inline-flex
+                                items-center
+                                gap-1
+                                mt-2
+                                px-3
+                                py-1
+                                rounded-full
+                                border
+                                border-white/10
+                                bg-slate-950/60
+                                text-slate-200
+                                text-xs
+                                font-black
+                            `;
+
+
+                            tituloElemento.textContent =
+                                `${
+                                    titulo.icone
+                                    ||
+                                    "✨"
+                                } ${
+                                    titulo.valor.texto
+                                }`;
+
+
+                            conteudo.appendChild(
+                                tituloElemento
+                            );
+
+                        }
+
+
+                        if (jogador.host) {
 
                             const etiquetaHost =
                                 document.createElement(
@@ -973,75 +839,37 @@ document.addEventListener(
 
                             etiquetaHost.className = `
                                 inline-flex
-
                                 items-center
                                 justify-center
-
                                 mt-2
-
+                                ml-1
                                 px-3
                                 py-1
-
                                 rounded-full
-
-                                bg-amber-100
-                                text-amber-700
-
+                                bg-amber-400/10
+                                border
+                                border-amber-300/20
+                                text-amber-300
                                 text-xs
                                 font-black
                             `;
 
 
                             etiquetaHost.textContent =
-                                "👑 Anfitrião";
+                                " Anfitrião";
 
 
-                            elemento.appendChild(
+                            conteudo.appendChild(
                                 etiquetaHost
                             );
+
                         }
 
 
-                        // ====================================
-                        // OFFLINE
-                        // ====================================
-
                         if (
-                            !jogador.online
-                        ) {
-
-                            const offline =
-                                document.createElement(
-                                    "div"
-                                );
-
-
-                            offline.className = `
-                                mt-2
-
-                                text-xs
-                                text-slate-400
-
-                                font-bold
-                            `;
-
-
-                            offline.textContent =
-                                "Desconectado";
-
-
-                            elemento.appendChild(
-                                offline
-                            );
-                        }
-
-
-                        // ====================================
-                        // VOCÊ
-                        // ====================================
-
-                        if (
-                            jogadorAtual
+                            String(jogador.id)
+                            ===
+                            String(jogadorId)
                         ) {
 
                             const voce =
@@ -1052,20 +880,17 @@ document.addEventListener(
 
                             voce.className = `
                                 absolute
-
                                 top-2
                                 right-2
-
-                                bg-indigo-600
+                                z-20
+                                bg-indigo-500
                                 text-white
-
                                 rounded-full
-
                                 px-2
                                 py-1
-
                                 text-[10px]
                                 font-black
+                                shadow-lg
                             `;
 
 
@@ -1076,61 +901,35 @@ document.addEventListener(
                             elemento.appendChild(
                                 voce
                             );
+
                         }
+
+
+                        elemento.appendChild(
+                            conteudo
+                        );
 
 
                         lista.appendChild(
                             elemento
                         );
+
                     }
                 );
 
 
-                // ============================================
+                // --------------------------------------------
                 // BOTÃO DO HOST
-                // ============================================
+                // --------------------------------------------
 
                 if (
-                    iniciar
+                    host &&
+                    iniciar &&
+                    !iniciar.dataset.iniciando
                 ) {
 
-                    /*
-                    Importante:
-                    verificamos !== "true".
+                    iniciar.disabled = false;
 
-                    "false" é uma string e seria
-                    considerada verdadeira em:
-                    !iniciar.dataset.iniciando
-                    */
-
-                    const estaIniciando =
-                        iniciar.dataset.iniciando
-                        ===
-                        "true";
-
-
-                    if (
-                        ehHost
-                        &&
-                        !estaIniciando
-                    ) {
-
-                        iniciar.disabled =
-                            false;
-
-
-                        iniciar.textContent =
-                            "▶ Iniciar partida";
-
-                    }
-
-                    else if (
-                        !ehHost
-                    ) {
-
-                        iniciar.disabled =
-                            true;
-                    }
                 }
 
             }
@@ -1138,161 +937,47 @@ document.addEventListener(
 
 
         // ====================================================
-        // BOTÃO DE INICIAR
+        // INICIAR PARTIDA
         // ====================================================
 
         if (
+            host &&
             iniciar
         ) {
-
-            iniciar.dataset.iniciando =
-                "false";
-
 
             iniciar.addEventListener(
                 "click",
                 () => {
 
-                    // ========================================
-                    // NÃO É HOST
-                    // ========================================
-
-                    if (
-                        !ehHost
-                    ) {
-
-                        console.warn(
-                            "[LOBBY] Jogador tentou iniciar sem ser host."
-                        );
-
-
-                        mostrarAviso(
-                            "Somente o anfitrião pode iniciar a partida."
-                        );
-
-
-                        return;
-                    }
-
-
-                    // ========================================
-                    // SOCKET DESCONECTADO
-                    // ========================================
-
-                    if (
-                        !socket.connected
-                    ) {
-
-                        mostrarAviso(
-                            "A conexão com o servidor foi perdida. Aguarde a reconexão."
-                        );
-
-
-                        return;
-                    }
-
-
-                    // ========================================
-                    // CLIQUE DUPLO
-                    // ========================================
-
+                    // Impede clique duplo.
                     if (
                         iniciar.dataset.iniciando
                         ===
                         "true"
                     ) {
-
                         return;
                     }
 
 
-                    tocarSom(
-                        "somClique"
-                    );
+                    iniciar.dataset.iniciando =
+                        "true";
 
 
-                    definirBotaoInicio(
-                        "iniciando"
-                    );
+                    iniciar.disabled =
+                        true;
 
 
-                    console.log(
-                        "[LOBBY] Solicitando início da partida:",
-                        {
-                            codigo:
-                                codigo,
-
-                            jogador_id:
-                                jogadorId,
-
-                            jogadores_online:
-                                quantidadeOnline
-                        }
-                    );
+                    iniciar.textContent =
+                        " Iniciando partida...";
 
 
                     socket.emit(
                         "iniciar_partida",
                         {
-                            codigo:
-                                codigo,
-
-                            jogador_id:
-                                jogadorId
+                            codigo: codigo,
+                            jogador_id: jogadorId
                         }
                     );
-
-
-                    /*
-                    Se o backend não responder com
-                    partida_iniciada ou erro_sala,
-                    o botão não fica travado para sempre.
-                    */
-
-                    clearTimeout(
-                        timeoutInicio
-                    );
-
-
-                    timeoutInicio =
-                        setTimeout(
-                            () => {
-
-                                if (
-                                    redirecionando
-                                ) {
-
-                                    return;
-                                }
-
-
-                                if (
-                                    iniciar.dataset.iniciando
-                                    !==
-                                    "true"
-                                ) {
-
-                                    return;
-                                }
-
-
-                                console.warn(
-                                    "[LOBBY] O servidor não respondeu ao iniciar_partida."
-                                );
-
-
-                                definirBotaoInicio(
-                                    "normal"
-                                );
-
-
-                                mostrarAviso(
-                                    "O servidor não respondeu ao pedido de início. Tente novamente."
-                                );
-
-                            },
-                            8000
-                        );
 
                 }
             );
@@ -1308,60 +993,15 @@ document.addEventListener(
             "partida_iniciada",
             dados => {
 
-                console.log(
-                    "[LOBBY] Partida iniciada:",
-                    dados
-                );
-
-
-                if (
-                    redirecionando
-                ) {
-
-                    return;
-                }
-
-
-                redirecionando =
-                    true;
-
-
-                clearTimeout(
-                    timeoutInicio
-                );
-
-
-                tocarSom(
-                    "somConcluido"
-                );
-
-
                 const codigoPartida =
-                    String(
-                        dados?.codigo ||
-                        codigo
-                    );
+                    dados?.codigo ||
+                    codigo;
 
 
-                mostrarStatus(
-                    "Partida iniciada! 🎮",
-                    "online"
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        window.location.href =
-                            `/multiplayer/jogo/${
-                                encodeURIComponent(
-                                    codigoPartida
-                                )
-                            }`;
-
-                    },
-                    250
-                );
+                window.location.href =
+                    `/multiplayer/jogo/${encodeURIComponent(
+                        codigoPartida
+                    )}`;
 
             }
         );
@@ -1380,52 +1020,30 @@ document.addEventListener(
                     "Ocorreu um erro na sala.";
 
 
-                console.error(
-                    "[LOBBY] erro_sala:",
-                    mensagem,
-                    dados
-                );
-
-
-                clearTimeout(
-                    timeoutInicio
-                );
-
-
-                tocarSom(
-                    "somErro"
-                );
-
-
-                mostrarAviso(
+                alert(
                     mensagem
                 );
 
 
+                // Se o host tentou iniciar
+                // e ocorreu erro, libera novamente.
                 if (
+                    host &&
                     iniciar
                 ) {
 
-                    definirBotaoInicio(
-                        "normal"
-                    );
+                    iniciar.dataset.iniciando =
+                        "false";
+
+
+                    iniciar.disabled =
+                        false;
+
+
+                    iniciar.textContent =
+                        " Iniciar partida";
+
                 }
-
-            }
-        );
-
-
-        // ====================================================
-        // SAÍDA DA PÁGINA
-        // ====================================================
-
-        window.addEventListener(
-            "beforeunload",
-            () => {
-
-                clearTimeout(
-                    timeoutInicio
-                );
 
             }
         );

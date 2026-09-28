@@ -1,0 +1,5 @@
+BUGS
+
+-ao player sair da sala e determiando como desconectado nao sendo removido o container de seus dados
+gereando um novo player com mesmo dados alem da partida ficar travada num aflitiao que nunca pode voltar a sala
+

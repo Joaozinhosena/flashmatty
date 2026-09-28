@@ -156,8 +156,14 @@ def criar_sala(
             "id":
                 host_id,
 
+            "usuario_id":
+                None,
+
             "nome":
                 host_nome,
+
+            "cosmeticos":
+                {},
 
             "sid":
                 None,
@@ -328,8 +334,14 @@ def adicionar_jogador(
             "id":
                 jogador_id,
 
+            "usuario_id":
+                None,
+
             "nome":
                 nome,
+
+            "cosmeticos":
+                {},
 
             "sid":
                 sid,
@@ -783,8 +795,19 @@ def serializar_jogadores(
                 "id":
                     jogador["id"],
 
+                "usuario_id":
+                    jogador.get(
+                        "usuario_id"
+                    ),
+
                 "nome":
                     jogador["nome"],
+
+                "cosmeticos":
+                    jogador.get(
+                        "cosmeticos",
+                        {}
+                    ),
 
                 "pontos":
                     jogador["pontos"],
@@ -880,8 +903,19 @@ def ranking(
                 "id":
                     jogador["id"],
 
+                "usuario_id":
+                    jogador.get(
+                        "usuario_id"
+                    ),
+
                 "nome":
                     jogador["nome"],
+
+                "cosmeticos":
+                    jogador.get(
+                        "cosmeticos",
+                        {}
+                    ),
 
                 "pontos":
                     jogador.get(
@@ -990,7 +1024,6 @@ def alterar_estado(
         codigo
     )
 
-
     with LOCK:
 
         sala = SALAS.get(
@@ -1000,18 +1033,15 @@ def alterar_estado(
         if not sala:
             return False
 
-
         sala[
             "estado"
         ] = str(
             estado
         )
 
-
         sala[
             "ultima_atividade"
         ] = time.time()
-
 
         return True
 
@@ -1027,7 +1057,6 @@ def apagar_sala(
     codigo = normalizar_codigo(
         codigo
     )
-
 
     with LOCK:
 
@@ -1050,7 +1079,6 @@ def limpar_salas_expiradas():
 
     removidas = []
 
-
     with LOCK:
 
         for codigo, sala in list(
@@ -1068,7 +1096,6 @@ def limpar_salas_expiradas():
                 )
             )
 
-
             if (
                 agora
                 -
@@ -1085,6 +1112,5 @@ def limpar_salas_expiradas():
                 removidas.append(
                     codigo
                 )
-
 
     return removidas
