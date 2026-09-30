@@ -69,39 +69,39 @@ ITENS = [
     item(
         "titulo_calculista",
         "titulo",
-        "Calculista",
-        "Um título simples para quem gosta de resolver tudo.",
+        "Frio e calculista",
+        "ja dar pra sentir o clima europeu",
         120,
         "comum",
-        "🧮",
+        "🥶",
         {
-            "texto": "Calculista",
+            "texto": "Frio e calculista",
         },
     ),
 
     item(
         "titulo_mestre_tabuada",
         "titulo",
-        "Mestre da Tabuada",
-        "Mostre que multiplicação é com você.",
+        "performatico",
+        "apenas alguem performatico",
         260,
         "raro",
-        "✖️",
+        "💯",
         {
-            "texto": "Mestre da Tabuada",
+            "texto": "Performatico",
         },
     ),
 
     item(
-        "titulo_cacador_desafios",
+        "Mentalista",
         "titulo",
-        "Caçador de Desafios",
-        "Para jogadores que não fogem de uma partida difícil.",
+        "Mentalista",
+        "patrick janes ?.",
         420,
         "epico",
-        "🎯",
+        "👁️‍🗨️",
         {
-            "texto": "Caçador de Desafios",
+            "texto": "Mentalista",
         },
     ),
 
@@ -121,13 +121,13 @@ ITENS = [
     item(
         "titulo_lenda_flashmatty",
         "titulo",
-        "Lenda do FlashMatty",
-        "Um dos títulos mais prestigiados da loja.",
+        "Pitagorico",
+        "hipotenusa ao quadrado e igual os cateto",
         1500,
         "lendario",
         "👑",
         {
-            "texto": "Lenda do FlashMatty",
+            "texto": "Pitagorico",
         },
     ),
 

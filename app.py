@@ -44,6 +44,7 @@ from datetime import datetime
 from social.models import PerfilUsuario
 from social.routes import social_bp
 from loja.routes import loja_bp
+from conquistas.routes import conquistas_bp
 
 
 # ============================================================
@@ -131,6 +132,11 @@ app.register_blueprint(
 
 app.register_blueprint(
     loja_bp
+)
+
+
+app.register_blueprint(
+    conquistas_bp
 )
 
 

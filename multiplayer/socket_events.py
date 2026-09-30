@@ -28,6 +28,11 @@ from loja.services import (
 )
 
 
+from conquistas.services import (
+    registrar_resultado_multiplayer,
+)
+
+
 # ============================================================
 # AUXILIARES
 # ============================================================
@@ -412,6 +417,12 @@ def proxima_questao(dados):
 
             classificacao = ranking(
                 codigo
+            )
+
+            registrar_resultado_multiplayer(
+                codigo,
+                sala,
+                classificacao
             )
 
             emit(
@@ -801,6 +812,12 @@ def encerrar_rodada(codigo):
     )
 
     if terminou:
+
+        registrar_resultado_multiplayer(
+            codigo,
+            sala,
+            classificacao
+        )
 
         emit(
             "partida_finalizada",
