@@ -4,6 +4,30 @@
 
 <head>
 
+
+<link
+    rel="manifest"
+    href="{{ url_for(
+        'static',
+        filename='manifest.json'
+    ) }}"
+>
+
+<meta
+    name="theme-color"
+    content="#6366f1"
+>
+
+
+
+
+
+
+
+
+
+
+
     <meta charset="UTF-8">
 
     <meta
@@ -36,52 +60,57 @@
         seo_description
         if seo_description is defined
         else
-        seo_default_description
+        (
+            seo_default_description
+            if seo_default_description is defined
+            else
+            "Aprenda matemática com exercícios progressivos, desafios, conquistas, moedas, perfis personalizados e partidas multiplayer no FlashMatty."
+        )
     %}
 
     {% set _seo_canonical =
         seo_canonical
         if seo_canonical is defined
         else
-        seo_canonical_default
+        (
+            seo_canonical_default
+            if seo_canonical_default is defined
+            else
+            request.url
+        )
     %}
 
     {% set _seo_image =
         seo_og_image
         if seo_og_image is defined
         else
-        seo_og_image_default
+        (
+            seo_og_image_default
+            if seo_og_image_default is defined
+            else
+            url_for(
+                'static',
+                filename='img/seo/flashmatty-og.png',
+                _external=True
+            )
+        )
     %}
-
 
     <meta
         name="description"
         content="{{ _seo_description }}"
     >
 
-
     {% if seo_index is defined and seo_index %}
 
     <meta
         name="robots"
-        content="
-            index,
-            follow,
-            max-image-preview:large,
-            max-snippet:-1,
-            max-video-preview:-1
-        "
+        content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     >
 
     <meta
         name="googlebot"
-        content="
-            index,
-            follow,
-            max-image-preview:large,
-            max-snippet:-1,
-            max-video-preview:-1
-        "
+        content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     >
 
     {% else %}
@@ -98,7 +127,6 @@
 
     {% endif %}
 
-
     <link
         rel="canonical"
         href="{{ _seo_canonical }}"
@@ -109,7 +137,6 @@
         hreflang="pt-BR"
         href="{{ _seo_canonical }}"
     >
-
 
     <meta property="og:locale" content="pt_BR">
     <meta property="og:type" content="website">
@@ -125,7 +152,6 @@
         content="FlashMatty - aprenda matemática jogando"
     >
 
-
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ _seo_title }}">
     <meta
@@ -134,11 +160,7 @@
     >
     <meta name="twitter:image" content="{{ _seo_image }}">
 
-
-    <meta name="theme-color" content="#0f172a">
-
-
-    {% if seo_google_verification %}
+    {% if seo_google_verification is defined and seo_google_verification %}
 
     <meta
         name="google-site-verification"
@@ -150,52 +172,40 @@
 
 
     <!-- ====================================================== -->
-    <!-- CARREGAR CONFIGURAÇÕES ANTES DA PÁGINA APARECER -->
-    <!-- Evita piscar tema claro antes do escuro -->
+    <!-- TEMA GLOBAL -->
+    <!-- Carrega antes da interface para evitar "flash" -->
+    <!-- ====================================================== -->
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/tema.js'
+        ) }}?v=2"
+    ></script>
+
+
+    <!-- ====================================================== -->
+    <!-- ACESSIBILIDADE -->
     <!-- ====================================================== -->
 
     <script>
 
         (function () {
 
-            const temaSalvo =
-                localStorage.getItem(
-                    "flashmatty_tema"
-                ) || "dark";
-
-
-            let temaFinal =
-                temaSalvo;
-
-
-            if (
-                temaSalvo === "system"
-            ) {
-
-                temaFinal =
-                    window.matchMedia(
-                        "(prefers-color-scheme: dark)"
-                    ).matches
-                        ? "dark"
-                        : "light";
-
-            }
-
-
-            document.documentElement.dataset.theme =
-                temaFinal;
-
-
             const reduzirAnimacoes =
                 localStorage.getItem(
                     "flashmatty_reduzir_animacoes"
-                ) === "true";
+                )
+                ===
+                "true";
 
 
             const textoGrande =
                 localStorage.getItem(
                     "flashmatty_texto_grande"
-                ) === "true";
+                )
+                ===
+                "true";
 
 
             if (reduzirAnimacoes) {
@@ -228,20 +238,343 @@
 
 
     <!-- ====================================================== -->
-    <!-- ESTILOS GLOBAIS -->
+    <!-- ESTILO GLOBAL FLASHMATTY -->
     <!-- ====================================================== -->
 
     <style>
 
         /* ==================================================== */
-        /* TRANSIÇÃO DE TEMA */
+        /* VARIÁVEIS PADRÃO */
+        /* ==================================================== */
+
+        :root {
+
+            --fm-primary:
+                #6366f1;
+
+            --fm-bg:
+                #0f172a;
+
+            --fm-card:
+                #1e293b;
+
+            --fm-surface:
+                #334155;
+
+            --fm-text:
+                #f8fafc;
+
+            --fm-muted:
+                #94a3b8;
+
+            --fm-border:
+                #334155;
+
+            --fm-on-primary:
+                #ffffff;
+
+        }
+
+
+        /* ==================================================== */
+        /* BASE */
         /* ==================================================== */
 
         html,
         body {
+
             transition:
-                background-color .2s ease,
-                color .2s ease;
+                background-color .20s ease,
+                color .20s ease;
+
+        }
+
+
+        body {
+
+            background-color:
+                var(--fm-bg) !important;
+
+            color:
+                var(--fm-text) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* HEADER */
+        /* ==================================================== */
+
+        .app-header {
+
+            background-color:
+                var(--fm-card) !important;
+
+            border-color:
+                var(--fm-border) !important;
+
+            color:
+                var(--fm-text) !important;
+
+        }
+
+
+        .app-logo {
+
+            color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        .app-logo:hover {
+
+            filter:
+                brightness(1.15);
+
+        }
+
+
+        .app-nav-link {
+
+            color:
+                var(--fm-text) !important;
+
+        }
+
+
+        .app-nav-link:hover {
+
+            color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        .app-avatar {
+
+            border-color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* FUNDOS ANTIGOS DO TAILWIND */
+        /* ==================================================== */
+
+        .bg-slate-50,
+        .bg-slate-900 {
+
+            background-color:
+                var(--fm-bg) !important;
+
+        }
+
+
+        .bg-white,
+        .bg-slate-800 {
+
+            background-color:
+                var(--fm-card) !important;
+
+        }
+
+
+        .bg-slate-100,
+        .bg-slate-200,
+        .bg-slate-700 {
+
+            background-color:
+                var(--fm-surface) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* TEXTOS */
+        /* ==================================================== */
+
+        .text-slate-900,
+        .text-slate-800,
+        .text-slate-700 {
+
+            color:
+                var(--fm-text) !important;
+
+        }
+
+
+        .text-slate-300,
+        .text-slate-400,
+        .text-slate-500,
+        .text-slate-600 {
+
+            color:
+                var(--fm-muted) !important;
+
+        }
+
+
+        /*
+        Elementos text-white normalmente precisam acompanhar
+        o tema, exceto botões coloridos.
+        */
+
+        .text-white {
+
+            color:
+                var(--fm-text) !important;
+
+        }
+
+
+        .bg-indigo-500.text-white,
+        .bg-indigo-600.text-white,
+        .bg-indigo-700.text-white,
+        .bg-violet-600.text-white,
+        .bg-violet-700.text-white,
+        .bg-red-500.text-white,
+        .bg-red-600.text-white,
+        .bg-green-500.text-white,
+        .bg-green-600.text-white {
+
+            color:
+                #ffffff !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* BORDAS */
+        /* ==================================================== */
+
+        .border-slate-100,
+        .border-slate-200,
+        .border-slate-300,
+        .border-slate-600,
+        .border-slate-700 {
+
+            border-color:
+                var(--fm-border) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* COR PRINCIPAL */
+        /* ==================================================== */
+
+        .bg-indigo-500,
+        .bg-indigo-600,
+        .bg-indigo-700 {
+
+            background-color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        .text-indigo-300,
+        .text-indigo-400,
+        .text-indigo-500,
+        .text-indigo-600,
+        .text-indigo-700 {
+
+            color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        .border-indigo-200,
+        .border-indigo-300,
+        .border-indigo-400,
+        .border-indigo-500,
+        .border-indigo-600 {
+
+            border-color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* HOVER PRIMÁRIO */
+        /* ==================================================== */
+
+        .hover\:bg-indigo-500:hover,
+        .hover\:bg-indigo-600:hover,
+        .hover\:bg-indigo-700:hover {
+
+            background-color:
+                var(--fm-primary) !important;
+
+            filter:
+                brightness(.88);
+
+        }
+
+
+        .hover\:text-indigo-300:hover,
+        .hover\:text-indigo-400:hover,
+        .hover\:text-indigo-500:hover,
+        .hover\:text-indigo-600:hover,
+        .hover\:text-indigo-700:hover {
+
+            color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* FOCUS */
+        /* ==================================================== */
+
+        .focus\:border-indigo-500:focus {
+
+            border-color:
+                var(--fm-primary) !important;
+
+        }
+
+
+        /* ==================================================== */
+        /* INPUTS */
+        /* ==================================================== */
+
+        input,
+        textarea,
+        select {
+
+            color:
+                var(--fm-text);
+
+        }
+
+
+        input::placeholder,
+        textarea::placeholder {
+
+            color:
+                var(--fm-muted);
+
+        }
+
+
+        /* ==================================================== */
+        /* TEMA PERSONALIZADO */
+        /* ==================================================== */
+
+        html[data-theme="custom"] body {
+
+            background-color:
+                var(--fm-bg) !important;
+
+            color:
+                var(--fm-text) !important;
+
         }
 
 
@@ -249,72 +582,10 @@
         /* TEMA ESCURO */
         /* ==================================================== */
 
-        html[data-theme="dark"] body {
+        html[data-theme="dark"] {
 
-            background:
-                #0f172a;
-
-            color:
-                #f8fafc;
-
-        }
-
-
-        html[data-theme="dark"] .app-header {
-
-            background:
-                rgba(
-                    15,
-                    23,
-                    42,
-                    .95
-                );
-
-            border-color:
-                #334155;
-
-            color:
-                #f8fafc;
-
-        }
-
-
-        html[data-theme="dark"] .app-logo {
-
-            color:
-                #818cf8;
-
-        }
-
-
-        html[data-theme="dark"] .app-logo:hover {
-
-            color:
-                #a5b4fc;
-
-        }
-
-
-        html[data-theme="dark"] .app-nav-link {
-
-            color:
-                #cbd5e1;
-
-        }
-
-
-        html[data-theme="dark"] .app-nav-link:hover {
-
-            color:
-                #818cf8;
-
-        }
-
-
-        html[data-theme="dark"] .app-avatar {
-
-            border-color:
-                #6366f1;
+            color-scheme:
+                dark;
 
         }
 
@@ -323,72 +594,10 @@
         /* TEMA CLARO */
         /* ==================================================== */
 
-        html[data-theme="light"] body {
+        html[data-theme="light"] {
 
-            background:
-                #f8fafc;
-
-            color:
-                #0f172a;
-
-        }
-
-
-        html[data-theme="light"] .app-header {
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    .96
-                );
-
-            border-color:
-                #e2e8f0;
-
-            color:
-                #0f172a;
-
-        }
-
-
-        html[data-theme="light"] .app-logo {
-
-            color:
-                #4f46e5;
-
-        }
-
-
-        html[data-theme="light"] .app-logo:hover {
-
-            color:
-                #4338ca;
-
-        }
-
-
-        html[data-theme="light"] .app-nav-link {
-
-            color:
-                #334155;
-
-        }
-
-
-        html[data-theme="light"] .app-nav-link:hover {
-
-            color:
-                #4f46e5;
-
-        }
-
-
-        html[data-theme="light"] .app-avatar {
-
-            border-color:
-                #c7d2fe;
+            color-scheme:
+                light;
 
         }
 
@@ -428,10 +637,6 @@
         }
 
 
-        /* ==================================================== */
-        /* SCROLL SUAVE NORMAL */
-        /* ==================================================== */
-
         html:not(.reduzir-animacoes) {
 
             scroll-behavior:
@@ -461,9 +666,7 @@
                     0;
 
                 transform:
-                    translateY(
-                        -8px
-                    );
+                    translateY(-8px);
 
             }
 
@@ -474,9 +677,7 @@
                     1;
 
                 transform:
-                    translateY(
-                        0
-                    );
+                    translateY(0);
 
             }
 
@@ -484,7 +685,7 @@
 
 
         /* ==================================================== */
-        /* AJUSTE PARA ÂNCORAS COM HEADER STICKY */
+        /* HEADER STICKY + ÂNCORA */
         /* ==================================================== */
 
         [id] {
@@ -545,9 +746,7 @@
     >
 
 
-        <!-- ================================================== -->
         <!-- LOGO -->
-        <!-- ================================================== -->
 
         <a
             href="{{ url_for('dashboard') }}"
@@ -563,9 +762,7 @@
         </a>
 
 
-        <!-- ================================================== -->
         <!-- NAVEGAÇÃO -->
-        <!-- ================================================== -->
 
         <nav
             class="
@@ -583,63 +780,19 @@
         >
 
 
-            <!-- INÍCIO -->
-
             <a
                 href="{{ url_for('dashboard') }}"
-
-                class="
-                    app-nav-link
-                    transition
-                "
+                class="app-nav-link transition"
             >
                 Início
             </a>
 
 
-            <!-- JORNADA -->
+          
 
-            <a
-                href="{{ url_for('jornada') }}"
-
-                class="
-                    app-nav-link
-                    transition
-                "
-            >
-                Jornada
-            </a>
+          
 
 
-            <!-- BIBLIOTECA -->
-
-            <a
-                href="{{ url_for('biblioteca') }}"
-
-                class="
-                    app-nav-link
-                    transition
-                "
-            >
-                Biblioteca
-            </a>
-
-
-            <!-- BUSCAR -->
-
-            <a
-                href="{{ url_for('social.buscar_usuarios') }}"
-
-                class="
-                    app-nav-link
-                    transition
-                "
-            >
-                Buscar
-            </a>
-
-
-            <!-- AMIGOS -->
 
             <a
                 href="{{ url_for('social.amigos') }}"
@@ -687,6 +840,30 @@
             </a>
 
 
+
+
+            <!-- LOJA -->
+
+            <a
+                href="{{ url_for('loja.index') }}"
+
+                class="
+                    app-nav-link
+                    transition
+                "
+
+                title="Loja"
+            >
+
+                
+
+                <span class="">
+                    Loja
+                </span>
+
+            </a>
+
+
             <!-- CONFIGURAÇÕES -->
 
             <a
@@ -699,11 +876,13 @@
 
                 title="Configurações"
             >
-                ⚙️
 
-                <span class="hidden lg:inline">
+                
+
+                <span class="">
                     Configurações
                 </span>
+
             </a>
 
 
@@ -715,7 +894,7 @@
                     whitespace-nowrap
                 "
             >
-                ⭐ {{ current_user.xp or 0 }} XP
+                XP {{ current_user.xp or 0 }} 
             </span>
 
 
@@ -805,7 +984,7 @@
 
 
 <!-- ========================================================== -->
-<!-- MENSAGENS FLASH -->
+<!-- FLASH MESSAGES -->
 <!-- ========================================================== -->
 
 {% with mensagens = get_flashed_messages() %}
@@ -866,29 +1045,26 @@
 
 
 <!-- ========================================================== -->
-<!-- CONFIGURAÇÕES GLOBAIS JS -->
+<!-- CONFIGURAÇÃO GLOBAL -->
 <!-- ========================================================== -->
 
 <script>
 
-    /*
-    ============================================================
-    CONFIGURAÇÃO GLOBAL DO FLASHMATTY
-
-    Pode ser utilizada por sons.js, multiplayer, exercícios etc.
-    ============================================================
-    */
-
     window.FlashMattyConfig = {
+
 
         get tema() {
 
             return (
+
                 localStorage.getItem(
                     "flashmatty_tema"
                 )
+
                 ||
+
                 "dark"
+
             );
 
         },
@@ -898,20 +1074,27 @@
 
             const valor =
                 Number(
+
                     localStorage.getItem(
                         "flashmatty_volume"
                     )
+
                     ??
+
                     70
+
                 );
 
 
             return Math.max(
+
                 0,
+
                 Math.min(
                     100,
                     valor
                 )
+
             );
 
         },
@@ -931,11 +1114,15 @@
         get sonsAtivados() {
 
             return (
+
                 localStorage.getItem(
                     "flashmatty_sons"
                 )
+
                 !==
+
                 "false"
+
             );
 
         },
@@ -944,11 +1131,15 @@
         get reduzirAnimacoes() {
 
             return (
+
                 localStorage.getItem(
                     "flashmatty_reduzir_animacoes"
                 )
+
                 ===
+
                 "true"
+
             );
 
         },
@@ -957,11 +1148,15 @@
         get textoGrande() {
 
             return (
+
                 localStorage.getItem(
                     "flashmatty_texto_grande"
                 )
+
                 ===
+
                 "true"
+
             );
 
         }
@@ -979,7 +1174,7 @@
     src="{{ url_for(
         'static',
         filename='js/sons.js'
-    ) }}?v=6"
+    ) }}?v=7"
 ></script>
 
 
@@ -994,18 +1189,36 @@
 ></script>
 
 
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/notificacoes.js'
+    ) }}?v=1"
+></script>
+
+
+
 <script
     src="{{ url_for(
         'static',
         filename='js/social.js'
-    ) }}?v=2"
+    ) }}?v=6"
 ></script>
+
+
+
+
+
+
+
+
 
 {% endif %}
 
 
 <!-- ========================================================== -->
-<!-- SCRIPTS DAS PÁGINAS -->
+<!-- SCRIPTS ESPECÍFICOS -->
 <!-- ========================================================== -->
 
 {% block scripts %}
