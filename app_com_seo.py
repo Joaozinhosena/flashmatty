@@ -39,12 +39,13 @@ from models import (
 from curriculum import CURRICULO
 from game import gerar_questao
 
+from seo import registrar_seo
+
 from datetime import datetime
 
 from social.models import PerfilUsuario
 from social.routes import social_bp
 from loja.routes import loja_bp
-from conquistas.routes import conquistas_bp
 
 
 # ============================================================
@@ -68,6 +69,13 @@ app.config[
 app.config[
     "SQLALCHEMY_TRACK_MODIFICATIONS"
 ] = False
+
+
+# ============================================================
+# SEO / GOOGLE
+# ============================================================
+
+registrar_seo(app)
 
 
 # ============================================================
@@ -132,11 +140,6 @@ app.register_blueprint(
 
 app.register_blueprint(
     loja_bp
-)
-
-
-app.register_blueprint(
-    conquistas_bp
 )
 
 

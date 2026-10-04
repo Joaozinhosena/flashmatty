@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}
+FlashMatty - Aprenda Matemática Jogando
+{% endblock %}
+
+
+{% block head %}
+{{ super() }}
+
+<script type="application/ld+json">
+{{
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FlashMatty",
+        "url": seo_site_url ~ "/",
+        "description": seo_default_description,
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "pt-BR",
+        "featureList": [
+            "Exercícios progressivos de matemática",
+            "Sistema de XP e moedas",
+            "Conquistas dinâmicas",
+            "Perfis personalizáveis",
+            "Partidas multiplayer"
+        ]
+    }
+    | tojson
+}}
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-950 text-white">
+
+    <header
+        class="
+            sticky top-0 z-40
+            border-b border-slate-800
+            bg-slate-950/90 backdrop-blur-xl
+        "
+    >
+        <div
+            class="
+                max-w-7xl mx-auto px-4 py-4
+                flex items-center justify-between gap-4
+            "
+        >
+            <a
+                href="{{ url_for('index') }}"
+                class="text-xl md:text-2xl font-black text-indigo-400"
+                aria-label="FlashMatty - início"
+            >
+                ⚡ FlashMatty
+            </a>
+
+            <nav
+                class="flex items-center gap-2 sm:gap-3"
+                aria-label="Navegação pública"
+            >
+                <a
+                    href="#recursos"
+                    class="
+                        hidden md:inline-flex
+                        text-slate-300 hover:text-white
+                        font-bold px-3 py-2
+                    "
+                >
+                    Recursos
+                </a>
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="
+                        rounded-xl border border-slate-700
+                        hover:border-indigo-400
+                        px-4 py-2 font-black transition
+                    "
+                >
+                    Entrar
+                </a>
+
+                <a
+                    href="{{ url_for('cadastro') }}"
+                    class="
+                        rounded-xl bg-indigo-600
+                        hover:bg-indigo-500
+                        px-4 py-2 font-black transition
+                    "
+                >
+                    Criar conta
+                </a>
+            </nav>
+        </div>
+    </header>
+
+
+    <main>
+
+        <section
+            class="
+                relative overflow-hidden
+                border-b border-slate-900
+            "
+        >
+            <div
+                class="
+                    absolute -top-48 left-1/2
+                    -translate-x-1/2
+                    w-[46rem] h-[46rem]
+                    rounded-full bg-indigo-600/15
+                    blur-3xl pointer-events-none
+                "
+                aria-hidden="true"
+            ></div>
+
+            <div
+                class="
+                    relative max-w-7xl mx-auto
+                    px-4 py-20 md:py-28 lg:py-32
+                "
+            >
+                <div class="max-w-4xl mx-auto text-center">
+
+                    <p
+                        class="
+                            inline-flex rounded-full
+                            border border-indigo-400/20
+                            bg-indigo-400/10
+                            px-4 py-2 text-sm
+                            text-indigo-300 font-black
+                        "
+                    >
+                        Matemática • Progressão • Multiplayer
+                    </p>
+
+                    <h1
+                        class="
+                            text-4xl sm:text-5xl lg:text-7xl
+                            font-black tracking-tight mt-6
+                        "
+                    >
+                        Aprenda matemática
+                        <span class="text-indigo-400">
+                            jogando e evoluindo
+                        </span>
+                    </h1>
+
+                    <p
+                        class="
+                            text-lg md:text-xl text-slate-300
+                            max-w-3xl mx-auto mt-6
+                            leading-relaxed
+                        "
+                    >
+                        O FlashMatty reúne exercícios progressivos,
+                        XP, moedas, conquistas, perfis personalizados
+                        e partidas multiplayer em uma experiência
+                        educacional de matemática.
+                    </p>
+
+                    <div
+                        class="
+                            flex flex-col sm:flex-row
+                            justify-center gap-3 mt-8
+                        "
+                    >
+                        <a
+                            href="{{ url_for('cadastro') }}"
+                            class="
+                                rounded-2xl bg-indigo-600
+                                hover:bg-indigo-500
+                                px-7 py-4 text-lg font-black
+                                shadow-xl transition
+                            "
+                        >
+                            Começar gratuitamente
+                        </a>
+
+                        <a
+                            href="#como-funciona"
+                            class="
+                                rounded-2xl border border-slate-700
+                                bg-slate-900/70 hover:bg-slate-900
+                                px-7 py-4 text-lg font-black transition
+                            "
+                        >
+                            Como funciona
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <section
+            id="recursos"
+            class="max-w-7xl mx-auto px-4 py-20"
+        >
+            <div class="max-w-3xl">
+                <p
+                    class="
+                        text-indigo-400 uppercase
+                        tracking-widest text-xs font-black
+                    "
+                >
+                    Recursos
+                </p>
+
+                <h2
+                    class="
+                        text-3xl md:text-4xl
+                        font-black mt-2
+                    "
+                >
+                    Mais do que uma lista de exercícios
+                </h2>
+
+                <p class="text-slate-400 mt-4 text-lg">
+                    Cada atividade contribui para a progressão
+                    do jogador e se conecta aos demais sistemas
+                    do FlashMatty.
+                </p>
+            </div>
+
+            <div
+                class="
+                    grid md:grid-cols-2 xl:grid-cols-3
+                    gap-5 mt-10
+                "
+            >
+
+                {% set recursos = [
+                    (
+                        "🧠",
+                        "Exercícios progressivos",
+                        "Trilhas organizadas para praticar matemática em etapas e acompanhar a evolução do conteúdo."
+                    ),
+                    (
+                        "🎮",
+                        "Multiplayer",
+                        "Partidas de matemática com ranking, pontuação, velocidade de resposta e competição entre jogadores."
+                    ),
+                    (
+                        "🏆",
+                        "Conquistas",
+                        "Emblemas acompanham marcos de estudo, precisão, XP, vitórias, pódios e outras metas dinâmicas."
+                    ),
+                    (
+                        "🪙",
+                        "XP e moedas",
+                        "O progresso gera recompensas que ajudam a representar a trajetória do jogador dentro da plataforma."
+                    ),
+                    (
+                        "✨",
+                        "Perfil personalizável",
+                        "Títulos, molduras, fundos, badges, cartões e efeitos cosméticos permitem personalizar o perfil."
+                    ),
+                    (
+                        "👥",
+                        "Social",
+                        "Perfis, amizades e desafios conectam o estudo individual às atividades com outros jogadores."
+                    )
+                ] %}
+
+                {% for icone, titulo, texto in recursos %}
+
+                <article
+                    class="
+                        rounded-3xl border border-slate-800
+                        bg-slate-900/70 p-6
+                    "
+                >
+                    <div class="text-4xl">
+                        {{ icone }}
+                    </div>
+
+                    <h3 class="text-xl font-black mt-4">
+                        {{ titulo }}
+                    </h3>
+
+                    <p
+                        class="
+                            text-slate-400 mt-2 leading-relaxed
+                        "
+                    >
+                        {{ texto }}
+                    </p>
+                </article>
+
+                {% endfor %}
+
+            </div>
+        </section>
+
+
+        <section
+            id="como-funciona"
+            class="
+                border-y border-slate-900
+                bg-slate-900/30
+            "
+        >
+            <div class="max-w-7xl mx-auto px-4 py-20">
+
+                <div
+                    class="
+                        grid lg:grid-cols-2
+                        gap-10 items-center
+                    "
+                >
+                    <div>
+                        <p
+                            class="
+                                text-emerald-400 uppercase
+                                tracking-widest text-xs font-black
+                            "
+                        >
+                            Como funciona
+                        </p>
+
+                        <h2
+                            class="
+                                text-3xl md:text-4xl
+                                font-black mt-2
+                            "
+                        >
+                            Estude, pratique e acompanhe sua evolução
+                        </h2>
+
+                        <p
+                            class="
+                                text-slate-400 text-lg
+                                leading-relaxed mt-4
+                            "
+                        >
+                            A jornada combina prática individual
+                            e elementos de jogo. O objetivo é tornar
+                            a continuidade do estudo mais visível
+                            e interativa.
+                        </p>
+                    </div>
+
+                    <ol class="space-y-4">
+
+                        {% set passos = [
+                            (
+                                "1",
+                                "Crie sua conta",
+                                "Seu progresso fica associado ao seu perfil.",
+                                "bg-indigo-600"
+                            ),
+                            (
+                                "2",
+                                "Resolva atividades",
+                                "Avance pelas etapas e acumule experiência.",
+                                "bg-violet-600"
+                            ),
+                            (
+                                "3",
+                                "Desbloqueie marcos",
+                                "Conquistas e recompensas registram sua evolução.",
+                                "bg-emerald-600"
+                            ),
+                            (
+                                "4",
+                                "Jogue com outras pessoas",
+                                "Use o multiplayer para testar velocidade e precisão.",
+                                "bg-rose-600"
+                            )
+                        ] %}
+
+                        {% for numero, titulo, texto, cor in passos %}
+
+                        <li
+                            class="
+                                flex gap-4 rounded-2xl
+                                border border-slate-800
+                                bg-slate-950/70 p-5
+                            "
+                        >
+                            <span
+                                class="
+                                    w-10 h-10 rounded-xl
+                                    {{ cor }}
+                                    flex items-center justify-center
+                                    font-black shrink-0
+                                "
+                            >
+                                {{ numero }}
+                            </span>
+
+                            <div>
+                                <h3 class="font-black">
+                                    {{ titulo }}
+                                </h3>
+                                <p class="text-slate-400 mt-1">
+                                    {{ texto }}
+                                </p>
+                            </div>
+                        </li>
+
+                        {% endfor %}
+
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="max-w-5xl mx-auto px-4 py-20">
+            <div
+                class="
+                    rounded-3xl border border-indigo-400/20
+                    bg-gradient-to-br
+                    from-indigo-950 via-slate-900 to-slate-950
+                    p-8 md:p-12 text-center shadow-2xl
+                "
+            >
+                <h2 class="text-3xl md:text-4xl font-black">
+                    Comece sua jornada no FlashMatty
+                </h2>
+
+                <p
+                    class="
+                        text-slate-300 max-w-2xl
+                        mx-auto mt-4
+                    "
+                >
+                    Crie uma conta para salvar seu progresso,
+                    desbloquear conquistas e participar das
+                    atividades da plataforma.
+                </p>
+
+                <a
+                    href="{{ url_for('cadastro') }}"
+                    class="
+                        inline-flex rounded-2xl
+                        bg-indigo-600 hover:bg-indigo-500
+                        px-7 py-4 font-black
+                        mt-7 transition
+                    "
+                >
+                    Criar minha conta
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+
+    <footer
+        class="
+            border-t border-slate-900
+            px-4 py-8 text-center
+            text-sm text-slate-500
+        "
+    >
+        <p>
+            FlashMatty — plataforma educacional de matemática.
+        </p>
+    </footer>
+
+</div>
+
+{% endblock %}
