@@ -2588,7 +2588,11 @@ def configuracoes():
     )
 
 
-
+@app.route("/.well-known/assetlinks.json")
+def assetlinks():
+    return app.send_static_file(
+        ".well-known/assetlinks.json"
+    )
 
 # ============================================================
 # INICIAR SERVIDOR
