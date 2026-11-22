@@ -1,5 +1,6 @@
 
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -206,6 +207,52 @@ def service_worker():
 
 
 
+
+
+# ============================================================
+# PWA: POLÍTICA DE ATUALIZAÇÃO DOS ARQUIVOS PÚBLICOS
+# ============================================================
+# Evita manter manifest, ícones e arquivo de registro da PWA
+# indefinidamente em cache HTTP. A versão do cache da PWA
+# continua sendo gerenciada pelo Service Worker.
+
+@app.after_request
+def configurar_cache_pwa(resposta):
+
+    caminho = request.path
+
+    if (
+        caminho == "/service-worker.js"
+        or caminho == "/static/manifest.json"
+        or caminho == "/static/js/pwa.js"
+        or caminho.startswith("/static/img/icons/")
+    ):
+        resposta.headers["Cache-Control"] = (
+            "no-cache, max-age=0, must-revalidate"
+        )
+
+    # O Search Console exige acesso ao arquivo de verificação
+    # sem login e com conteúdo idêntico ao arquivo fornecido.
+    if request.endpoint == "google_verificacao":
+        resposta.headers["Cache-Control"] = "no-store"
+
+    return resposta
+
+
+# ============================================================
+# SEARCH CONSOLE: ARQUIVO HTML DISPONÍVEL NA RAIZ DO SITE
+# ============================================================
+# Exemplo: static/google123abc.html será servido em
+# /google123abc.html (sem redirecionamento para login).
+# O arquivo exato fornecido pelo Google deve estar em /static.
+
+@app.route("/google<codigo>.html", methods=["GET"])
+def google_verificacao(codigo):
+
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", codigo):
+        abort(404)
+
+    return app.send_static_file(f"google{codigo}.html")
 
 
 # ============================================================
