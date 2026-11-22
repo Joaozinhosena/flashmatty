@@ -73,7 +73,7 @@ ITENS = [
         "ja dar pra sentir o clima europeu",
         120,
         "comum",
-        "🥶",
+        "",
         {
             "texto": "Frio e calculista",
         },
@@ -86,7 +86,7 @@ ITENS = [
         "apenas alguem performatico",
         260,
         "raro",
-        "💯",
+        "",
         {
             "texto": "Performatico",
         },
@@ -99,7 +99,7 @@ ITENS = [
         "patrick janes ?.",
         420,
         "epico",
-        "👁️‍🗨️",
+        "",
         {
             "texto": "Mentalista",
         },
@@ -112,7 +112,7 @@ ITENS = [
         "Um título épico para quem domina os números.",
         650,
         "epico",
-        "🧠",
+        "",
         {
             "texto": "Gênio dos Números",
         },
@@ -125,7 +125,7 @@ ITENS = [
         "hipotenusa ao quadrado e igual os cateto",
         1500,
         "lendario",
-        "👑",
+        "",
         {
             "texto": "Pitagorico",
         },
@@ -142,7 +142,7 @@ ITENS = [
         "Azul profundo com atmosfera noturna.",
         180,
         "comum",
-        "🌙",
+        "",
         {
             "background":
                 "linear-gradient(135deg,#020617 0%,#172554 55%,#312e81 100%)",
@@ -156,7 +156,7 @@ ITENS = [
         "Um degradê quente inspirado no pôr do sol.",
         320,
         "raro",
-        "🌅",
+        "",
         {
             "background":
                 "linear-gradient(135deg,#431407 0%,#9a3412 35%,#be185d 72%,#312e81 100%)",
@@ -170,7 +170,7 @@ ITENS = [
         "Cores elétricas para um perfil chamativo.",
         480,
         "epico",
-        "💜",
+        "",
         {
             "background":
                 "radial-gradient(circle at 18% 20%,rgba(34,211,238,.34),transparent 30%),"
@@ -186,7 +186,7 @@ ITENS = [
         "Um fundo espacial com profundidade e brilho.",
         750,
         "lendario",
-        "🌌",
+        "",
         {
             "background":
                 "radial-gradient(circle at 20% 22%,rgba(129,140,248,.45),transparent 24%),"
@@ -203,7 +203,7 @@ ITENS = [
         "Tons verdes profundos e sofisticados.",
         520,
         "epico",
-        "💚",
+        "",
         {
             "background":
                 "radial-gradient(circle at 75% 25%,rgba(52,211,153,.32),transparent 28%),"
@@ -222,7 +222,7 @@ ITENS = [
         "Moldura brilhante em tons índigo.",
         150,
         "comum",
-        "🔵",
+        "",
         {
             "style":
                 "border:4px solid #818cf8;"
@@ -237,7 +237,7 @@ ITENS = [
         "Uma moldura intensa para o avatar.",
         380,
         "raro",
-        "🔥",
+        "",
         {
             "style":
                 "border:4px solid #fb923c;"
@@ -252,7 +252,7 @@ ITENS = [
         "Visual frio em azul e ciano.",
         380,
         "raro",
-        "❄️",
+        "",
         {
             "style":
                 "border:4px solid #67e8f9;"
@@ -267,7 +267,7 @@ ITENS = [
         "Uma moldura dourada de alto destaque.",
         720,
         "lendario",
-        "👑",
+        "",
         {
             "style":
                 "border:4px solid #facc15;"
@@ -282,7 +282,7 @@ ITENS = [
         "Uma moldura colorida e rara.",
         900,
         "mitico",
-        "🌈",
+        "",
         {
             "style":
                 "border:4px solid #c084fc;"
@@ -376,7 +376,7 @@ ITENS = [
         "Seu nome ganha um tom ciano brilhante.",
         140,
         "comum",
-        "🩵",
+        "",
         {
             "style":
                 "color:#67e8f9;text-shadow:0 0 16px rgba(34,211,238,.35);",
@@ -390,7 +390,7 @@ ITENS = [
         "Destaque dourado para o nome do jogador.",
         300,
         "raro",
-        "💛",
+        "",
         {
             "style":
                 "color:#fde047;text-shadow:0 0 18px rgba(250,204,21,.42);",
@@ -404,7 +404,7 @@ ITENS = [
         "Nome com gradiente violeta, rosa e ciano.",
         560,
         "epico",
-        "✨",
+        "",
         {
             "style":
                 "background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6);"
@@ -420,7 +420,7 @@ ITENS = [
         "Nome em verde esmeralda luminoso.",
         360,
         "raro",
-        "💚",
+        "",
         {
             "style":
                 "color:#6ee7b7;text-shadow:0 0 18px rgba(16,185,129,.42);",
@@ -434,7 +434,7 @@ ITENS = [
         "Um estilo premium com brilho quente.",
         900,
         "lendario",
-        "🌟",
+        "",
         {
             "style":
                 "background:linear-gradient(90deg,#fef08a,#f59e0b,#fb7185,#c084fc);"
@@ -454,7 +454,7 @@ ITENS = [
         "Cartão principal com efeito de vidro.",
         250,
         "raro",
-        "🪟",
+        "",
         {
             "style":
                 "background:rgba(15,23,42,.68);"
@@ -470,7 +470,7 @@ ITENS = [
         "Borda violeta e brilho neon.",
         480,
         "epico",
-        "🟣",
+        "",
         {
             "style":
                 "background:rgba(15,23,42,.82);"
@@ -486,7 +486,7 @@ ITENS = [
         "Cartão com borda dourada e brilho quente.",
         700,
         "lendario",
-        "🏅",
+        "",
         {
             "style":
                 "background:linear-gradient(145deg,rgba(69,26,3,.78),rgba(15,23,42,.90));"
@@ -502,7 +502,7 @@ ITENS = [
         "Um cartão raro com tons cósmicos.",
         860,
         "lendario",
-        "🌌",
+        "",
         {
             "style":
                 "background:linear-gradient(145deg,rgba(30,27,75,.88),rgba(88,28,135,.64),rgba(15,23,42,.90));"
@@ -522,7 +522,7 @@ ITENS = [
         "Pequenos pontos de luz se movem pelo fundo.",
         350,
         "raro",
-        "✨",
+        "",
         {
             "classe": "fm-effect-stars",
         },
@@ -535,7 +535,7 @@ ITENS = [
         "Uma grade futurista discreta.",
         520,
         "epico",
-        "🔷",
+        "",
         {
             "classe": "fm-effect-grid",
         },
@@ -548,7 +548,7 @@ ITENS = [
         "Faixas luminosas flutuam suavemente.",
         800,
         "lendario",
-        "🌈",
+        "",
         {
             "classe": "fm-effect-aurora",
         },
@@ -561,7 +561,7 @@ ITENS = [
         "Uma faixa luminosa percorre o perfil.",
         620,
         "epico",
-        "📡",
+        "",
         {
             "classe": "fm-effect-scan",
         },

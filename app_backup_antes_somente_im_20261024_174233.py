@@ -1,0 +1,3114 @@
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    jsonify,
+    session,
+    abort
+)
+
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    current_user
+)
+
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash
+)
+
+from models import (
+    db,
+    Usuario,
+    ProgressoAssunto,
+    ProgressoEtapa,
+    Resposta
+)
+
+
+
+from seo import registrar_seo
+
+
+from curriculum import CURRICULO
+from game import gerar_questao
+
+# Banco pedagógico: importa os modelos antes do db.create_all()
+# e disponibiliza o seletor com fallback para o game.py.
+from atividades.models import HistoricoQuestao
+from atividades.seletor import (
+    obter_questao_para_usuario,
+    registrar_resposta_banco,
+    contar_questoes_disponiveis
+)
+
+from datetime import datetime
+
+from social.models import PerfilUsuario
+from social.routes import social_bp
+from loja.routes import loja_bp
+from conquistas.routes import conquistas_bp
+
+
+# ============================================================
+# MULTIPLAYER
+# ============================================================
+
+from multiplayer import socketio
+from multiplayer.routes import multiplayer_bp
+# ============================================================
+# APP
+# ============================================================
+
+app = Flask(__name__)
+
+app.config["SECRET_KEY"] = "matematica-kids-desenvolvimento"
+
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "sqlite:///matematica.db"
+
+app.config[
+    "SQLALCHEMY_TRACK_MODIFICATIONS"
+] = False
+
+registrar_seo(app)
+# ============================================================
+# BANCO
+# ============================================================
+
+db.init_app(app)
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
+login_manager = LoginManager()
+
+login_manager.init_app(app)
+
+login_manager.login_view = "login"
+
+login_manager.login_message = (
+    "Faça login para continuar."
+)
+
+
+@login_manager.user_loader
+def carregar_usuario(user_id):
+
+    try:
+
+        return db.session.get(
+            Usuario,
+            int(user_id)
+        )
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        return None
+
+
+# ============================================================
+# MULTIPLAYER
+# ============================================================
+
+socketio.init_app(
+    app,
+    cors_allowed_origins="*"
+)
+
+app.register_blueprint(
+    multiplayer_bp
+)
+
+
+
+app.register_blueprint(
+    social_bp
+)
+
+
+app.register_blueprint(
+    loja_bp
+)
+
+
+app.register_blueprint(
+    conquistas_bp
+)
+
+
+#regristo blueprint da rotas das notificações
+from notificacoes.routes import notificacoes_bp
+
+app.register_blueprint(
+    notificacoes_bp
+)
+
+
+
+# IMPORTANTE:
+# eventos somente depois de configurar SocketIO
+import multiplayer.socket_events
+
+import social.socket_events
+
+
+
+
+
+
+
+# ============================================================
+# SERVICE WORKER
+# ============================================================
+
+@app.route(
+    "/service-worker.js"
+)
+def service_worker():
+
+    resposta = (
+        app.send_static_file(
+            "service-worker.js"
+        )
+    )
+
+    resposta.headers[
+        "Content-Type"
+    ] = (
+        "application/javascript; charset=utf-8"
+    )
+
+    resposta.headers[
+        "Cache-Control"
+    ] = (
+        "no-cache"
+    )
+
+    return resposta
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# CRIAR TABELAS
+# ============================================================
+
+with app.app_context():
+
+    db.create_all()
+
+
+# ============================================================
+# BUSCAR ANO
+# ============================================================
+
+def buscar_ano(ano_id):
+
+    ano = CURRICULO.get(
+        ano_id
+    )
+
+    if not ano:
+
+        abort(404)
+
+    return ano
+
+
+# ============================================================
+# BUSCAR TEMA
+# ============================================================
+
+def buscar_tema(
+    ano,
+    tema_id
+):
+
+    tema = (
+        ano
+        .get(
+            "temas",
+            {}
+        )
+        .get(
+            tema_id
+        )
+    )
+
+    if not tema:
+
+        abort(404)
+
+    return tema
+
+
+# ============================================================
+# BUSCAR ASSUNTO
+# ============================================================
+
+def buscar_assunto(
+    tema,
+    assunto_id
+):
+
+    assunto = (
+        tema
+        .get(
+            "assuntos",
+            {}
+        )
+        .get(
+            assunto_id
+        )
+    )
+
+    if not assunto:
+
+        abort(404)
+
+    return assunto
+
+
+# ============================================================
+# BUSCAR ETAPA
+# ============================================================
+
+def buscar_etapa(
+    assunto,
+    etapa_id
+):
+
+    etapa = (
+        assunto
+        .get(
+            "etapas",
+            {}
+        )
+        .get(
+            etapa_id
+        )
+    )
+
+    if not etapa:
+
+        abort(404)
+
+    return etapa
+
+
+# ============================================================
+# CORRIGIR VALORES NULOS DO USUÁRIO
+# ============================================================
+
+def corrigir_usuario(
+    usuario
+):
+
+    usuario.xp = (
+        usuario.xp
+        or 0
+    )
+
+    usuario.moedas = (
+        usuario.moedas
+        or 0
+    )
+
+    usuario.acertos = (
+        usuario.acertos
+        or 0
+    )
+
+    usuario.erros = (
+        usuario.erros
+        or 0
+    )
+
+
+# ============================================================
+# PROGRESSO DA ETAPA
+# ============================================================
+
+def obter_progresso_etapa(
+    ano_id,
+    tema_id,
+    assunto_id,
+    etapa_id,
+    criar=False
+):
+
+    progresso = (
+        ProgressoEtapa.query
+        .filter_by(
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                ano_id,
+
+            tema=
+                tema_id,
+
+            assunto=
+                assunto_id,
+
+            etapa=
+                etapa_id
+
+        )
+        .first()
+    )
+
+
+    if (
+        not progresso
+        and
+        criar
+    ):
+
+        progresso = ProgressoEtapa(
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                ano_id,
+
+            tema=
+                tema_id,
+
+            assunto=
+                assunto_id,
+
+            etapa=
+                etapa_id,
+
+            acertos=0,
+
+            erros=0,
+
+            xp=0,
+
+            tentativas=0,
+
+            melhor_pontuacao=0,
+
+            concluida=False
+        )
+
+        db.session.add(
+            progresso
+        )
+
+
+    return progresso
+
+
+# ============================================================
+# PROGRESSO DO ASSUNTO
+# ============================================================
+
+def obter_progresso_assunto(
+    ano_id,
+    tema_id,
+    assunto_id,
+    criar=False
+):
+
+    progresso = (
+        ProgressoAssunto.query
+        .filter_by(
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                ano_id,
+
+            tema=
+                tema_id,
+
+            assunto=
+                assunto_id
+
+        )
+        .first()
+    )
+
+
+    if (
+        not progresso
+        and
+        criar
+    ):
+
+        progresso = (
+            ProgressoAssunto(
+
+                usuario_id=
+                    current_user.id,
+
+                ano=
+                    ano_id,
+
+                tema=
+                    tema_id,
+
+                assunto=
+                    assunto_id,
+
+                concluido=False
+            )
+        )
+
+
+        db.session.add(
+            progresso
+        )
+
+
+    return progresso
+
+
+# ============================================================
+# VERIFICAR SE ETAPA ESTÁ LIBERADA
+# ============================================================
+
+def etapa_liberada(
+    assunto,
+    ano_id,
+    tema_id,
+    assunto_id,
+    etapa_id
+):
+
+    ids = list(
+        assunto[
+            "etapas"
+        ].keys()
+    )
+
+
+    if etapa_id not in ids:
+
+        return False
+
+
+    indice = ids.index(
+        etapa_id
+    )
+
+
+    # PRIMEIRA ETAPA SEMPRE LIBERADA
+
+    if indice == 0:
+
+        return True
+
+
+    etapa_anterior = ids[
+        indice - 1
+    ]
+
+
+    progresso_anterior = (
+        obter_progresso_etapa(
+
+            ano_id,
+
+            tema_id,
+
+            assunto_id,
+
+            etapa_anterior
+        )
+    )
+
+
+    return bool(
+
+        progresso_anterior
+
+        and
+
+        progresso_anterior.concluida
+    )
+
+
+# ============================================================
+# ATUALIZAR CONCLUSÃO DO ASSUNTO
+# ============================================================
+
+def atualizar_assunto(
+    ano_id,
+    tema_id,
+    assunto_id,
+    assunto
+):
+
+    progresso_assunto = (
+        obter_progresso_assunto(
+
+            ano_id,
+
+            tema_id,
+
+            assunto_id,
+
+            criar=True
+        )
+    )
+
+
+    todas_concluidas = True
+
+
+    for etapa_id in assunto[
+        "etapas"
+    ].keys():
+
+        progresso = (
+            obter_progresso_etapa(
+
+                ano_id,
+
+                tema_id,
+
+                assunto_id,
+
+                etapa_id
+            )
+        )
+
+
+        if (
+            not progresso
+            or
+            not progresso.concluida
+        ):
+
+            todas_concluidas = False
+
+            break
+
+
+    # Uma vez concluído, permanece concluído
+
+    if todas_concluidas:
+
+        progresso_assunto.concluido = True
+
+
+    return progresso_assunto
+
+
+# ============================================================
+# QUESTÃO PÚBLICA
+# ============================================================
+
+def questao_publica(
+    questao
+):
+
+    """
+    Remove a resposta correta antes de
+    enviar a questão para o navegador.
+    """
+
+    if not isinstance(
+        questao,
+        dict
+    ):
+
+        return {}
+
+
+    return {
+
+        chave:
+            valor
+
+        for chave, valor
+        in questao.items()
+
+        if chave not in (
+            "resposta",
+            "explicacao"
+        )
+    }
+
+
+# ============================================================
+# NORMALIZAR RESPOSTA
+# ============================================================
+
+def normalizar_resposta(
+    valor
+):
+
+    # --------------------------------------------------------
+    # ASSOCIAÇÃO
+    # --------------------------------------------------------
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return {
+
+            str(chave)
+            .strip()
+            .casefold():
+
+                normalizar_resposta(
+                    conteudo
+                )
+
+            for chave, conteudo
+            in sorted(
+
+                valor.items(),
+
+                key=lambda item:
+                    str(
+                        item[0]
+                    )
+            )
+        }
+
+
+    # --------------------------------------------------------
+    # ORDENAÇÃO
+    # --------------------------------------------------------
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return [
+
+            normalizar_resposta(
+                item
+            )
+
+            for item
+            in valor
+        ]
+
+
+    # --------------------------------------------------------
+    # NULO
+    # --------------------------------------------------------
+
+    if valor is None:
+
+        return ""
+
+
+    # --------------------------------------------------------
+    # TEXTO / NÚMERO
+    # --------------------------------------------------------
+
+    return (
+
+        str(valor)
+
+        .strip()
+
+        .casefold()
+
+        .replace(
+            ",",
+            "."
+        )
+    )
+
+
+# ============================================================
+# COMPARAR RESPOSTAS
+# ============================================================
+
+def respostas_iguais(
+    resposta_usuario,
+    resposta_correta
+):
+
+    return (
+
+        normalizar_resposta(
+            resposta_usuario
+        )
+
+        ==
+
+        normalizar_resposta(
+            resposta_correta
+        )
+    )
+
+
+# ============================================================
+# CONVERTER RESPOSTA PARA TEXTO
+# ============================================================
+
+def resposta_para_texto(
+    valor
+):
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return "; ".join(
+
+            f"{chave} → {conteudo}"
+
+            for chave, conteudo
+            in valor.items()
+        )
+
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return " → ".join(
+
+            str(item)
+
+            for item
+            in valor
+        )
+
+
+    return str(
+        valor
+    )
+
+
+# ============================================================
+# VERIFICAR RESPOSTA VAZIA
+# ============================================================
+
+def resposta_vazia(
+    valor
+):
+
+    if valor is None:
+
+        return True
+
+
+    if isinstance(
+        valor,
+        str
+    ):
+
+        return not valor.strip()
+
+
+    if isinstance(
+        valor,
+        list
+    ):
+
+        return (
+            len(valor)
+            ==
+            0
+        )
+
+
+    if isinstance(
+        valor,
+        dict
+    ):
+
+        return (
+            len(valor)
+            ==
+            0
+        )
+
+
+    return False
+
+
+# ============================================================
+# HOME
+# ============================================================
+
+@app.route("/")
+def index():
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for(
+                "dashboard"
+            )
+        )
+
+
+    return redirect(
+        url_for(
+            "login"
+        )
+    )
+
+
+# ============================================================
+# CADASTRO
+# ============================================================
+
+@app.route(
+    "/cadastro",
+    methods=[
+        "GET",
+        "POST"
+    ]
+)
+def cadastro():
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for(
+                "dashboard"
+            )
+        )
+
+
+    if request.method == "POST":
+
+        nome = (
+            request.form
+            .get(
+                "nome",
+                ""
+            )
+            .strip()
+        )
+
+
+        username = (
+            request.form
+            .get(
+                "username",
+                ""
+            )
+            .strip()
+        )
+
+
+        senha = request.form.get(
+            "senha",
+            ""
+        )
+
+
+        confirmar = request.form.get(
+            "confirmar_senha",
+            ""
+        )
+
+
+        if (
+            not nome
+            or
+            not username
+            or
+            not senha
+        ):
+
+            flash(
+                "Preencha todos os campos."
+            )
+
+
+            return redirect(
+                url_for(
+                    "cadastro"
+                )
+            )
+
+
+        if senha != confirmar:
+
+            flash(
+                "As senhas não são iguais."
+            )
+
+
+            return redirect(
+                url_for(
+                    "cadastro"
+                )
+            )
+
+
+        existente = (
+            Usuario.query
+            .filter_by(
+                username=
+                    username
+            )
+            .first()
+        )
+
+
+        if existente:
+
+            flash(
+                "Usuário já existe."
+            )
+
+
+            return redirect(
+                url_for(
+                    "cadastro"
+                )
+            )
+
+
+        usuario = Usuario(
+
+            nome=
+                nome,
+
+            username=
+                username,
+
+            senha=
+                generate_password_hash(
+                    senha
+                ),
+
+            xp=0,
+
+            moedas=0,
+
+            acertos=0,
+
+            erros=0
+        )
+
+
+        db.session.add(
+            usuario
+        )
+
+
+        db.session.commit()
+
+
+        login_user(
+            usuario
+        )
+
+
+        return redirect(
+            url_for(
+                "dashboard"
+            )
+        )
+
+
+    return render_template(
+        "cadastro.html"
+    )
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
+@app.route(
+    "/login",
+    methods=[
+        "GET",
+        "POST"
+    ]
+)
+def login():
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for(
+                "dashboard"
+            )
+        )
+
+
+    if request.method == "POST":
+
+        username = (
+            request.form
+            .get(
+                "username",
+                ""
+            )
+            .strip()
+        )
+
+
+        senha = request.form.get(
+            "senha",
+            ""
+        )
+
+
+        usuario = (
+            Usuario.query
+            .filter_by(
+                username=
+                    username
+            )
+            .first()
+        )
+
+
+        if (
+            not usuario
+            or
+            not check_password_hash(
+                usuario.senha,
+                senha
+            )
+        ):
+
+            flash(
+                "Usuário ou senha incorretos."
+            )
+
+
+            return redirect(
+                url_for(
+                    "login"
+                )
+            )
+
+
+        corrigir_usuario(
+            usuario
+        )
+
+
+        db.session.commit()
+
+
+        login_user(
+            usuario
+        )
+
+
+        return redirect(
+            url_for(
+                "dashboard"
+            )
+        )
+
+
+    return render_template(
+        "login.html"
+    )
+
+
+# ============================================================
+# LOGOUT
+# ============================================================
+
+@app.route("/logout")
+@login_required
+def logout():
+
+    perfil = PerfilUsuario.obter(
+        current_user.id,
+        criar=True
+    )
+
+    perfil.ultimo_acesso = (
+        datetime.utcnow()
+    )
+
+    db.session.commit()
+
+    logout_user()
+    session.clear()
+
+    return redirect(
+        url_for("login")
+    )
+
+
+
+# ============================================================
+# DASHBOARD
+# ============================================================
+
+@app.route(
+    "/dashboard"
+)
+@login_required
+def dashboard():
+
+    corrigir_usuario(
+        current_user
+    )
+
+
+    db.session.commit()
+
+
+    return render_template(
+        "dashboard.html"
+    )
+
+
+# ============================================================
+# JORNADA
+# ============================================================
+
+@app.route(
+    "/jornada"
+)
+@login_required
+def jornada():
+
+    anos = sorted(
+
+        CURRICULO.items(),
+
+        key=lambda item:
+            item[1][
+                "ordem"
+            ]
+    )
+
+
+    progresso_anos = {}
+
+
+    for ano_id, ano in anos:
+
+        total = 0
+
+        concluidos = 0
+
+
+        for tema_id, tema in ano[
+            "temas"
+        ].items():
+
+            for assunto_id in tema[
+                "assuntos"
+            ]:
+
+                total += 1
+
+
+                progresso = (
+                    obter_progresso_assunto(
+
+                        ano_id,
+
+                        tema_id,
+
+                        assunto_id
+                    )
+                )
+
+
+                if (
+                    progresso
+                    and
+                    progresso.concluido
+                ):
+
+                    concluidos += 1
+
+
+        if total:
+
+            progresso_anos[
+                ano_id
+            ] = round(
+
+                concluidos
+                /
+                total
+                *
+                100
+            )
+
+        else:
+
+            progresso_anos[
+                ano_id
+            ] = 0
+
+
+    return render_template(
+
+        "jornada.html",
+
+        anos=
+            anos,
+
+        progresso_anos=
+            progresso_anos
+    )
+
+
+# ============================================================
+# ANO
+# ============================================================
+
+@app.route(
+    "/ano/<ano_id>"
+)
+@login_required
+def ano(
+    ano_id
+):
+
+    dados_ano = buscar_ano(
+        ano_id
+    )
+
+
+    return render_template(
+
+        "ano.html",
+
+        ano=
+            dados_ano,
+
+        ano_id=
+            ano_id
+    )
+
+
+# ============================================================
+# TEMA
+# ============================================================
+
+@app.route(
+    "/ano/<ano_id>/tema/<tema_id>"
+)
+@login_required
+def tema(
+    ano_id,
+    tema_id
+):
+
+    dados_ano = buscar_ano(
+        ano_id
+    )
+
+
+    dados_tema = buscar_tema(
+
+        dados_ano,
+
+        tema_id
+    )
+
+
+    progressos = {}
+
+
+    for assunto_id in dados_tema[
+        "assuntos"
+    ]:
+
+        progressos[
+            assunto_id
+        ] = obter_progresso_assunto(
+
+            ano_id,
+
+            tema_id,
+
+            assunto_id
+        )
+
+
+    return render_template(
+
+        "tema.html",
+
+        ano=
+            dados_ano,
+
+        ano_id=
+            ano_id,
+
+        tema=
+            dados_tema,
+
+        tema_id=
+            tema_id,
+
+        progressos=
+            progressos
+    )
+
+
+# ============================================================
+# ASSUNTO / TRILHA
+# ============================================================
+
+@app.route(
+    "/ano/<ano_id>/tema/<tema_id>/assunto/<assunto_id>"
+)
+@login_required
+def assunto(
+    ano_id,
+    tema_id,
+    assunto_id
+):
+
+    dados_ano = buscar_ano(
+        ano_id
+    )
+
+
+    dados_tema = buscar_tema(
+
+        dados_ano,
+
+        tema_id
+    )
+
+
+    dados_assunto = buscar_assunto(
+
+        dados_tema,
+
+        assunto_id
+    )
+
+
+    progressos = {}
+
+
+    for etapa_id in dados_assunto[
+        "etapas"
+    ]:
+
+        progresso = (
+            obter_progresso_etapa(
+
+                ano_id,
+
+                tema_id,
+
+                assunto_id,
+
+                etapa_id
+            )
+        )
+
+
+        progressos[
+            etapa_id
+        ] = {
+
+            "progresso":
+                progresso,
+
+            "liberada":
+                etapa_liberada(
+
+                    dados_assunto,
+
+                    ano_id,
+
+                    tema_id,
+
+                    assunto_id,
+
+                    etapa_id
+                )
+        }
+
+
+    progresso_assunto = (
+        atualizar_assunto(
+
+            ano_id,
+
+            tema_id,
+
+            assunto_id,
+
+            dados_assunto
+        )
+    )
+
+
+    db.session.commit()
+
+
+    return render_template(
+
+        "assunto.html",
+
+        ano=
+            dados_ano,
+
+        ano_id=
+            ano_id,
+
+        tema=
+            dados_tema,
+
+        tema_id=
+            tema_id,
+
+        assunto=
+            dados_assunto,
+
+        assunto_id=
+            assunto_id,
+
+        progressos=
+            progressos,
+
+        progresso_assunto=
+            progresso_assunto
+    )
+
+
+# ============================================================
+# ETAPA
+# ============================================================
+
+@app.route(
+    "/etapa/<ano_id>/<tema_id>/<assunto_id>/<etapa_id>"
+)
+@login_required
+def etapa(
+    ano_id,
+    tema_id,
+    assunto_id,
+    etapa_id
+):
+
+    dados_ano = buscar_ano(
+        ano_id
+    )
+
+
+    dados_tema = buscar_tema(
+
+        dados_ano,
+
+        tema_id
+    )
+
+
+    dados_assunto = buscar_assunto(
+
+        dados_tema,
+
+        assunto_id
+    )
+
+
+    dados_etapa = buscar_etapa(
+
+        dados_assunto,
+
+        etapa_id
+    )
+
+
+    # --------------------------------------------------------
+    # VERIFICAR LIBERAÇÃO
+    # --------------------------------------------------------
+
+    if not etapa_liberada(
+
+        dados_assunto,
+
+        ano_id,
+
+        tema_id,
+
+        assunto_id,
+
+        etapa_id
+    ):
+
+        flash(
+            "Conclua a etapa anterior primeiro. 🔒"
+        )
+
+
+        return redirect(
+            url_for(
+
+                "assunto",
+
+                ano_id=
+                    ano_id,
+
+                tema_id=
+                    tema_id,
+
+                assunto_id=
+                    assunto_id
+            )
+        )
+
+
+    # --------------------------------------------------------
+    # TIPOS DE INTERAÇÃO DA ETAPA
+    # --------------------------------------------------------
+
+    interacoes = (
+        dados_etapa.get(
+            "interacoes",
+            []
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # GERAR PRIMEIRA QUESTÃO
+    # --------------------------------------------------------
+
+    nova_questao = obter_questao_para_usuario(
+
+        usuario_id=
+            current_user.id,
+
+        ano_id=
+            ano_id,
+
+        tema_id=
+            tema_id,
+
+        assunto_id=
+            assunto_id,
+
+        etapa_id=
+            etapa_id,
+
+        tipo=
+            dados_etapa[
+                "tipo"
+            ],
+
+        interacoes=
+            interacoes,
+
+        nivel=
+            dados_etapa.get(
+                "nivel"
+            ),
+
+        ano_numero=
+            dados_etapa.get(
+                "ano",
+                dados_ano.get(
+                    "ordem"
+                )
+            ),
+
+        complexidade=
+            dados_etapa.get(
+                "complexidade"
+            ),
+
+        operacoes=
+            dados_etapa.get(
+                "operacoes"
+            ),
+
+        desafio=
+            dados_etapa.get(
+                "desafio",
+                False
+            ),
+
+        ids_evitar=[]
+    )
+
+
+    quantidade_disponivel = contar_questoes_disponiveis(
+        ano_id=ano_id,
+        tema_id=tema_id,
+        assunto_id=assunto_id,
+        etapa_id=etapa_id,
+        tipo=dados_etapa["tipo"]
+    )
+
+
+    # --------------------------------------------------------
+    # ETAPA AINDA SEM CONTEÚDO REAL
+    # --------------------------------------------------------
+
+    if (
+        quantidade_disponivel <= 0
+        or
+        nova_questao is None
+    ):
+
+        session.pop(
+            "tentativa",
+            None
+        )
+
+        flash(
+            "Esta etapa ainda está em preparação. "
+            "Ainda não há questões reais disponíveis para ela."
+        )
+
+        return redirect(
+            url_for(
+                "assunto",
+                ano_id=ano_id,
+                tema_id=tema_id,
+                assunto_id=assunto_id
+            )
+        )
+
+
+    if (
+        not isinstance(
+            nova_questao,
+            dict
+        )
+        or
+        "pergunta" not in nova_questao
+        or
+        "resposta" not in nova_questao
+    ):
+
+        abort(
+            500,
+            description=
+                "A questão cadastrada no banco é inválida."
+        )
+
+
+    # --------------------------------------------------------
+    # CRIAR TENTATIVA
+    # --------------------------------------------------------
+
+    session[
+        "tentativa"
+    ] = {
+
+        "ano":
+            ano_id,
+
+        "tema":
+            tema_id,
+
+        "assunto":
+            assunto_id,
+
+        "etapa":
+            etapa_id,
+
+        "respondidas":
+            0,
+
+        "acertos":
+            0,
+
+        "quantidade":
+            min(
+                int(dados_etapa["quantidade"]),
+                int(quantidade_disponivel)
+            ),
+
+        "pergunta":
+            nova_questao[
+                "pergunta"
+            ],
+
+        "resposta":
+            nova_questao[
+                "resposta"
+            ],
+
+        "tipo":
+            dados_etapa[
+                "tipo"
+            ],
+
+        "interacoes":
+            interacoes,
+
+        "nivel":
+            dados_etapa.get(
+                "nivel",
+                2
+            ),
+
+        "ano_numero":
+            dados_etapa.get(
+                "ano",
+                dados_ano.get(
+                    "ordem",
+                    1
+                )
+            ),
+
+        "complexidade":
+            dados_etapa.get(
+                "complexidade",
+                "pratica"
+            ),
+
+        "operacoes":
+            dados_etapa.get(
+                "operacoes",
+                1
+            ),
+
+        "desafio":
+            bool(
+                dados_etapa.get(
+                    "desafio",
+                    False
+                )
+            ),
+
+        "explicacao":
+            nova_questao.get(
+                "explicacao",
+                ""
+            ),
+
+        "habilidade":
+            nova_questao.get(
+                "habilidade",
+                ""
+            ),
+
+        "questao_id":
+            nova_questao.get(
+                "id_questao"
+            ),
+
+        "origem_questao":
+            nova_questao.get(
+                "origem",
+                "gerador"
+            ),
+
+        "questoes_usadas":
+            (
+                [
+                    nova_questao.get(
+                        "id_questao"
+                    )
+                ]
+                if nova_questao.get(
+                    "id_questao"
+                )
+                else []
+            )
+    }
+
+
+    session.modified = True
+
+
+    # --------------------------------------------------------
+    # NÃO ENVIA RESPOSTA CORRETA AO NAVEGADOR
+    # --------------------------------------------------------
+
+    return render_template(
+
+        "etapa.html",
+
+        ano=
+            dados_ano,
+
+        tema=
+            dados_tema,
+
+        assunto=
+            dados_assunto,
+
+        etapa=
+            dados_etapa,
+
+        etapa_id=
+            etapa_id,
+
+        questao_publica=
+            questao_publica(
+                nova_questao
+            )
+    )
+
+
+# ============================================================
+# API RESPONDER
+# ============================================================
+
+@app.route(
+    "/api/responder",
+    methods=[
+        "POST"
+    ]
+)
+@login_required
+def responder():
+
+    try:
+
+        # ====================================================
+        # RECEBER JSON
+        # ====================================================
+
+        dados = (
+
+            request.get_json(
+                silent=True
+            )
+
+            or {}
+        )
+
+
+        if "resposta" not in dados:
+
+            return jsonify(
+
+                erro=
+                    "Escolha ou digite uma resposta."
+
+            ), 400
+
+
+        resposta_usuario = dados.get(
+            "resposta"
+        )
+
+
+        if resposta_vazia(
+            resposta_usuario
+        ):
+
+            return jsonify(
+
+                erro=
+                    "Escolha ou digite uma resposta."
+
+            ), 400
+
+
+        # ====================================================
+        # TENTATIVA
+        # ====================================================
+
+        tentativa = session.get(
+            "tentativa"
+        )
+
+
+        if not tentativa:
+
+            return jsonify(
+
+                erro=
+                    "A tentativa expirou."
+
+            ), 400
+
+
+        correta = tentativa[
+            "resposta"
+        ]
+
+
+        # ====================================================
+        # COMPARAR RESPOSTA
+        # ====================================================
+
+        acertou = respostas_iguais(
+
+            resposta_usuario,
+
+            correta
+        )
+
+
+        corrigir_usuario(
+            current_user
+        )
+
+
+        # ====================================================
+        # PROGRESSO
+        # ====================================================
+
+        progresso = (
+            obter_progresso_etapa(
+
+                tentativa[
+                    "ano"
+                ],
+
+                tentativa[
+                    "tema"
+                ],
+
+                tentativa[
+                    "assunto"
+                ],
+
+                tentativa[
+                    "etapa"
+                ],
+
+                criar=True
+            )
+        )
+
+
+        progresso.acertos = (
+            progresso.acertos
+            or 0
+        )
+
+        progresso.erros = (
+            progresso.erros
+            or 0
+        )
+
+        progresso.xp = (
+            progresso.xp
+            or 0
+        )
+
+        progresso.tentativas = (
+            progresso.tentativas
+            or 0
+        )
+
+        progresso.melhor_pontuacao = (
+            progresso.melhor_pontuacao
+            or 0
+        )
+
+
+        # ====================================================
+        # ACERTO
+        # ====================================================
+
+        if acertou:
+
+            tentativa[
+                "acertos"
+            ] += 1
+
+
+            progresso.acertos += 1
+
+
+            progresso.xp += 10
+
+
+            current_user.acertos += 1
+
+
+            current_user.xp += 10
+
+
+            current_user.moedas += 2
+
+
+            mensagem = (
+                "Muito bem! "
+            )
+
+
+        # ====================================================
+        # ERRO
+        # ====================================================
+
+        else:
+
+            progresso.erros += 1
+
+
+            current_user.erros += 1
+
+
+            mensagem = (
+
+                "Quase! A resposta correta era "
+
+                f"{resposta_para_texto(correta)}."
+            )
+
+
+        # ====================================================
+        # FEEDBACK PEDAGÓGICO
+        # ====================================================
+
+        explicacao = (
+            tentativa.get(
+                "explicacao",
+                ""
+            )
+            or ""
+        ).strip()
+
+
+        if explicacao:
+
+            mensagem = (
+                f"{mensagem} "
+                f"{explicacao}"
+            ).strip()
+
+
+        tentativa[
+            "respondidas"
+        ] += 1
+
+
+        # ====================================================
+        # SALVAR HISTÓRICO
+        # ====================================================
+
+        registro = Resposta(
+
+            usuario_id=
+                current_user.id,
+
+            ano=
+                tentativa[
+                    "ano"
+                ],
+
+            tema=
+                tentativa[
+                    "tema"
+                ],
+
+            assunto=
+                tentativa[
+                    "assunto"
+                ],
+
+            etapa=
+                tentativa[
+                    "etapa"
+                ],
+
+            pergunta=
+                tentativa[
+                    "pergunta"
+                ],
+
+            resposta_usuario=
+                resposta_para_texto(
+                    resposta_usuario
+                ),
+
+            resposta_correta=
+                resposta_para_texto(
+                    correta
+                ),
+
+            acertou=
+                acertou
+        )
+
+
+        db.session.add(
+            registro
+        )
+
+
+        # ====================================================
+        # HISTÓRICO DA QUESTÃO FIXA DO BANCO
+        # ====================================================
+
+        if (
+            tentativa.get("origem_questao") in ("banco_professor", "fonte_real")
+            and
+            tentativa.get(
+                "questao_id"
+            )
+        ):
+
+            registrar_resposta_banco(
+
+                usuario_id=
+                    current_user.id,
+
+                questao_id=
+                    tentativa.get(
+                        "questao_id"
+                    ),
+
+                resposta_usuario=
+                    resposta_para_texto(
+                        resposta_usuario
+                    ),
+
+                acertou=
+                    acertou
+            )
+
+
+        # ====================================================
+        # TERMINOU?
+        # ====================================================
+
+        terminou = (
+
+            tentativa[
+                "respondidas"
+            ]
+
+            >=
+
+            tentativa[
+                "quantidade"
+            ]
+        )
+
+
+        # ====================================================
+        # FINAL DA ETAPA
+        # ====================================================
+
+        if terminou:
+
+            quantidade = tentativa[
+                "quantidade"
+            ]
+
+
+            acertos_tentativa = tentativa[
+                "acertos"
+            ]
+
+
+            pontuacao = round(
+
+                acertos_tentativa
+
+                /
+
+                quantidade
+
+                *
+
+                100
+            )
+
+
+            progresso.tentativas += 1
+
+
+            progresso.melhor_pontuacao = max(
+
+                progresso.melhor_pontuacao,
+
+                pontuacao
+            )
+
+
+            passou = (
+                pontuacao >= 80
+            )
+
+
+            # ------------------------------------------------
+            # EVITA GANHAR BÔNUS REPETIDO
+            # ------------------------------------------------
+
+            ja_estava_concluida = bool(
+                progresso.concluida
+            )
+
+
+            if passou:
+
+                progresso.concluida = True
+
+
+                if not ja_estava_concluida:
+
+                    current_user.xp += 20
+
+                    current_user.moedas += 5
+
+
+            # ------------------------------------------------
+            # VERIFICAR ASSUNTO
+            # ------------------------------------------------
+
+            dados_ano = buscar_ano(
+
+                tentativa[
+                    "ano"
+                ]
+            )
+
+
+            dados_tema = buscar_tema(
+
+                dados_ano,
+
+                tentativa[
+                    "tema"
+                ]
+            )
+
+
+            dados_assunto = buscar_assunto(
+
+                dados_tema,
+
+                tentativa[
+                    "assunto"
+                ]
+            )
+
+
+            progresso_assunto = (
+                atualizar_assunto(
+
+                    tentativa[
+                        "ano"
+                    ],
+
+                    tentativa[
+                        "tema"
+                    ],
+
+                    tentativa[
+                        "assunto"
+                    ],
+
+                    dados_assunto
+                )
+            )
+
+
+            db.session.commit()
+
+
+            session.pop(
+                "tentativa",
+                None
+            )
+
+
+            session.modified = True
+
+
+            return jsonify(
+
+                terminou=
+                    True,
+
+                correto=
+                    acertou,
+
+                mensagem=
+                    mensagem,
+
+                passou=
+                    passou,
+
+                pontuacao=
+                    pontuacao,
+
+                acertos=
+                    acertos_tentativa,
+
+                quantidade=
+                    quantidade,
+
+                xp=
+                    current_user.xp,
+
+                moedas=
+                    current_user.moedas,
+
+                assunto_concluido=
+                    bool(
+                        progresso_assunto.concluido
+                    )
+            )
+
+
+        # ====================================================
+        # GERAR PRÓXIMA QUESTÃO
+        # ====================================================
+
+        nova_questao = obter_questao_para_usuario(
+
+            usuario_id=
+                current_user.id,
+
+            ano_id=
+                tentativa[
+                    "ano"
+                ],
+
+            tema_id=
+                tentativa[
+                    "tema"
+                ],
+
+            assunto_id=
+                tentativa[
+                    "assunto"
+                ],
+
+            etapa_id=
+                tentativa[
+                    "etapa"
+                ],
+
+            tipo=
+                tentativa[
+                    "tipo"
+                ],
+
+            interacoes=
+                tentativa.get(
+                    "interacoes",
+                    []
+                ),
+
+            nivel=
+                tentativa.get(
+                    "nivel"
+                ),
+
+            ano_numero=
+                tentativa.get(
+                    "ano_numero"
+                ),
+
+            complexidade=
+                tentativa.get(
+                    "complexidade"
+                ),
+
+            operacoes=
+                tentativa.get(
+                    "operacoes"
+                ),
+
+            desafio=
+                tentativa.get(
+                    "desafio",
+                    False
+                ),
+
+            ids_evitar=
+                tentativa.get(
+                    "questoes_usadas",
+                    []
+                )
+        )
+
+
+        # ====================================================
+        # VALIDAR PRÓXIMA QUESTÃO
+        # ====================================================
+
+        if nova_questao is None:
+
+            raise ValueError(
+                "Não há mais questões reais disponíveis nesta etapa."
+            )
+
+
+        if (
+            not isinstance(
+                nova_questao,
+                dict
+            )
+            or
+            "pergunta" not in nova_questao
+            or
+            "resposta" not in nova_questao
+        ):
+
+            raise ValueError(
+                "A questão cadastrada no banco é inválida."
+            )
+
+
+        # ====================================================
+        # ATUALIZAR SESSÃO
+        # ====================================================
+
+        tentativa[
+            "pergunta"
+        ] = nova_questao[
+            "pergunta"
+        ]
+
+
+        tentativa[
+            "resposta"
+        ] = nova_questao[
+            "resposta"
+        ]
+
+
+        tentativa[
+            "explicacao"
+        ] = nova_questao.get(
+            "explicacao",
+            ""
+        )
+
+
+        tentativa[
+            "habilidade"
+        ] = nova_questao.get(
+            "habilidade",
+            ""
+        )
+
+
+        tentativa[
+            "questao_id"
+        ] = nova_questao.get(
+            "id_questao"
+        )
+
+
+        tentativa[
+            "origem_questao"
+        ] = nova_questao.get(
+            "origem",
+            "gerador"
+        )
+
+
+        if nova_questao.get(
+            "id_questao"
+        ):
+
+            usadas = tentativa.get(
+                "questoes_usadas",
+                []
+            )
+
+            if nova_questao[
+                "id_questao"
+            ] not in usadas:
+
+                usadas.append(
+                    nova_questao[
+                        "id_questao"
+                    ]
+                )
+
+            tentativa[
+                "questoes_usadas"
+            ] = usadas
+
+
+        session[
+            "tentativa"
+        ] = tentativa
+
+
+        session.modified = True
+
+
+        db.session.commit()
+
+
+        # ====================================================
+        # DEVOLVER QUESTÃO SEM RESPOSTA
+        # ====================================================
+
+        return jsonify(
+
+            terminou=
+                False,
+
+            correto=
+                acertou,
+
+            mensagem=
+                mensagem,
+
+            xp=
+                current_user.xp,
+
+            moedas=
+                current_user.moedas,
+
+            respondidas=
+                tentativa[
+                    "respondidas"
+                ],
+
+            quantidade=
+                tentativa[
+                    "quantidade"
+                ],
+
+            questao=
+                questao_publica(
+                    nova_questao
+                )
+        )
+
+
+    # ========================================================
+    # ERRO
+    # ========================================================
+
+    except Exception as erro:
+
+        db.session.rollback()
+
+
+        print(
+            "ERRO /api/responder:",
+            erro
+        )
+
+
+        return jsonify(
+
+            erro=
+                str(
+                    erro
+                )
+
+        ), 500
+
+
+# ============================================================
+# BIBLIOTECA
+# ============================================================
+
+@app.route(
+    "/biblioteca"
+)
+@login_required
+def biblioteca():
+
+    corrigir_usuario(
+        current_user
+    )
+
+
+    progressos = (
+        ProgressoAssunto.query
+        .filter_by(
+
+            usuario_id=
+                current_user.id
+        )
+        .all()
+    )
+
+
+    etapas = (
+        ProgressoEtapa.query
+        .filter_by(
+
+            usuario_id=
+                current_user.id
+        )
+        .all()
+    )
+
+
+    total_assuntos = sum(
+
+        len(
+            tema[
+                "assuntos"
+            ]
+        )
+
+        for ano
+        in CURRICULO.values()
+
+        for tema
+        in ano[
+            "temas"
+        ].values()
+    )
+
+
+    assuntos_concluidos = sum(
+
+        1
+
+        for progresso
+        in progressos
+
+        if progresso.concluido
+    )
+
+
+    etapas_concluidas = sum(
+
+        1
+
+        for progresso
+        in etapas
+
+        if progresso.concluida
+    )
+
+
+    if total_assuntos:
+
+        progresso_geral = round(
+
+            assuntos_concluidos
+
+            /
+
+            total_assuntos
+
+            *
+
+            100
+        )
+
+    else:
+
+        progresso_geral = 0
+
+
+    historico = (
+        Resposta.query
+
+        .filter_by(
+
+            usuario_id=
+                current_user.id
+        )
+
+        .order_by(
+
+            Resposta.criado_em.desc()
+        )
+
+        .limit(
+            10
+        )
+
+        .all()
+    )
+
+
+    return render_template(
+
+        "biblioteca.html",
+
+        total_assuntos=
+            total_assuntos,
+
+        assuntos_concluidos=
+            assuntos_concluidos,
+
+        etapas_concluidas=
+            etapas_concluidas,
+
+        progresso_geral=
+            progresso_geral,
+
+        historico=
+            historico
+    )
+
+
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+
+@app.route(
+    "/configuracoes"
+)
+@login_required
+def configuracoes():
+
+    return render_template(
+        "configuracoes.html"
+    )
+
+
+@app.route("/.well-known/assetlinks.json")
+def assetlinks():
+    return app.send_static_file(
+        ".well-known/assetlinks.json"
+    )
+
+
+
+
+from pathlib import Path
+from datetime import datetime
+import shutil
+import re
+
+ARQUIVO = Path("app.py")
+
+if not ARQUIVO.exists():
+    print("ERRO: app.py não encontrado na pasta atual.")
+    raise SystemExit(1)
+
+texto = ARQUIVO.read_text(encoding="utf-8")
+
+if "obter_questao_para_usuario" not in texto:
+    print("")
+    print("ERRO: este app.py ainda não está integrado ao seletor do banco pedagógico.")
+    print("Nenhuma alteração foi aplicada.")
+    print("")
+    raise SystemExit(1)
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+backup = Path(f"app_backup_antes_somente_im_{timestamp}.py")
+shutil.copy2(ARQUIVO, backup)
+
+# 1) Importar o contador do seletor
+padrao_import = re.compile(
+    r"from atividades\.seletor import \(\s*"
+    r"obter_questao_para_usuario,\s*"
+    r"registrar_resposta_banco\s*"
+    r"\)",
+    re.MULTILINE
+)
+
+novo_import = '''from atividades.seletor import (
+    obter_questao_para_usuario,
+    registrar_resposta_banco,
+    contar_questoes_disponiveis
+)'''
+
+texto, n_import = padrao_import.subn(
+    novo_import,
+    texto,
+    count=1
+)
+
+# 2) Primeira questão: tratar etapa sem IM-*
+marcador_validacao = '''    if (
+        not isinstance(
+            nova_questao,
+            dict
+        )
+        or
+        "pergunta" not in nova_questao
+        or
+        "resposta" not in nova_questao
+    ):
+
+        abort(
+            500,
+            description=
+                "O gerador retornou uma questão inválida."
+        )
+'''
+
+bloco_novo = '''    quantidade_disponivel = contar_questoes_disponiveis(
+        ano_id=ano_id,
+        tema_id=tema_id,
+        assunto_id=assunto_id,
+        etapa_id=etapa_id,
+        tipo=dados_etapa["tipo"]
+    )
+
+
+    # --------------------------------------------------------
+    # ETAPA AINDA SEM CONTEÚDO REAL
+    # --------------------------------------------------------
+
+    if (
+        quantidade_disponivel <= 0
+        or
+        nova_questao is None
+    ):
+
+        session.pop(
+            "tentativa",
+            None
+        )
+
+        flash(
+            "Esta etapa ainda está em preparação. "
+            "Ainda não há questões reais disponíveis para ela."
+        )
+
+        return redirect(
+            url_for(
+                "assunto",
+                ano_id=ano_id,
+                tema_id=tema_id,
+                assunto_id=assunto_id
+            )
+        )
+
+
+    if (
+        not isinstance(
+            nova_questao,
+            dict
+        )
+        or
+        "pergunta" not in nova_questao
+        or
+        "resposta" not in nova_questao
+    ):
+
+        abort(
+            500,
+            description=
+                "A questão cadastrada no banco é inválida."
+        )
+'''
+
+if marcador_validacao in texto:
+    texto = texto.replace(
+        marcador_validacao,
+        bloco_novo,
+        1
+    )
+    n_validacao = 1
+else:
+    n_validacao = 0
+
+# 3) Quantidade da tentativa = quantidade realmente disponível
+padrao_quantidade = re.compile(
+    r'"quantidade":\s*'
+    r'dados_etapa\[\s*"quantidade"\s*\],',
+    re.MULTILINE
+)
+
+texto, n_quantidade = padrao_quantidade.subn(
+    '"quantidade":\n'
+    '            min(\n'
+    '                int(dados_etapa["quantidade"]),\n'
+    '                int(quantidade_disponivel)\n'
+    '            ),',
+    texto,
+    count=1
+)
+
+# 4) Histórico: aceitar a nova origem "fonte_real"
+texto, n_origem = re.subn(
+    r'tentativa\.get\(\s*"origem_questao"\s*\)\s*'
+    r'==\s*"banco_professor"',
+    'tentativa.get("origem_questao") '
+    'in ("banco_professor", "fonte_real")',
+    texto,
+    count=1,
+    flags=re.MULTILINE
+)
+
+# 5) Próxima questão: nunca chamar/aceitar gerador antigo
+marcador_proxima = '''        # ====================================================
+        # VALIDAR QUESTÃO
+        # ====================================================
+
+        if (
+            not isinstance(
+                nova_questao,
+                dict
+            )
+            or
+            "pergunta" not in nova_questao
+            or
+            "resposta" not in nova_questao
+        ):
+
+            raise ValueError(
+
+                "O game.py retornou uma questão inválida."
+            )
+'''
+
+bloco_proxima = '''        # ====================================================
+        # VALIDAR PRÓXIMA QUESTÃO
+        # ====================================================
+
+        if nova_questao is None:
+
+            raise ValueError(
+                "Não há mais questões reais disponíveis nesta etapa."
+            )
+
+
+        if (
+            not isinstance(
+                nova_questao,
+                dict
+            )
+            or
+            "pergunta" not in nova_questao
+            or
+            "resposta" not in nova_questao
+        ):
+
+            raise ValueError(
+                "A questão cadastrada no banco é inválida."
+            )
+'''
+
+if marcador_proxima in texto:
+    texto = texto.replace(
+        marcador_proxima,
+        bloco_proxima,
+        1
+    )
+    n_proxima = 1
+else:
+    n_proxima = 0
+
+resultados = {
+    "import": n_import,
+    "tratamento_sem_conteudo": n_validacao,
+    "quantidade_disponivel": n_quantidade,
+    "origem_historico": n_origem,
+    "proxima_questao": n_proxima,
+}
+
+falhas = [
+    nome
+    for nome, quantidade in resultados.items()
+    if quantidade != 1
+]
+
+if falhas:
+    print("")
+    print("Não foi possível aplicar a correção com segurança.")
+    print("Nenhuma alteração foi salva em app.py.")
+    print("")
+    print("Partes não localizadas:")
+    for falha in falhas:
+        print(f"- {falha}")
+    print("")
+    print(f"Backup criado: {backup}")
+    raise SystemExit(1)
+
+# Teste sintático antes de salvar
+compile(texto, "app.py", "exec")
+
+ARQUIVO.write_text(
+    texto,
+    encoding="utf-8"
+)
+
+print("")
+print("=" * 64)
+print(" FLASHMATTY — APP.PY CORRIGIDO PARA SOMENTE IM-*")
+print("=" * 64)
+print("")
+print(f"Backup criado: {backup}")
+print("")
+print("Alterações aplicadas:")
+print("- etapa sem IM-* volta ao assunto com mensagem;")
+print("- quantidade da tentativa usa o número real disponível;")
+print("- histórico aceita origem fonte_real;")
+print("- nenhuma questão do game.py entra como fallback pelo seletor;")
+print("")
+print("Agora rode:")
+print("python .\\app.py")
+print("")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# INICIAR SERVIDOR
+# ============================================================
+
+if __name__ == "__main__":
+
+    print("")
+    print("==========================================")
+    print(" flashmatty")
+    print(" http://127.0.0.1:5000")
+    print("==========================================")
+    print("")
+
+
+    socketio.run(
+
+        app,
+
+        debug=True,
+
+        host="0.0.0.0",
+
+        port=5000,
+
+        allow_unsafe_werkzeug=True
+    )
+
+

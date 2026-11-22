@@ -4,219 +4,339 @@
 {{ ano.nome }} - FlashMatty
 {% endblock %}
 
-
 {% block content %}
 
-<div
-    class="
-        min-h-screen
-        bg-slate-900
-        text-white
-        px-4
-        py-10
-    "
->
+<style>
+    /* Estilos isolados da página de detalhes do ano. */
+    @keyframes ano-fade-up {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-    <div
-        class="
-            max-w-5xl
-            mx-auto
-        "
-    >
+    @keyframes ano-orbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
 
-        <!-- ================================================= -->
+    @keyframes ano-shimmer {
+        0% { transform: translateX(-150%); }
+        100% { transform: translateX(260%); }
+    }
+
+    .ano-enter {
+        animation: ano-fade-up .7s cubic-bezier(.2,.75,.25,1) both;
+    }
+
+    .ano-delay-1 { animation-delay: .08s; }
+    .ano-delay-2 { animation-delay: .16s; }
+
+    .ano-back-link {
+        transition: gap .22s ease, color .22s ease, transform .22s ease;
+    }
+
+    .ano-back-link:hover {
+        gap: .8rem;
+        transform: translateX(-3px);
+    }
+
+    .ano-hero {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        border: 1px solid rgba(129,140,248,.22);
+        background:
+            radial-gradient(circle at 88% 12%, rgba(99,102,241,.25), transparent 18rem),
+            radial-gradient(circle at 5% 100%, rgba(56,189,248,.12), transparent 21rem),
+            linear-gradient(135deg, #172554 0%, #1e1b4b 48%, #0f172a 100%);
+        box-shadow: 0 24px 65px rgba(2,6,23,.34);
+    }
+
+    .ano-hero::before,
+    .ano-hero::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        border: 1px solid rgba(199,210,254,.12);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .ano-hero::before {
+        width: 21rem;
+        height: 21rem;
+        right: -8rem;
+        top: -12rem;
+        box-shadow: 0 0 0 2rem rgba(129,140,248,.035),
+                    0 0 0 4rem rgba(129,140,248,.025);
+    }
+
+    .ano-hero::after {
+        width: 12rem;
+        height: 12rem;
+        right: 7rem;
+        bottom: -9rem;
+        border-color: rgba(125,211,252,.13);
+    }
+
+    .ano-orbit {
+        position: absolute;
+        top: 50%;
+        right: clamp(1.2rem, 7vw, 5rem);
+        width: 8.5rem;
+        height: 8.5rem;
+        margin-top: -4.25rem;
+        border: 1px dashed rgba(199,210,254,.2);
+        border-radius: 50%;
+        animation: ano-orbit 28s linear infinite;
+        pointer-events: none;
+    }
+
+    .ano-orbit::before,
+    .ano-orbit::after {
+        content: "";
+        position: absolute;
+        width: .65rem;
+        height: .65rem;
+        border-radius: 50%;
+        background: #a5b4fc;
+        box-shadow: 0 0 18px rgba(165,180,252,.85);
+    }
+
+    .ano-orbit::before { top: .7rem; left: 1.2rem; }
+    .ano-orbit::after { right: .45rem; bottom: 2rem; background: #7dd3fc; }
+
+    .ano-topic-card {
+        position: relative;
+        isolation: isolate;
+        display: block;
+        overflow: hidden;
+        border: 1px solid rgba(148,163,184,.17);
+        border-radius: 1.7rem;
+        background:
+            linear-gradient(145deg, rgba(30,41,59,.96), rgba(15,23,42,.96));
+        box-shadow: 0 12px 32px rgba(2,6,23,.19);
+        transition:
+            transform .3s cubic-bezier(.2,.75,.25,1),
+            border-color .3s ease,
+            box-shadow .3s ease,
+            background .3s ease;
+    }
+
+    .ano-topic-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        opacity: 0;
+        background:
+            radial-gradient(circle at 12% 0%, rgba(129,140,248,.2), transparent 55%),
+            linear-gradient(120deg, rgba(99,102,241,.08), transparent 65%);
+        transition: opacity .3s ease;
+    }
+
+    .ano-topic-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 42%;
+        height: 1px;
+        opacity: 0;
+        background: linear-gradient(90deg, transparent, rgba(165,180,252,.9), transparent);
+        transition: opacity .3s ease;
+    }
+
+    .ano-topic-card:hover {
+        transform: translateY(-7px);
+        border-color: rgba(129,140,248,.55);
+        box-shadow: 0 24px 48px rgba(2,6,23,.34), 0 0 28px rgba(99,102,241,.09);
+        background: linear-gradient(145deg, rgba(39,49,88,.98), rgba(23,31,65,.98));
+    }
+
+    .ano-topic-card:hover::before,
+    .ano-topic-card:hover::after { opacity: 1; }
+
+    .ano-topic-icon {
+        display: grid;
+        width: 4.25rem;
+        height: 4.25rem;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid rgba(165,180,252,.16);
+        border-radius: 1.3rem;
+        background: linear-gradient(145deg, rgba(99,102,241,.24), rgba(51,65,85,.72));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 18px rgba(2,6,23,.18);
+        transition: transform .3s ease, border-color .3s ease, background .3s ease;
+    }
+
+    .ano-topic-card:hover .ano-topic-icon {
+        transform: translateY(-3px) rotate(-4deg) scale(1.06);
+        border-color: rgba(199,210,254,.42);
+        background: linear-gradient(145deg, rgba(99,102,241,.4), rgba(56,189,248,.18));
+    }
+
+    .ano-topic-count {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        border: 1px solid rgba(129,140,248,.2);
+        border-radius: 999px;
+        padding: .42rem .75rem;
+        color: #c7d2fe;
+        background: rgba(99,102,241,.11);
+        font-size: .75rem;
+        font-weight: 850;
+        letter-spacing: .02em;
+        transition: color .25s ease, background .25s ease, border-color .25s ease;
+    }
+
+    .ano-topic-card:hover .ano-topic-count {
+        color: #fff;
+        border-color: rgba(199,210,254,.35);
+        background: rgba(99,102,241,.26);
+    }
+
+    .ano-topic-arrow {
+        display: grid;
+        width: 2.5rem;
+        height: 2.5rem;
+        place-items: center;
+        border: 1px solid rgba(148,163,184,.17);
+        border-radius: 999px;
+        color: #a5b4fc;
+        background: rgba(15,23,42,.5);
+        transition: transform .25s ease, color .25s ease, background .25s ease;
+    }
+
+    .ano-topic-card:hover .ano-topic-arrow {
+        transform: translateX(4px);
+        color: #fff;
+        background: rgba(99,102,241,.45);
+    }
+
+    @media (max-width: 640px) {
+        .ano-orbit { width: 5.5rem; height: 5.5rem; margin-top: -2.75rem; right: 1.25rem; opacity: .65; }
+        .ano-topic-card:hover { transform: translateY(-3px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ano-enter, .ano-orbit { animation: none !important; }
+        .ano-back-link, .ano-topic-card, .ano-topic-icon, .ano-topic-count, .ano-topic-arrow {
+            transition: none !important;
+        }
+        .ano-topic-card:hover { transform: none; }
+    }
+</style>
+
+<div class="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 text-white sm:px-6 sm:py-10">
+    <!-- Luzes decorativas de fundo -->
+    <div aria-hidden="true" class="pointer-events-none absolute -left-40 top-40 h-80 w-80 rounded-full bg-indigo-600/10 blur-3xl"></div>
+    <div aria-hidden="true" class="pointer-events-none absolute -right-40 bottom-20 h-96 w-96 rounded-full bg-sky-600/10 blur-3xl"></div>
+
+    <div class="relative z-10 mx-auto max-w-5xl">
+
         <!-- VOLTAR -->
-        <!-- ================================================= -->
-
         <a
             href="{{ url_for('jornada') }}"
-
-            class="
-                inline-flex
-                items-center
-                gap-2
-
-                text-indigo-400
-                hover:text-indigo-300
-
-                font-bold
-                transition
-            "
+            class="ano-back-link inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-4 py-2.5 font-bold text-indigo-300 hover:border-indigo-300/40 hover:bg-indigo-500/15 hover:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400"
         >
-            ← Jornada
+            <span aria-hidden="true">←</span>
+            Voltar para Jornada
         </a>
 
-
-        <!-- ================================================= -->
         <!-- CABEÇALHO DO ANO -->
-        <!-- ================================================= -->
+        <header class="ano-hero ano-enter mt-7 rounded-[2rem] p-6 sm:p-8 lg:p-10">
+            <div class="relative z-10 max-w-3xl">
+                <div class="inline-flex items-center gap-2 rounded-full border border-indigo-200/20 bg-indigo-200/10 px-3 py-1.5 text-xs font-black uppercase tracking-[.18em] text-indigo-200">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.8)]"></span>
+                    Jornada de aprendizagem
+                </div>
 
-        <div class="mt-7">
+                <h1 class="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+                    <span class="mr-2">{{ ano.icone }}</span>{{ ano.nome }}
+                </h1>
 
-            <p
-                class="
-                    text-sm
-                    uppercase
-                    tracking-wider
-                    font-black
-                    text-indigo-400
-                "
-            >
-                Jornada de aprendizagem
-            </p>
-
-
-            <h1
-                class="
-                    text-4xl
-                    md:text-5xl
-                    font-black
-                    mt-2
-                    text-white
-                "
-            >
-                {{ ano.icone }}
-                {{ ano.nome }}
-            </h1>
-
-
-            {% if ano.descricao %}
-
-                <p
-                    class="
-                        mt-3
-                        max-w-2xl
-                        text-slate-400
-                        text-lg
-                    "
-                >
-                    {{ ano.descricao }}
-                </p>
-
-            {% endif %}
-
-        </div>
-
-
-        <!-- ================================================= -->
-        <!-- TEMAS -->
-        <!-- ================================================= -->
-
-        <div
-            class="
-                grid
-                md:grid-cols-2
-                gap-5
-                mt-10
-            "
-        >
-
-            {% for tema_id, tema in ano.temas.items() %}
-
-                <a
-                    href="{{
-                        url_for(
-                            'tema',
-                            ano_id=ano_id,
-                            tema_id=tema_id
-                        )
-                    }}"
-
-                    class="
-                        group
-                        relative
-
-                        bg-slate-800
-                        border
-                        border-slate-700
-
-                        rounded-3xl
-                        p-6
-
-                        shadow-lg
-
-                        transition
-                        duration-200
-
-                        hover:-translate-y-1
-                        hover:bg-indigo-600
-                        hover:border-indigo-500
-                        hover:shadow-xl
-                    "
-                >
-
-                    <!-- ÍCONE -->
-
-                    <div
-                        class="
-                            flex
-                            items-center
-                            justify-center
-
-                            w-16
-                            h-16
-
-                            rounded-2xl
-
-                            bg-slate-700
-
-                            text-4xl
-
-                            transition
-
-                            group-hover:bg-white/15
-                        "
-                    >
-                        {{ tema.icone }}
-                    </div>
-
-
-                    <!-- NOME -->
-
-                    <h2
-                        class="
-                            font-black
-                            text-2xl
-                            mt-5
-                            text-white
-                        "
-                    >
-                        {{ tema.nome }}
-                    </h2>
-
-
-                    <!-- QUANTIDADE -->
-
-                    <p
-                        class="
-                            text-slate-400
-                            mt-2
-
-                            group-hover:text-indigo-100
-                        "
-                    >
-                        {{ tema.assuntos|length }}
-
-                        {% if tema.assuntos|length == 1 %}
-                            assunto
-                        {% else %}
-                            assuntos
-                        {% endif %}
+                {% if ano.descricao %}
+                    <p class="mt-4 max-w-2xl text-base leading-relaxed text-indigo-100/80 sm:text-lg">
+                        {{ ano.descricao }}
                     </p>
+                {% else %}
+                    <p class="mt-4 max-w-2xl text-base leading-relaxed text-indigo-100/80 sm:text-lg">
+                        Explore os temas, avance no seu ritmo e fortaleça seus conhecimentos.
+                    </p>
+                {% endif %}
+            </div>
 
+            <div aria-hidden="true" class="ano-orbit"></div>
 
-                    <!-- CTA -->
+            <div aria-hidden="true" class="pointer-events-none absolute bottom-0 left-10 right-10 h-px bg-gradient-to-r from-transparent via-indigo-300/30 to-transparent"></div>
+        </header>
 
-                   
+        <!-- TEMAS -->
+        <section class="mt-10">
+            <div class="ano-enter ano-delay-1 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-[.2em] text-indigo-300">Conteúdo programático</p>
+                    <h2 class="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">Escolha um tema</h2>
+                    <p class="mt-2 text-sm text-slate-400">Selecione um tópico para continuar seus estudos.</p>
+                </div>
 
-                </a>
+                <div class="inline-flex w-fit items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-bold text-slate-400">
+                    <span class="h-2 w-2 rounded-full bg-indigo-400"></span>
+                    Seus próximos passos
+                </div>
+            </div>
 
-            {% endfor %}
+            <div class="mt-5 grid gap-4 md:grid-cols-2">
+                {% for tema_id, tema in ano.temas.items() %}
+                    <a
+                        href="{{ url_for('tema', ano_id=ano_id, tema_id=tema_id) }}"
+                        class="ano-topic-card ano-enter ano-delay-2 p-5 sm:p-6 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950"
+                    >
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="ano-topic-icon text-4xl">
+                                {{ tema.icone }}
+                            </div>
 
-        </div>
+                            <span class="ano-topic-arrow text-xl" aria-hidden="true">→</span>
+                        </div>
 
+                        <h3 class="mt-5 text-xl font-black leading-tight text-white sm:text-2xl">
+                            {{ tema.nome }}
+                        </h3>
+
+                        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+                            <span class="text-sm text-slate-400">
+                                {% if tema.assuntos|length == 1 %}
+                                    {{ tema.assuntos|length }} assunto disponível
+                                {% else %}
+                                    {{ tema.assuntos|length }} assuntos disponíveis
+                                {% endif %}
+                            </span>
+
+                            <span class="ano-topic-count">
+                                Explorar tema
+                                <span aria-hidden="true">↗</span>
+                            </span>
+                        </div>
+                    </a>
+                {% else %}
+                    <div class="col-span-full rounded-3xl border border-dashed border-slate-700 bg-slate-900/75 px-6 py-12 text-center">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-indigo-400/20 bg-indigo-500/10 text-3xl">
+                            📚
+                        </div>
+                        <h3 class="mt-4 text-xl font-black text-white">Nenhum tema disponível</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-400">
+                            Ainda não há temas cadastrados para este ano. Volte à Jornada para explorar outros conteúdos.
+                        </p>
+                        <a href="{{ url_for('jornada') }}" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-black text-white transition hover:bg-indigo-500">
+                            <span aria-hidden="true">←</span> Voltar para Jornada
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
-
 </div>
 
 {% endblock %}

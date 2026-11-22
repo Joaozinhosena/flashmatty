@@ -1,0 +1,1180 @@
+{
+  "_sobre": [
+    "30 questões-piloto derivadas de problemas reais do currículo K–5 da Illustrative Mathematics.",
+    "Nenhuma questão foi criada pelo game.py.",
+    "Enunciados traduzidos/adaptados para português e múltipla escolha.",
+    "Cada item mantém URL, referência do problema original e licença CC BY 4.0."
+  ],
+  "questoes": [
+    {
+      "codigo": "IM-1-001",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "problemas-adicao",
+      "etapa": "3",
+      "tipo": "problema_adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Havia 7 crianças na piscina. Outras chegaram e agora há 10. Quantas chegaram?",
+      "resposta_correta": "3",
+      "alternativas": [
+        {
+          "valor": "3",
+          "texto": "3"
+        },
+        {
+          "valor": "2",
+          "texto": "2"
+        },
+        {
+          "valor": "4",
+          "texto": "4"
+        },
+        {
+          "valor": "17",
+          "texto": "17"
+        }
+      ],
+      "explicacao": "10 - 7 = 3.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section A, Problem 5",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-1-002",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "problemas-adicao",
+      "etapa": "3",
+      "tipo": "problema_adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Havia 3 estudantes no parquinho. Depois chegaram mais alguns e passaram a ser 9. Quantos chegaram?",
+      "resposta_correta": "6",
+      "alternativas": [
+        {
+          "valor": "6",
+          "texto": "6"
+        },
+        {
+          "valor": "3",
+          "texto": "3"
+        },
+        {
+          "valor": "9",
+          "texto": "9"
+        },
+        {
+          "valor": "12",
+          "texto": "12"
+        }
+      ],
+      "explicacao": "9 - 3 = 6.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section A, Problem 6",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-1-003",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "problemas-adicao",
+      "etapa": "3",
+      "tipo": "problema_adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um time tem 3 alunos do 1º ano e 6 do 2º ano. Quantas crianças há no time?",
+      "resposta_correta": "9",
+      "alternativas": [
+        {
+          "valor": "9",
+          "texto": "9"
+        },
+        {
+          "valor": "3",
+          "texto": "3"
+        },
+        {
+          "valor": "6",
+          "texto": "6"
+        },
+        {
+          "valor": "18",
+          "texto": "18"
+        }
+      ],
+      "explicacao": "3 + 6 = 9.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section B, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-1-004",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "4",
+      "tipo": "problema_subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Uma pulseira tem 9 contas. Duas são rosas e o restante é verde. Quantas são verdes?",
+      "resposta_correta": "7",
+      "alternativas": [
+        {
+          "valor": "7",
+          "texto": "7"
+        },
+        {
+          "valor": "2",
+          "texto": "2"
+        },
+        {
+          "valor": "9",
+          "texto": "9"
+        },
+        {
+          "valor": "11",
+          "texto": "11"
+        }
+      ],
+      "explicacao": "9 - 2 = 7.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section B, Problem 4",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-1-005",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "4",
+      "tipo": "problema_subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Há 10 dragões na caverna e 3 do lado de fora. Quantos a menos estão do lado de fora?",
+      "resposta_correta": "7",
+      "alternativas": [
+        {
+          "valor": "7",
+          "texto": "7"
+        },
+        {
+          "valor": "3",
+          "texto": "3"
+        },
+        {
+          "valor": "10",
+          "texto": "10"
+        },
+        {
+          "valor": "13",
+          "texto": "13"
+        }
+      ],
+      "explicacao": "10 - 3 = 7.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section C, Problem 2",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-1-006",
+      "ano": "1-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "4",
+      "tipo": "problema_subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Havia 9 carros no estacionamento. Cinco foram embora. Quantos ficaram?",
+      "resposta_correta": "4",
+      "alternativas": [
+        {
+          "valor": "4",
+          "texto": "4"
+        },
+        {
+          "valor": "5",
+          "texto": "5"
+        },
+        {
+          "valor": "9",
+          "texto": "9"
+        },
+        {
+          "valor": "14",
+          "texto": "14"
+        }
+      ],
+      "explicacao": "9 - 5 = 4.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-1/unit-2/practice.html",
+      "fonte_referencia": "Grade 1 Unit 2, Section D, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-001",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "adicao",
+      "etapa": "2",
+      "tipo": "adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual número completa 9 + 7 = ___?",
+      "resposta_correta": "16",
+      "alternativas": [
+        {
+          "valor": "16",
+          "texto": "16"
+        },
+        {
+          "valor": "2",
+          "texto": "2"
+        },
+        {
+          "valor": "9",
+          "texto": "9"
+        },
+        {
+          "valor": "14",
+          "texto": "14"
+        }
+      ],
+      "explicacao": "9 + 7 = 16.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://www.tudosaladeaula.com/atividades-de-matematica-2-ano-e-3-ano/",
+      "fonte_referencia": "Grade 2 Unit 4, Pre-unit Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-002",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "2",
+      "tipo": "subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual número completa 15 - ___ = 8?",
+      "resposta_correta": "7",
+      "alternativas": [
+        {
+          "valor": "7",
+          "texto": "7"
+        },
+        {
+          "valor": "8",
+          "texto": "8"
+        },
+        {
+          "valor": "15",
+          "texto": "15"
+        },
+        {
+          "valor": "23",
+          "texto": "23"
+        }
+      ],
+      "explicacao": "15 - 7 = 8.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/k5/teachers/grade-2/unit-4/practice.html",
+      "fonte_referencia": "Grade 2 Unit 4, Pre-unit Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-003",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "2",
+      "tipo": "subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual número completa ___ - 11 = 8?",
+      "resposta_correta": "19",
+      "alternativas": [
+        {
+          "valor": "19",
+          "texto": "19"
+        },
+        {
+          "valor": "3",
+          "texto": "3"
+        },
+        {
+          "valor": "11",
+          "texto": "11"
+        },
+        {
+          "valor": "21",
+          "texto": "21"
+        }
+      ],
+      "explicacao": "19 - 11 = 8.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/k5/teachers/grade-2/unit-4/practice.html",
+      "fonte_referencia": "Grade 2 Unit 4, Pre-unit Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-004",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "adicao",
+      "etapa": "4",
+      "tipo": "problema_adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Há 37 sapos em um lago e 16 peixes a mais do que sapos. Quantos peixes há?",
+      "resposta_correta": "53",
+      "alternativas": [
+        {
+          "valor": "53",
+          "texto": "53"
+        },
+        {
+          "valor": "21",
+          "texto": "21"
+        },
+        {
+          "valor": "37",
+          "texto": "37"
+        },
+        {
+          "valor": "43",
+          "texto": "43"
+        }
+      ],
+      "explicacao": "37 + 16 = 53.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/k5/teachers/grade-2/unit-4/practice.html",
+      "fonte_referencia": "Grade 2 Unit 4, Pre-unit Problem 4",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-005",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "adicao",
+      "etapa": "3",
+      "tipo": "adicao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Calcule 32 + 26.",
+      "resposta_correta": "58",
+      "alternativas": [
+        {
+          "valor": "58",
+          "texto": "58"
+        },
+        {
+          "valor": "6",
+          "texto": "6"
+        },
+        {
+          "valor": "48",
+          "texto": "48"
+        },
+        {
+          "valor": "68",
+          "texto": "68"
+        }
+      ],
+      "explicacao": "32 + 26 = 58.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/k5/teachers/grade-2/unit-4/practice.html",
+      "fonte_referencia": "Grade 2 Unit 4, Section B, Problem 4",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-2-006",
+      "ano": "2-ano",
+      "tema": "numeros",
+      "assunto": "subtracao",
+      "etapa": "3",
+      "tipo": "subtracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Calcule 65 - 58.",
+      "resposta_correta": "7",
+      "alternativas": [
+        {
+          "valor": "7",
+          "texto": "7"
+        },
+        {
+          "valor": "6",
+          "texto": "6"
+        },
+        {
+          "valor": "8",
+          "texto": "8"
+        },
+        {
+          "valor": "123",
+          "texto": "123"
+        }
+      ],
+      "explicacao": "65 - 58 = 7.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/k5/teachers/grade-2/unit-4/practice.html",
+      "fonte_referencia": "Grade 2 Unit 4, Section B, Problem 5",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-001",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "2",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um retângulo foi dividido em 8 partes iguais e 5 estão pintadas. Qual fração está pintada?",
+      "resposta_correta": "5/8",
+      "alternativas": [
+        {
+          "valor": "5/8",
+          "texto": "5/8"
+        },
+        {
+          "valor": "3/8",
+          "texto": "3/8"
+        },
+        {
+          "valor": "8/5",
+          "texto": "8/5"
+        },
+        {
+          "valor": "5/3",
+          "texto": "5/3"
+        }
+      ],
+      "explicacao": "Cinco de oito partes: 5/8.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section A, Problem 7",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-002",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "3",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual fração é equivalente a 1/2?",
+      "resposta_correta": "3/6",
+      "alternativas": [
+        {
+          "valor": "3/6",
+          "texto": "3/6"
+        },
+        {
+          "valor": "1/3",
+          "texto": "1/3"
+        },
+        {
+          "valor": "2/3",
+          "texto": "2/3"
+        },
+        {
+          "valor": "3/4",
+          "texto": "3/4"
+        }
+      ],
+      "explicacao": "3/6 simplifica para 1/2.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section C, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-003",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "3",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual fração é equivalente a 2/3?",
+      "resposta_correta": "4/6",
+      "alternativas": [
+        {
+          "valor": "4/6",
+          "texto": "4/6"
+        },
+        {
+          "valor": "3/4",
+          "texto": "3/4"
+        },
+        {
+          "valor": "2/6",
+          "texto": "2/6"
+        },
+        {
+          "valor": "5/6",
+          "texto": "5/6"
+        }
+      ],
+      "explicacao": "4/6 simplifica para 2/3.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section C, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-004",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "4",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "88/8 equivale a qual número inteiro?",
+      "resposta_correta": "11",
+      "alternativas": [
+        {
+          "valor": "11",
+          "texto": "11"
+        },
+        {
+          "valor": "8",
+          "texto": "8"
+        },
+        {
+          "valor": "10",
+          "texto": "10"
+        },
+        {
+          "valor": "12",
+          "texto": "12"
+        }
+      ],
+      "explicacao": "88 ÷ 8 = 11.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section C, Problem 4",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-005",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "4",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "2/3 e 4/6 são equivalentes?",
+      "resposta_correta": "sim",
+      "alternativas": [
+        {
+          "valor": "sim",
+          "texto": "sim"
+        },
+        {
+          "valor": "não",
+          "texto": "não"
+        },
+        {
+          "valor": "somente às vezes",
+          "texto": "somente às vezes"
+        },
+        {
+          "valor": "não é possível comparar",
+          "texto": "não é possível comparar"
+        }
+      ],
+      "explicacao": "4/6 = 2/3.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section D, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-3-006",
+      "ano": "3-ano",
+      "tema": "numeros",
+      "assunto": "fracao",
+      "etapa": "4",
+      "tipo": "fracao",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "6/8 e 7/8 são equivalentes?",
+      "resposta_correta": "não",
+      "alternativas": [
+        {
+          "valor": "não",
+          "texto": "não"
+        },
+        {
+          "valor": "sim",
+          "texto": "sim"
+        },
+        {
+          "valor": "sempre",
+          "texto": "sempre"
+        },
+        {
+          "valor": "não é possível comparar",
+          "texto": "não é possível comparar"
+        }
+      ],
+      "explicacao": "Mesmo denominador, numeradores diferentes.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-3/unit-5/practice.html",
+      "fonte_referencia": "Grade 3 Unit 5, Section D, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-001",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "3",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um círculo foi dividido em 12 partes iguais. Quantos graus mede cada parte?",
+      "resposta_correta": "30",
+      "alternativas": [
+        {
+          "valor": "30",
+          "texto": "30"
+        },
+        {
+          "valor": "12",
+          "texto": "12"
+        },
+        {
+          "valor": "24",
+          "texto": "24"
+        },
+        {
+          "valor": "45",
+          "texto": "45"
+        }
+      ],
+      "explicacao": "360 ÷ 12 = 30°.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 2",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-002",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "3",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um círculo foi dividido em 8 partes iguais. Quantos graus mede cada parte?",
+      "resposta_correta": "45",
+      "alternativas": [
+        {
+          "valor": "45",
+          "texto": "45"
+        },
+        {
+          "valor": "30",
+          "texto": "30"
+        },
+        {
+          "valor": "60",
+          "texto": "60"
+        },
+        {
+          "valor": "90",
+          "texto": "90"
+        }
+      ],
+      "explicacao": "360 ÷ 8 = 45°.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 3",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-003",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "3",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um círculo foi dividido em 5 partes iguais. Quantos graus mede cada parte?",
+      "resposta_correta": "72",
+      "alternativas": [
+        {
+          "valor": "72",
+          "texto": "72"
+        },
+        {
+          "valor": "60",
+          "texto": "60"
+        },
+        {
+          "valor": "75",
+          "texto": "75"
+        },
+        {
+          "valor": "90",
+          "texto": "90"
+        }
+      ],
+      "explicacao": "360 ÷ 5 = 72°.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 3",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-004",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "4",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um ângulo reto de 90° tem uma parte de 15° e três partes iguais. Quanto mede cada parte igual?",
+      "resposta_correta": "25",
+      "alternativas": [
+        {
+          "valor": "25",
+          "texto": "25"
+        },
+        {
+          "valor": "15",
+          "texto": "15"
+        },
+        {
+          "valor": "30",
+          "texto": "30"
+        },
+        {
+          "valor": "45",
+          "texto": "45"
+        }
+      ],
+      "explicacao": "(90 - 15) ÷ 3 = 25°.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 4",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-005",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "4",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Quantos ângulos de 20° completam uma volta de 360°?",
+      "resposta_correta": "18",
+      "alternativas": [
+        {
+          "valor": "18",
+          "texto": "18"
+        },
+        {
+          "valor": "12",
+          "texto": "12"
+        },
+        {
+          "valor": "20",
+          "texto": "20"
+        },
+        {
+          "valor": "36",
+          "texto": "36"
+        }
+      ],
+      "explicacao": "360 ÷ 20 = 18.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 2",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-4-006",
+      "ano": "4-ano",
+      "tema": "geometria",
+      "assunto": "angulos",
+      "etapa": "4",
+      "tipo": "angulos",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "O ponteiro dos minutos girou 210°. Quantos minutos se passaram?",
+      "resposta_correta": "35",
+      "alternativas": [
+        {
+          "valor": "35",
+          "texto": "35"
+        },
+        {
+          "valor": "30",
+          "texto": "30"
+        },
+        {
+          "valor": "40",
+          "texto": "40"
+        },
+        {
+          "valor": "45",
+          "texto": "45"
+        }
+      ],
+      "explicacao": "6° por minuto; 210 ÷ 6 = 35.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-4/unit-7/practice.html",
+      "fonte_referencia": "Grade 4 Unit 7, Section C, Problem 6",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-001",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "3",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um prisma retangular mede 8 por 6 por 4 unidades. Qual é o volume?",
+      "resposta_correta": "192",
+      "alternativas": [
+        {
+          "valor": "192",
+          "texto": "192"
+        },
+        {
+          "valor": "48",
+          "texto": "48"
+        },
+        {
+          "valor": "96",
+          "texto": "96"
+        },
+        {
+          "valor": "288",
+          "texto": "288"
+        }
+      ],
+      "explicacao": "8 × 6 × 4 = 192.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-002",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "3",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um prisma mede 6 por 3 por 4 unidades. Qual é o volume?",
+      "resposta_correta": "72",
+      "alternativas": [
+        {
+          "valor": "72",
+          "texto": "72"
+        },
+        {
+          "valor": "13",
+          "texto": "13"
+        },
+        {
+          "valor": "24",
+          "texto": "24"
+        },
+        {
+          "valor": "288",
+          "texto": "288"
+        }
+      ],
+      "explicacao": "6 × 3 × 4 = 72.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 2",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-003",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "3",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Uma caixa mede 4 cm por 10 cm por 30 cm. Qual é o volume?",
+      "resposta_correta": "1200",
+      "alternativas": [
+        {
+          "valor": "1200",
+          "texto": "1200"
+        },
+        {
+          "valor": "44",
+          "texto": "44"
+        },
+        {
+          "valor": "400",
+          "texto": "400"
+        },
+        {
+          "valor": "3000",
+          "texto": "3000"
+        }
+      ],
+      "explicacao": "4 × 10 × 30 = 1200 cm³.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 3",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-004",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "4",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Qual conjunto de dimensões forma um prisma com volume 120?",
+      "resposta_correta": "5 × 6 × 4",
+      "alternativas": [
+        {
+          "valor": "5 × 6 × 4",
+          "texto": "5 × 6 × 4"
+        },
+        {
+          "valor": "5 × 5 × 4",
+          "texto": "5 × 5 × 4"
+        },
+        {
+          "valor": "6 × 6 × 4",
+          "texto": "6 × 6 × 4"
+        },
+        {
+          "valor": "10 × 10 × 2",
+          "texto": "10 × 10 × 2"
+        }
+      ],
+      "explicacao": "5 × 6 × 4 = 120.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 7",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-005",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "5",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Um sólido retangular tem base 8 × 6 e altura 4. Qual cálculo encontra o volume?",
+      "resposta_correta": "8 × 6 × 4",
+      "alternativas": [
+        {
+          "valor": "8 × 6 × 4",
+          "texto": "8 × 6 × 4"
+        },
+        {
+          "valor": "8 + 6 + 4",
+          "texto": "8 + 6 + 4"
+        },
+        {
+          "valor": "2 × (8 + 6 + 4)",
+          "texto": "2 × (8 + 6 + 4)"
+        },
+        {
+          "valor": "8 × 6 + 4",
+          "texto": "8 × 6 + 4"
+        }
+      ],
+      "explicacao": "Volume = comprimento × largura × altura.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 1",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    },
+    {
+      "codigo": "IM-5-006",
+      "ano": "5-ano",
+      "tema": "matematica",
+      "assunto": "volume",
+      "etapa": "5",
+      "tipo": "volume",
+      "tipo_ui": "multipla_escolha",
+      "enunciado": "Para um prisma 6 × 3 × 4, qual expressão também representa o volume?",
+      "resposta_correta": "18 × 4",
+      "alternativas": [
+        {
+          "valor": "18 × 4",
+          "texto": "18 × 4"
+        },
+        {
+          "valor": "24 × 12",
+          "texto": "24 × 12"
+        },
+        {
+          "valor": "12 + 12 + 12",
+          "texto": "12 + 12 + 12"
+        },
+        {
+          "valor": "6 + 3 + 4",
+          "texto": "6 + 3 + 4"
+        }
+      ],
+      "explicacao": "6 × 3 = 18; 18 × 4 = 72.",
+      "instrucao": "Escolha a alternativa correta.",
+      "dificuldade": 2,
+      "autor": "Illustrative Mathematics®, © 2021. Adaptado/traduzido para o FlashMatty.",
+      "instituicao": "Illustrative Mathematics / Kendall Hunt",
+      "fonte": "https://im.kendallhunt.com/K5/teachers/grade-5/unit-1/practice.html",
+      "fonte_referencia": "Grade 5 Unit 1, Section B, Problem 2",
+      "licenca": "CC BY 4.0",
+      "revisada": true,
+      "ativa": true
+    }
+  ]
+}

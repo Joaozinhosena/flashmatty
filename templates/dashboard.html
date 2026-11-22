@@ -1,497 +1,353 @@
 {% extends "base.html" %}
 
-{% block title %}
-Início - FlashMatty
-{% endblock %}
-
+{% block title %}Início - FlashMatty{% endblock %}
 
 {% block content %}
+<style>
+    /* Identidade visual da página inicial */
+    .fm-home {
+        --fm-accent: #8b7cff;
+        --fm-cyan: #43d9e8;
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        background:
+            radial-gradient(ellipse at 12% 8%, rgba(99, 102, 241, .18), transparent 34%),
+            radial-gradient(ellipse at 88% 22%, rgba(14, 165, 233, .12), transparent 30%),
+            #080d1b;
+    }
 
-<div
-    class="
-        min-h-screen
-        bg-slate-900
-        text-white
-        px-4
-        py-10
-    "
->
+    .fm-home::before,
+    .fm-home::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 24rem;
+        height: 24rem;
+        border-radius: 9999px;
+        filter: blur(90px);
+        opacity: .18;
+        pointer-events: none;
+        animation: fm-orbit 16s ease-in-out infinite alternate;
+    }
 
-    <div
-        class="
-            max-w-5xl
-            mx-auto
-        "
-    >
+    .fm-home::before {
+        top: 8rem;
+        left: -14rem;
+        background: #6366f1;
+    }
 
-        <!-- ================================================= -->
-        <!-- BOAS-VINDAS -->
-        <!-- ================================================= -->
+    .fm-home::after {
+        right: -14rem;
+        bottom: 2rem;
+        background: #06b6d4;
+        animation-delay: -7s;
+    }
 
-        <section
-            class="
-                bg-indigo-600
-                text-white
-                rounded-3xl
-                p-6
-                md:p-10
-                shadow-xl
-            "
-        >
+    @keyframes fm-orbit {
+        from { transform: translate3d(0, 0, 0) scale(.9); }
+        to { transform: translate3d(3rem, 2rem, 0) scale(1.15); }
+    }
 
-            <p
-                class="
-                    font-bold
-                    text-indigo-100
-                "
-            >
-                Olá,
-            </p>
+    @keyframes fm-enter {
+        from { opacity: 0; transform: translateY(22px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
+    @keyframes fm-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-7px); }
+    }
 
-            <h1
-                class="
-                    text-3xl
-                    md:text-5xl
-                    font-black
-                    mt-1
-                "
-            >
-                {{ current_user.nome }} 
-            </h1>
+    @keyframes fm-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(129, 140, 248, .22); }
+        50% { box-shadow: 0 0 0 9px rgba(129, 140, 248, 0); }
+    }
 
+    .fm-animate-in {
+        animation: fm-enter .75s cubic-bezier(.2, .75, .25, 1) both;
+    }
 
-            <p
-                class="
-                    mt-3
-                    text-indigo-100
-                    max-w-xl
-                "
-            >
-                Continue aprendendo matemática e avance
-                na sua jornada.
-            </p>
+    .fm-delay-1 { animation-delay: .10s; }
+    .fm-delay-2 { animation-delay: .20s; }
+    .fm-delay-3 { animation-delay: .30s; }
 
+    .fm-glass {
+        background: linear-gradient(135deg, rgba(255,255,255,.105), rgba(255,255,255,.035));
+        border: 1px solid rgba(255,255,255,.11);
+        box-shadow: 0 18px 55px rgba(0,0,0,.16);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
 
-            <!-- STATUS -->
+    .fm-stat {
+        transition: transform .3s ease, border-color .3s ease, background .3s ease;
+    }
 
-            <div
-                class="
-                    grid
-                    grid-cols-1
-                    sm:grid-cols-3
-                    gap-4
-                    mt-8
-                "
-            >
+    .fm-stat:hover {
+        transform: translateY(-5px);
+        border-color: rgba(165, 180, 252, .48);
+        background: rgba(255,255,255,.13);
+    }
 
-                <!-- NÍVEL -->
+    .fm-card {
+        position: relative;
+        transform: translateY(0);
+        transition: transform .35s cubic-bezier(.2,.8,.2,1),
+                    border-color .35s ease,
+                    box-shadow .35s ease,
+                    background .35s ease;
+    }
 
-                <div
-                    class="
-                        bg-white/10
-                        border
-                        border-white/10
-                        rounded-2xl
-                        p-4
-                    "
-                >
+    .fm-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(129,140,248,.0), rgba(103,232,249,.0));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        transition: opacity .35s ease;
+        opacity: 0;
+    }
 
-                    <span
-                        class="
-                            text-sm
-                            font-bold
-                            text-indigo-100
-                        "
-                    >
-                        Nível
+    .fm-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(129,140,248,.55);
+        box-shadow: 0 24px 65px rgba(0,0,0,.32), 0 0 35px rgba(99,102,241,.10);
+        background-color: rgba(30,41,59,.92);
+    }
+
+    .fm-card:hover::before { opacity: 1; }
+
+    .fm-icon-wrap {
+        transition: transform .45s cubic-bezier(.2,.8,.2,1), background .35s ease;
+    }
+
+    .fm-card:hover .fm-icon-wrap {
+        transform: scale(1.08) rotate(-4deg);
+        background: rgba(129,140,248,.2);
+    }
+
+    .fm-arrow {
+        transition: transform .3s ease;
+    }
+
+    .fm-card:hover .fm-arrow { transform: translateX(5px); }
+
+    .fm-cta {
+        background-size: 200% 200%;
+        background-image: linear-gradient(115deg, #6256e8 0%, #7457df 45%, #347bdc 100%);
+        transition: background-position .5s ease, transform .35s ease, box-shadow .35s ease;
+    }
+
+    .fm-cta:hover {
+        background-position: 100% 0;
+        transform: translateY(-5px);
+        box-shadow: 0 22px 55px rgba(79,70,229,.28);
+    }
+
+    .fm-cta:hover .fm-cta-icon { animation: fm-float 1.6s ease-in-out infinite; }
+
+    .fm-eyebrow {
+        letter-spacing: .2em;
+        text-transform: uppercase;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            scroll-behavior: auto !important;
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+<main class="fm-home min-h-screen px-4 py-8 text-white sm:px-6 sm:py-12 lg:px-8">
+    <div class="relative mx-auto max-w-6xl">
+
+        <!-- Cabeçalho / boas-vindas -->
+        <section class="fm-animate-in relative overflow-hidden rounded-[2rem] border border-indigo-300/20 bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 p-6 shadow-2xl shadow-indigo-950/40 sm:p-9 lg:p-11">
+            <div class="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border border-white/10"></div>
+            <div class="pointer-events-none absolute -right-4 -top-12 h-52 w-52 rounded-full border border-white/10"></div>
+            <div class="pointer-events-none absolute -bottom-28 right-1/4 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl"></div>
+
+            <div class="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-2xl">
+                    <span class="fm-eyebrow inline-flex items-center gap-2 text-[10px] font-extrabold text-indigo-200 sm:text-xs">
+                        <span class="h-2 w-2 animate-pulse rounded-full bg-cyan-300"></span>
+                        Seu espaço de aprendizagem
                     </span>
 
-
-                    <strong
-                        class="
-                            block
-                            text-2xl
-                            mt-1
-                        "
-                    >
-                        {{ current_user.nivel }}
-                    </strong>
-
+                    <p class="mt-5 text-sm font-semibold text-indigo-100 sm:text-base">Olá, seja bem-vindo(a)!</p>
+                    <h1 class="mt-1 break-words text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+                        {{ current_user.nome }}
+                        <span class="text-cyan-300">.</span>
+                    </h1>
+                    <p class="mt-4 max-w-xl text-sm leading-7 text-indigo-100/90 sm:text-base">
+                        Continue aprendendo matemática, supere desafios e avance um passo de cada vez na sua jornada.
+                    </p>
                 </div>
 
-
-                <!-- XP -->
-
-                <div
-                    class="
-                        bg-white/10
-                        border
-                        border-white/10
-                        rounded-2xl
-                        p-4
-                    "
-                >
-
-                    <span
-                        class="
-                            text-sm
-                            font-bold
-                            text-indigo-100
-                        "
-                    >
-                        XP
-                    </span>
-
-
-                    <strong
-                        class="
-                            block
-                            text-2xl
-                            mt-1
-                        "
-                    >
-                         {{ current_user.xp or 0 }}
-                    </strong>
-
+                <div class="fm-glass hidden shrink-0 rounded-2xl px-5 py-4 sm:block">
+                    <p class="text-xs font-bold uppercase tracking-[.18em] text-indigo-200">Seu próximo passo</p>
+                    <p class="mt-1 text-lg font-extrabold">Evoluir todos os dias</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-cyan-200">
+                        <span class="h-1.5 w-1.5 rounded-full bg-cyan-300"></span>
+                        Aprender • praticar • conquistar
+                    </div>
                 </div>
-
-
-                <!-- PRECISÃO -->
-
-                <div
-                    class="
-                        bg-white/10
-                        border
-                        border-white/10
-                        rounded-2xl
-                        p-4
-                    "
-                >
-
-                    <span
-                        class="
-                            text-sm
-                            font-bold
-                            text-indigo-100
-                        "
-                    >
-                        Precisão
-                    </span>
-
-
-                    <strong
-                        class="
-                            block
-                            text-2xl
-                            mt-1
-                        "
-                    >
-                        {{ current_user.precisao }}%
-                    </strong>
-
-                </div>
-
             </div>
 
+            <!-- Indicadores -->
+            <div class="relative z-10 mt-9 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                <div class="fm-glass fm-stat rounded-2xl p-4 sm:p-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-100/80">Nível atual</span>
+                        <span class="rounded-xl bg-white/10 p-2 text-cyan-200" aria-hidden="true">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.2 5.1 5.5.5-4.2 3.6 1.3 5.4L12 14.8l-4.8 2.8 1.3-5.4-4.2-3.6 5.5-.5L12 3Z"/><path d="M5 21h14"/></svg>
+                        </span>
+                    </div>
+                    <strong class="mt-2 block text-3xl font-black tracking-tight">{{ current_user.nivel }}</strong>
+                    <span class="mt-1 block text-xs text-indigo-100/65">Sua evolução no FlashMatty</span>
+                </div>
+
+                <div class="fm-glass fm-stat rounded-2xl p-4 sm:p-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-100/80">Experiência</span>
+                        <span class="rounded-xl bg-white/10 p-2 text-amber-200" aria-hidden="true">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.8 14.8 9l6.4.7-4.8 4.3 1.4 6.3-5.8-3.3-5.8 3.3 1.4-6.3-4.8-4.3L9.2 9 12 2.8Z"/></svg>
+                        </span>
+                    </div>
+                    <strong class="mt-2 block text-3xl font-black tracking-tight">{{ current_user.xp or 0 }} <span class="text-base font-bold text-indigo-200">XP</span></strong>
+                    <span class="mt-1 block text-xs text-indigo-100/65">Cada desafio conta</span>
+                </div>
+
+                <div class="fm-glass fm-stat rounded-2xl p-4 sm:p-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-100/80">Precisão</span>
+                        <span class="rounded-xl bg-white/10 p-2 text-emerald-200" aria-hidden="true">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7 10 17l-5-5"/><path d="M21 12a9 9 0 1 1-5.2-8.2"/></svg>
+                        </span>
+                    </div>
+                    <strong class="mt-2 block text-3xl font-black tracking-tight">{{ current_user.precisao }}<span class="text-xl">%</span></strong>
+                    <span class="mt-1 block text-xs text-indigo-100/65">Atenção e consistência</span>
+                </div>
+            </div>
         </section>
 
-
-        <!-- ================================================= -->
-        <!-- MENU -->
-        <!-- ================================================= -->
-
-        <div
-            class="
-                grid
-                md:grid-cols-2
-                gap-5
-                mt-8
-            "
-        >
-
-            <!-- ================================================= -->
-            <!-- JORNADA -->
-            <!-- ================================================= -->
-
-            <a
-                href="{{ url_for('jornada') }}"
-
-                class="
-                    group
-                    overflow-hidden
-
-                    bg-slate-800
-                    border
-                    border-slate-700
-
-                    rounded-3xl
-                    shadow-lg
-
-                    transition
-                    duration-200
-
-                    hover:-translate-y-1
-                    hover:border-indigo-500
-                    hover:shadow-xl
-                "
-            >
-
-                <div
-                    class="
-                        h-48
-                        bg-slate-700
-                        overflow-hidden
-                    "
-                >
-
-                    <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLuChs4XQuFEx06_gPUj5-QcZBbYaRIp502HHO9VdiOg2vVs--8_L6bZk&s=10"
-
-                        alt="Ilustração da Jornada"
-
-                        class="
-                            w-full
-                            h-full
-                            object-contain
-                            transition
-                            duration-300
-
-                            group-hover:scale-105
-                        "
-                    >
-
+        <!-- Área de navegação -->
+        <section class="mt-12 sm:mt-14" aria-labelledby="fm-menu-title">
+            <div class="fm-animate-in fm-delay-1 mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                <div>
+                    <span class="fm-eyebrow text-[10px] font-extrabold text-cyan-300">Explore a plataforma</span>
+                    <h2 id="fm-menu-title" class="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Continue de onde parou</h2>
                 </div>
+                <p class="text-sm text-slate-400">Escolha seu próximo desafio.</p>
+            </div>
 
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                <div class="p-6">
-
-                    <h2
-                        class="
-                            font-black
-                            text-2xl
-                            text-white
-                        "
-                    >
-                        Jornada
-                    </h2>
-
-
-                    <p
-                        class="
-                            text-slate-400
-                            mt-2
-                        "
-                    >
-                        Continue sua trilha de aprendizado.
-                    </p>
-
-
-                   
-
-                </div>
-
-            </a>
-
-
-            <!-- ================================================= -->
-            <!-- BIBLIOTECA -->
-            <!-- ================================================= -->
-
-            <a
-                href="{{ url_for('biblioteca') }}"
-
-                class="
-                    group
-                    overflow-hidden
-
-                    bg-slate-800
-                    border
-                    border-slate-700
-
-                    rounded-3xl
-                    shadow-lg
-
-                    transition
-                    duration-200
-
-                    hover:-translate-y-1
-                    hover:border-indigo-500
-                    hover:shadow-xl
-                "
-            >
-
-                <div
-                    class="
-                        h-48
-                        bg-slate-700
-
-                        flex
-                        items-center
-                        justify-center
-                        overflow-hidden
-                    "
-                >
-
-                    <!--
-                    GIFV não é confiável em <img>.
-                    Por isso deixamos um ícone visual estável.
-                    -->
-
-                    <div
-                        class="
-                            text-8xl
-                            transition
-                            duration-300
-
-                            group-hover:scale-110
-                        "
-                    >
-                        <img
-                        src="https://i.pinimg.com/originals/93/bc/31/93bc31ef41a444f54fd1e86fa0041ee4.gif"
-
-                        alt="Ilustração da Jornada"
-
-                        class="
-                            w-full
-                            h-full
-                            object-contain
-                            transition
-                            duration-300
-
-                            group-hover:scale-105
-                        "
-                    >
-
+                <!-- Jornada -->
+                <a href="{{ url_for('jornada') }}"
+                   class="fm-card fm-animate-in fm-delay-1 group overflow-hidden rounded-3xl border border-slate-700/80 bg-slate-800/75 shadow-xl shadow-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-950">
+                    <div class="relative h-48 overflow-hidden bg-gradient-to-br from-indigo-500/20 via-slate-800 to-slate-900 sm:h-56">
+                        <div class="absolute h-36 w-36 rounded-full bg-indigo-500/20 blur-2xl transition-all duration-500 group-hover:scale-150"></div>
+                        <img src="{{ url_for('static', filename='img/icons/icon-512.png') }}"
+                             alt="Ilustração da jornada FlashMatty"
+                             loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                             class="absolute inset-0 z-10 h-full w-full object-cover object-center opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100">
+                        <div class="absolute inset-0 z-10 hidden items-center justify-center bg-gradient-to-br from-indigo-500/25 to-slate-950/30" aria-hidden="true">
+                            <svg class="h-28 w-28 text-indigo-200 drop-shadow-2xl sm:h-32 sm:w-32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                <path d="m9 9 2 2 4-4M9 14h7"/>
+                            </svg>
+                        </div>
+                        <span class="absolute left-5 top-5 rounded-full border border-indigo-300/20 bg-indigo-400/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.16em] text-indigo-200">Aprendizado</span>
                     </div>
-
-                </div>
-
-
-                <div class="p-6">
-
-                    <h2
-                        class="
-                            font-black
-                            text-2xl
-                            text-white
-                        "
-                    >
-                        Biblioteca
-                    </h2>
-
-
-                    <p
-                        class="
-                            text-slate-400
-                            mt-2
-                        "
-                    >
-                        Veja seu progresso e histórico.
-                    </p>
-
-
-
-                </div>
-
-            </a>
-
-
-            <!-- ================================================= -->
-            <!-- MULTIPLAYER -->
-            <!-- ================================================= -->
-
-            <a
-                href="{{ url_for('multiplayer.inicio') }}"
-
-                class="
-                    group
-
-                    md:col-span-2
-
-                    bg-gradient-to-r
-                    from-violet-600
-                    to-indigo-600
-
-                    border
-                    border-indigo-500
-
-                    rounded-3xl
-                    p-7
-
-                    shadow-lg
-
-                    transition
-                    duration-200
-
-                    hover:-translate-y-1
-                    hover:shadow-xl
-                "
-            >
-
-                <div
-                    class="
-                        flex
-                        flex-col
-                        sm:flex-row
-                        items-start
-                        sm:items-center
-                        gap-5
-                    "
-                >
-
-                    
-
-                    <div class="flex-1">
-
-                        <p
-                            class="
-                                text-sm
-                                uppercase
-                                tracking-wider
-                                font-black
-                                text-indigo-200
-                            "
-                        >
-                            Multiplayer
-                        </p>
-
-
-                        <h2
-                            class="
-                                font-black
-                                text-2xl
-                                md:text-3xl
-                                text-white
-                                mt-1
-                            "
-                        >
-                            Jogar com amigos
-                        </h2>
-
-
-                        <p
-                            class="
-                                text-indigo-100
-                                mt-2
-                            "
-                        >
-                            Crie uma sala e desafie seus amigos
-                            responda mais rapido e fique no podio!
-                        </p>
-
+                    <div class="p-6 sm:p-7">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-2xl font-black tracking-tight text-white">Jornada</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">Avance por etapas, pratique matemática e desbloqueie novas conquistas.</p>
+                            </div>
+                            <span class="fm-arrow flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-700/70 text-indigo-200" aria-hidden="true">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+                            </span>
+                        </div>
                     </div>
+                </a>
 
+                <!-- Biblioteca -->
+                <a href="{{ url_for('biblioteca') }}"
+                   class="fm-card fm-animate-in fm-delay-2 group overflow-hidden rounded-3xl border border-slate-700/80 bg-slate-800/75 shadow-xl shadow-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-950">
+                    <div class="relative h-48 overflow-hidden bg-gradient-to-br from-cyan-500/15 via-slate-800 to-slate-900 sm:h-56">
+                        <div class="absolute h-36 w-36 rounded-full bg-cyan-400/15 blur-2xl transition-all duration-500 group-hover:scale-150"></div>
+                        <img src="{{ url_for('static', filename='img/icons/icon-192.png') }}"
+                             alt="Ilustração da biblioteca FlashMatty"
+                             loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                             class="absolute inset-0 z-10 h-full w-full object-cover object-center opacity-80 transition duration-700 group-hover:scale-105 group-hover:opacity-100">
+                        <div class="absolute inset-0 z-10 hidden items-center justify-center bg-gradient-to-br from-cyan-500/20 to-slate-950/30" aria-hidden="true">
+                            <svg class="h-28 w-28 text-cyan-200 drop-shadow-2xl sm:h-32 sm:w-32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"/>
+                                <path d="M4 6h13M8 8.5h8M8 12h8M8 15.5h5"/>
+                            </svg>
+                        </div>
+                        <span class="absolute left-5 top-5 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.16em] text-cyan-200">Seu histórico</span>
+                    </div>
+                    <div class="p-6 sm:p-7">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-2xl font-black tracking-tight text-white">Biblioteca</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-400">Consulte seus conteúdos, acompanhe seu progresso e retome sua evolução.</p>
+                            </div>
+                            <span class="fm-arrow flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-700/70 text-cyan-200" aria-hidden="true">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+                            </span>
+                        </div>
+                    </div>
+                </a>
 
-                   
-                </div>
+                <!-- Multiplayer -->
+                <a href="{{ url_for('multiplayer.inicio') }}"
+                   class="fm-cta fm-animate-in fm-delay-3 group relative overflow-hidden rounded-3xl border border-indigo-300/30 p-6 shadow-xl shadow-indigo-950/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-950 sm:col-span-2 sm:p-8">
+                    <div class="pointer-events-none absolute -right-10 -top-24 h-72 w-72 rounded-full border border-white/10"></div>
+                    <div class="pointer-events-none absolute -right-2 -top-16 h-52 w-52 rounded-full border border-white/10"></div>
+                    <div class="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="max-w-2xl">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-indigo-100">
+                                <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300"></span>
+                                Modo competitivo
+                            </span>
+                            <h3 class="mt-4 text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">Jogue com seus amigos</h3>
+                            <p class="mt-3 max-w-xl text-sm leading-7 text-indigo-100/90 sm:text-base">
+                                Crie uma sala, convide seus amigos e dispute quem resolve os desafios primeiro. Mostre suas habilidades e conquiste o pódio!
+                            </p>
+                            <span class="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-indigo-700 shadow-lg transition group-hover:bg-cyan-50">
+                                Entrar no multiplayer
+                                <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+                            </span>
+                        </div>
+                        <div class="fm-cta-icon mx-auto flex h-28 w-28 shrink-0 items-center justify-center rounded-[2rem] border border-white/20 bg-white/10 shadow-inner sm:mx-4 sm:h-36 sm:w-36">
+                            <svg class="h-16 w-16 text-white sm:h-20 sm:w-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true">
+                                <circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1.2A5.8 5.8 0 0 1 8.8 13h.4a5.8 5.8 0 0 1 5.8 5.8V20H3Z"/>
+                                <path d="M16 5.2a3.2 3.2 0 0 1 0 6.2M17 13.4a5.8 5.8 0 0 1 4 5.4V20h-3"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
 
-            </a>
-
-        </div>
-
+        <footer class="fm-animate-in mt-10 pb-2 text-center text-xs text-slate-500 sm:mt-12">
+            Cada exercício é uma nova oportunidade de evoluir.
+        </footer>
     </div>
-
-</div>
-
+</main>
 {% endblock %}

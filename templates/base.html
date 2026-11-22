@@ -589,6 +589,245 @@
 
         }
 
+    
+
+        /* ====================================================
+           FLASHMATTY — CAMADA VISUAL PREMIUM
+           Apenas apresentação: não altera rotas, templates,
+           variáveis Jinja, autenticação ou scripts existentes.
+           ==================================================== */
+
+        :root {
+            --fm-radius-card: 1.35rem;
+            --fm-shadow-soft: 0 14px 38px rgba(2, 6, 23, .16);
+            --fm-shadow-hover: 0 22px 55px rgba(2, 6, 23, .28);
+            --fm-focus: rgba(129, 140, 248, .72);
+        }
+
+        body {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        ::selection {
+            color: #fff;
+            background: var(--fm-primary);
+        }
+
+        /* Cabeçalho refinado, sem alterar sua estrutura */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: color-mix(in srgb, var(--fm-card) 88%, transparent) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            backdrop-filter: blur(20px) saturate(150%);
+            box-shadow: 0 8px 30px rgba(2, 6, 23, .08);
+            transition: box-shadow .25s ease, background-color .25s ease;
+        }
+
+        .app-header > div {
+            min-height: 4.25rem;
+        }
+
+        .app-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            letter-spacing: -.045em;
+            transition: transform .25s ease, filter .25s ease;
+        }
+
+        .app-logo:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.2) drop-shadow(0 0 12px color-mix(in srgb, var(--fm-primary) 35%, transparent));
+        }
+
+        .app-header nav {
+            row-gap: .7rem;
+        }
+
+        .app-header nav a {
+            position: relative;
+            border-radius: .85rem;
+            transition: color .22s ease, background-color .22s ease,
+                        transform .22s ease, filter .22s ease;
+        }
+
+        .app-header nav a:not(:has(img)) {
+            padding: .45rem .65rem;
+        }
+
+        .app-header nav a:hover {
+            transform: translateY(-2px);
+        }
+
+        .app-header nav a:has(img) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-avatar {
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--fm-primary) 12%, transparent);
+            transition: transform .3s cubic-bezier(.2,.8,.2,1),
+                        box-shadow .3s ease, border-color .3s ease;
+        }
+
+        .app-header a:hover .app-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 0 0 5px color-mix(in srgb, var(--fm-primary) 18%, transparent),
+                        0 8px 20px rgba(0,0,0,.2);
+        }
+
+        /* Cartões clicáveis: realce discreto e consistente */
+        main a[class*="rounded-2xl"],
+        main a[class*="rounded-3xl"],
+        main button[class*="rounded-2xl"],
+        main button[class*="rounded-3xl"] {
+            transform: translateY(0);
+            transition: transform .32s cubic-bezier(.2,.8,.2,1),
+                        box-shadow .32s ease, border-color .32s ease,
+                        filter .32s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        main a[class*="rounded-2xl"]:hover,
+        main a[class*="rounded-3xl"]:hover,
+        main button[class*="rounded-2xl"]:hover,
+        main button[class*="rounded-3xl"]:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--fm-shadow-hover);
+        }
+
+        main a:active,
+        main button:active {
+            transform: scale(.985);
+        }
+
+        /* Botões com acabamento mais preciso */
+        main button,
+        main input[type="submit"],
+        main input[type="button"] {
+            font-weight: 700;
+            letter-spacing: -.01em;
+            transition: transform .2s ease, box-shadow .2s ease,
+                        filter .2s ease, background-color .2s ease;
+        }
+
+        main button:hover,
+        main input[type="submit"]:hover,
+        main input[type="button"]:hover {
+            filter: brightness(1.07);
+        }
+
+        /* Campos de formulário */
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]),
+        textarea,
+        select {
+            border-radius: .85rem;
+            transition: border-color .2s ease, box-shadow .2s ease,
+                        background-color .2s ease;
+        }
+
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible,
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--fm-focus);
+            outline-offset: 3px;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--fm-primary) !important;
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--fm-primary) 16%, transparent);
+        }
+
+        /* Mensagens do Flask */
+        .flash-message {
+            border-radius: 1rem;
+            box-shadow: var(--fm-shadow-soft);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Barra de rolagem discreta */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: color-mix(in srgb, var(--fm-primary) 65%, #64748b) transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            border: 2px solid transparent;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--fm-primary) 65%, #64748b);
+            background-clip: padding-box;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--fm-primary);
+            background-clip: padding-box;
+        }
+
+        /* Entrada suave do conteúdo sem esconder conteúdo por padrão */
+        @media (prefers-reduced-motion: no-preference) {
+            main {
+                animation: fmPageReveal .42s ease-out both;
+            }
+
+            @keyframes fmPageReveal {
+                from { opacity: .94; }
+                to { opacity: 1; }
+            }
+        }
+
+        /* Layout do cabeçalho em telas pequenas */
+        @media (max-width: 640px) {
+            .app-header > div {
+                align-items: center;
+                padding-top: .7rem;
+                padding-bottom: .7rem;
+            }
+
+            .app-header nav {
+                width: 100%;
+                justify-content: flex-start;
+                gap: .55rem;
+                padding-bottom: .15rem;
+            }
+
+            .app-header nav a:not(:has(img)) {
+                padding: .4rem .5rem;
+            }
+
+            .app-header nav .app-avatar {
+                width: 2.15rem;
+                height: 2.15rem;
+            }
+        }
+
+        /* Compatibilidade com a opção de acessibilidade já existente */
+        html.reduzir-animacoes *,
+        html.reduzir-animacoes *::before,
+        html.reduzir-animacoes *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
+            scroll-behavior: auto !important;
+        }
+
     </style>
 
 
@@ -678,7 +917,26 @@
                 href="{{ url_for('dashboard') }}"
                 class="app-nav-link transition"
             >
-                Início
+
+                
+                <img
+                    src="https://images.vexels.com/media/users/3/223203/isolated/preview/9e8eb0c3ea3141b66500d7f18542a650-icone-inicial-plano.png"
+
+                    alt="Foto de {{ current_user.nome }}"
+
+                    class="
+                        app-avatar
+
+                        w-9
+                        h-9
+
+                        rounded-full
+                        object-cover
+
+                        border-2
+                    "
+                >
+
             </a>
 
 
@@ -698,7 +956,24 @@
                 "
             >
 
-                Amigos
+                
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/8131/8131340.png"
+
+                    alt="Foto de {{ current_user.nome }}"
+
+                    class="
+                        app-avatar
+
+                        w-9
+                        h-9
+
+                        rounded-full
+                        object-cover
+
+                        border-2
+                    "
+                >
 
 
                 {% if social_pedidos_pendentes %}
@@ -752,7 +1027,24 @@
                 
 
                 <span class="">
-                    Loja
+                    <img
+                    src="https://cdn-icons-png.flaticon.com/512/8146/8146003.png"
+
+                    alt="Foto de {{ current_user.nome }}"
+
+                    class="
+                        app-avatar
+
+                        w-9
+                        h-9
+
+                        rounded-full
+                        object-cover
+
+                        border-2
+                    "
+                >
+                    
                 </span>
 
             </a>
@@ -774,7 +1066,23 @@
                 
 
                 <span class="">
-                    Configurações
+                    <img
+                    src="https://img.icons8.com/flat_round/1200/settings--v1.jpg"
+
+                    alt="Foto de {{ current_user.nome }}"
+
+                    class="
+                        app-avatar
+
+                        w-9
+                        h-9
+
+                        rounded-full
+                        object-cover
+
+                        border-2
+                    "
+                >
                 </span>
 
             </a>
