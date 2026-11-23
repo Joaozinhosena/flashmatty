@@ -12,13 +12,13 @@ const CACHE_VERSION = "flashmatty-static-v2";
 const PRECACHE = [
     "/static/manifest.json",
     "/static/js/pwa.js",
-    "/static/img/icons/icon-192.png",
     "/static/img/icons/icon-512.png",
-    "/static/img/icons/icon-maskable-192.png",
-    "/static/img/icons/icon-maskable-512.png",
-    "/static/img/icons/favicon-48.png",
-    "/static/img/icons/apple-touch-icon-180.png",
-    "/static/img/icons/badge-96.png"
+    "/static/img/icons/icon.png",
+    "/static/img/icons/icon-maskable.png",
+    "/static/img/icons/icon-maskable512.png",
+    "/static/img/icons/favicon.png",
+    "/static/img/icons/apple-touch-icon.png",
+    "/static/img/icons/badge.png"
 ];
 
 // ============================================================
