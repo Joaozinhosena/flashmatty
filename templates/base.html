@@ -919,23 +919,7 @@
             >
 
                 
-                <img
-                    src="https://images.vexels.com/media/users/3/223203/isolated/preview/9e8eb0c3ea3141b66500d7f18542a650-icone-inicial-plano.png"
-
-                    alt="Foto de {{ current_user.nome }}"
-
-                    class="
-                        app-avatar
-
-                        w-9
-                        h-9
-
-                        rounded-full
-                        object-cover
-
-                        border-2
-                    "
-                >
+                início
 
             </a>
 
@@ -954,10 +938,10 @@
                     relative
                     transition
                 "
-            >
+            > Amigos
 
                 
-                <img
+            <!----    <img
                     src="https://cdn-icons-png.flaticon.com/512/8131/8131340.png"
 
                     alt="Foto de {{ current_user.nome }}"
@@ -973,7 +957,7 @@
 
                         border-2
                     "
-                >
+                > ->
 
 
                 {% if social_pedidos_pendentes %}
@@ -1027,24 +1011,7 @@
                 
 
                 <span class="">
-                    <img
-                    src="https://cdn-icons-png.flaticon.com/512/8146/8146003.png"
-
-                    alt="Foto de {{ current_user.nome }}"
-
-                    class="
-                        app-avatar
-
-                        w-9
-                        h-9
-
-                        rounded-full
-                        object-cover
-
-                        border-2
-                    "
-                >
-                    
+                    loja
                 </span>
 
             </a>
@@ -1066,23 +1033,7 @@
                 
 
                 <span class="">
-                    <img
-                    src="https://img.icons8.com/flat_round/1200/settings--v1.jpg"
-
-                    alt="Foto de {{ current_user.nome }}"
-
-                    class="
-                        app-avatar
-
-                        w-9
-                        h-9
-
-                        rounded-full
-                        object-cover
-
-                        border-2
-                    "
-                >
+                    Configurações
                 </span>
 
             </a>
@@ -1090,17 +1041,17 @@
 
             <!-- XP -->
 
-            <span
+     <!--       <span
                 class="
                     text-indigo-500
                     whitespace-nowrap
                 "
             >
                 XP {{ current_user.xp or 0 }} 
-            </span>
+            </span> -->  
 
 
-            <!-- MOEDAS -->
+            <!-- MOEDAS 
 
             <span
                 class="
@@ -1109,7 +1060,7 @@
                 "
             >
                 🪙 {{ current_user.moedas or 0 }}
-            </span>
+            </span> -->
 
 
             <!-- PERFIL -->
@@ -1153,11 +1104,11 @@
                 >
 
 
-                <span class="hidden sm:inline">
+             <!--   <span class="hidden sm:inline">
 
                     {{ current_user.nome }}
 
-                </span>
+                </span> -->
 
             </a>
 
